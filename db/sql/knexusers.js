@@ -3,7 +3,7 @@ var knex = require('../knex')
 // Insert new user to 'users'
 function addUser(user){
     // return knex('users').insert(user)
-    return knex.raw('INSERT INTO fwaze_db.users (name, email, role) VALUES ("' + user.name + '", "' + user.email + '", ' + user.role.toString() + ');')
+    return knex.raw('INSERT INTO users (name, email, role) VALUES (?,?,?)', [user.name, user.email, user.role])
 }
 
 function getAllUsers(){
