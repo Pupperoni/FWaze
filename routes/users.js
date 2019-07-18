@@ -5,8 +5,7 @@ var userHandler = require('../db/sql/knexusers')
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   var userList = userHandler.getAllUsers()
-  console.log(userList)
-  res.send({msg: userList})
+  res.send(userList)
 });
 
 /* GET login form. */
