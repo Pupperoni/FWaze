@@ -21,12 +21,15 @@ router.post('/new', (req, res) => {
       role: req.body.role
   }
 
-  // if(!newMember.name || !newMember.email || newMember.role != undefined){
-  //     return res.status(400).json({msg: "Please include name, email and role"})
-  // }
+  if(!newMember.name || !newMember.email || newMember.role != undefined){
+      return res.status(400).json({msg: "Please include name, email and role"})
+  }
 
   userHandler.addUser(newMember)
-  res.json({name: newMember.name, email: newMember.email, role: newMember.role})
+  .then( () => {res.json({name: newMember.name, email: newMember.email, role: newMember.role})})
+  .catch( () => {res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
+
+  
 })
 
 module.exports = router;
