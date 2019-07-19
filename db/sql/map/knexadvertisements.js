@@ -28,10 +28,18 @@ function getAdByUserId(userId){
     })
 }
 
+function getAdsByBorder(xl, xu, yl, yu){
+    return knex.raw('SELECT newpoints.id, newpoints.type, users.id as user_id, newpoints.latitude, newpoints.longitude FROM (SELECT * FROM advertisements WHERE latitude > ? and latitude < ? and longitude > ? and longitude < ?) as newpoints INNER JOIN users on newpoints.user_id = users.id', [xl, xu, yl, yu])
+    .then((row) => {
+        return Promise.resolve(row[0])
+    })
+}
+
 module.exports = {
     addAd: addAd,
     getAds: getAds,
     getAdById: getAdById,
-    getAdByUserId: getAdByUserId
+    getAdByUserId: getAdByUserId,
+    getAdsByBorder: getAdsByBorder
 
 }
