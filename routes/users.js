@@ -9,7 +9,6 @@ router.get('/', function(req, res, next) {
     res.send(row)
   })
   .catch(() => {})  // Fix this: response headers set again after being sent
-
 });
 
 /* GET login form. */
