@@ -14,7 +14,7 @@ function getAllUsers(){
 function getUserById(id){
     return knex.raw('SELECT name, email FROM users WHERE id = ?', [id])
     .then((row) => {
-        return Promise.resolve(row[0])
+        return Promise.resolve(row[0][0])
     })
 }
 
@@ -31,7 +31,7 @@ function addUser(user){
 function getUserRole(id){
     return knex.raw('SELECT role FROM users WHERE id = ?', [id])
     .then((row) => {
-        return Promise.resolve(row[0])
+        return Promise.resolve(row[0][0])
     })
 }
 

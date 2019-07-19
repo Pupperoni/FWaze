@@ -10,35 +10,45 @@ router.get('/', (req, res, next) => {
 
 // Get all ads
 router.get('/ads', (req, res, next) => {
-    res.send("List of ads here")
+    mapHandler.getAds()
+    .then((results) => {
+        return res.json(results)
+    })
+    .catch((e) => {return res.status(400).json({msg: "Something went wrong. Try again."})})
 })
 
 // Get ad by id
 router.get('/ads/:id', (req, res, next) => {
-    res.send('Ad ${req.params.id} here')
+    res.send(`Ad ${req.params.id} here`)
 })
 
 // Add new advertisement
 router.post('/ads/new', (req, res, next) => {
     // Check user role (must be advertiser)
     userHandler.getUserRole(req.body.user_id)
-    .map((row) => {
-        var role = row[0].role
-        if(role != 1)
-            return res.json({msg: "Sorry. Only advertisers can post advertisements."})
-        
-            // Creating ad here
-            var newAd = {
-                caption: req.body.caption,
-                userId: req.body.user_id
-            }
+    .then( (result) => {
+        var role = result.role
+        if(role != 1) return res.status(400).json({msg: "Sorry. Only advertisers can post advertisements."})
+    
+        // Creating ad here
+        var newAd = {
+            caption: req.body.caption,
+            userId: req.body.user_id,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude
+        }
 
-            mapHandler.addAd(newAd)
-            .then( () => {res.json({msg: "Success!"})})
-            .catch((e) => {res.send(JSON.parse(e))})
+        mapHandler.addAd(newAd)
+        .then( (result) => {
+            return res.json({msg: "Success!", caption: newAd.caption})
+        })
+        .catch((e) => {
+            console.log(e)
+            return res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
     })
-    .catch(() => {})
+    .catch((e) => {
+        console.log(e)
+        return res.status(400).json({msg: "Something went wrong. Check your info and try again."})
+    })
 })
-
-
 module.exports = router;

@@ -15,11 +15,17 @@ function addReport(type, userId){
 }
 
 function addAd(adData){
-    return knex.raw('INSERT INTO advertisements (caption, user_id) VALUES (?,?)', [adData.caption, adData.userId])
+    return knex.raw('INSERT INTO advertisements (caption, user_id, latitude, longitude) VALUES (?,?,?,?)', [adData.caption, adData.userId, adData.latitude, adData.longitude])
+    .then((row) => {
+        return Promise.resolve(row[0])
+    })
 }
 
 function getAds(){
-    return knex.raw('SELECT advertisements.id, users.name FROM advertisements inner join users on users.id = advertisements.user_id')
+    return knex.raw('SELECT advertisements.caption, advertisements.latitude, advertisements.longitude, users.name FROM advertisements inner join users on users.id = advertisements.user_id')
+    .then((row) => {
+        return Promise.resolve(row[0])
+    })
 }
 
 function getAdById(id){

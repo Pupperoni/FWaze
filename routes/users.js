@@ -19,7 +19,7 @@ router.get('/:id', (req, res, next) => {
   .then((results) => {
     if(results.length == 0)
       return res.status(400).json({msg: "Something went wrong. Check the error and try again"})
-    return res.json(results[0])  // result sent as a list so we take the first (and only) element
+    return res.json(results)  // result sent as a list so we take the first (and only) element
   })
   .catch((e) => {
     return res.status(400).json({msg: "Something went wrong. Check the error and try again"})
@@ -40,7 +40,7 @@ router.post('/new', (req, res) => {
   }
 
   userHandler.addUser(newMember)
-  .then( (result) => {return res.json(result)})
+  .then( (result) => {return res.json({msg: "Success"})})
   .catch( () => {return res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
 })
 
