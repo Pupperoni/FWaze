@@ -6,7 +6,8 @@ knex.schema.createTable('users', (table) => {
     table.string('name').notNullable()
     table.string('email').notNullable()
     table.integer('role').notNullable()
-    table.timestamps();
+    table.timestamp('created_at').defaultTo(knex.fn.now())
+    table.timestamp('updated_at').defaultTo(knex.fn.now())
 })
 .then(console.log)
 .catch(console.log)

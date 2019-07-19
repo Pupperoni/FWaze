@@ -7,9 +7,7 @@ function addUser(user){
 }
 
 function getAllUsers(){
-    return knex.select('*').from('users')
-    .map(function(row) {console.log(row);})
-    // return knex.raw('SELECT * FROM users');
+    return knex.raw('SELECT * FROM users')
 }
 
 module.exports = {
