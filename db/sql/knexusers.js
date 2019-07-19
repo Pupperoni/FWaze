@@ -7,10 +7,15 @@ function addUser(user){
 }
 
 function getAllUsers(){
-    return knex.raw('SELECT * FROM users')
+    return knex.raw('SELECT name, email FROM users')
+}
+
+function getUserById(id){
+    return knex.raw('SELECT name, email FROM users WHERE id = ?', [id])
 }
 
 module.exports = {
     addUser: addUser,
-    getAllUsers: getAllUsers
+    getAllUsers: getAllUsers,
+    getUserById: getUserById
 }

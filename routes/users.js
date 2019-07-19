@@ -6,10 +6,20 @@ var userHandler = require('../db/sql/knexusers')
 router.get('/', function(req, res, next) {
   var results = userHandler.getAllUsers()
   results.map( (row) => {
-    res.send(row)
+    res.json(row)
   })
   .catch(() => {})  // Fix this: response headers set again after being sent
 });
+
+// Get single user
+router.get('/:id', (req, res, next) => {
+  var results = userHandler.getUserById(req.params.id)
+  results.map( (row) => {
+    res.json(row)
+  })
+  .catch(() => {})  // Fix this: response headers set again after being sent
+
+})
 
 /* GET login form. */
 router.get('/login', function(req, res, next) {
