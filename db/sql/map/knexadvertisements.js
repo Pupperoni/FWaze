@@ -8,14 +8,21 @@ function addAd(adData){
 }
 
 function getAds(){
-    return knex.raw('SELECT advertisements.caption, advertisements.latitude, advertisements.longitude, users.name FROM advertisements inner join users on users.id = advertisements.user_id')
+    return knex.raw('SELECT id, caption, latitude, longitude FROM advertisementd')
     .then((row) => {
         return Promise.resolve(row[0])
     })
 }
 
-function getAdById(id){
-    return knex.raw('SELECT advertisements.caption, advertisements.latitude, advertisements.longitude, users.name FROM advertisements inner join users on users.id = advertisements.user_id WHERE advertisements.id = ?', [id])
+function getAdById(adISd){
+    return knex.raw('SELECT id, caption, latitude, longitude WHERE id = ?', [adId])
+    .then((row) => {
+        return Promise.resolve(row[0][0])
+    })
+}
+
+function getAdByUserId(userId){
+    return knex.raw('SELECT advertisements.id, advertisements.caption, advertisements.latitude, advertisements.longitude FROM advertisements INNER JOIN users ON advertisements.user_id = users.id WHERE users.id = ?', [id])
     .then((row) => {
         return Promise.resolve(row[0][0])
     })
@@ -25,5 +32,6 @@ module.exports = {
     addAd: addAd,
     getAds: getAds,
     getAdById: getAdById,
+    getAdByUserId: getAdByUserId
 
 }
