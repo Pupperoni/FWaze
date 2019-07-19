@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
     return res.json(results)
   })
   .catch((e) => {
-    return res.status(400).json({msg: "Something went wrong. Check the error and try again", err:e})
+    return res.status(400).json({msg: "Something went wrong. Check the error and try again"})
   })
 });
 
@@ -22,7 +22,7 @@ router.get('/:id', (req, res, next) => {
     return res.json(results[0])  // result sent as a list so we take the first (and only) element
   })
   .catch((e) => {
-    return res.status(400).json({msg: "Something went wrong. Check the error and try again", err:e,err:e})
+    return res.status(400).json({msg: "Something went wrong. Check the error and try again"})
   })
 })
 
