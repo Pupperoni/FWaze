@@ -17,8 +17,8 @@ router.get('/', function(req, res, next) {
 router.get('/:id', (req, res, next) => {
   userHandler.getUserById(req.params.id)
   .then((results) => {
-    if(results.length == 0)
-      return res.status(400).json({msg: "Something went wrong. Check the error and try again"})
+    if(results == undefined)
+      return res.status(400).json({msg: "This user does not exist!"})
     return res.json(results)  // result sent as a list so we take the first (and only) element
   })
   .catch((e) => {

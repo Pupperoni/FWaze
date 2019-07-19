@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const adHandler = require('../db/sql/map/knexadvertisements')
 const reportHandler = require('../db/sql/map/knexreports')
+const commentHandler = require("../db/sql/map/knexcomments")
 const userHandler = require('../db/sql/users/knexusers')
 
 const reportTypes = {
@@ -39,7 +40,19 @@ router.get('/ads/:id', (req, res, next) => {
     .catch((e) => {
         console.log(e)
         return res.status(400).json({msg: "Something went wrong. Try again."})})
+})
 
+// Get ad by user id
+router.get('/ads/user/:id', (req, res, next) => {
+    adHandler.getAdByUserId(req.params.id)
+    .then((result) => {
+        if(result == undefined)
+            return res.status(400).json({msg: `User ${req.params.id} had no ads!`})
+        return res.json(result)
+    })
+    .catch((e) => {
+        console.log(e)
+        return res.status(400).json({msg: "Something went wrong. Try again."})})
 })
 
 // Add new advertisement
@@ -87,7 +100,7 @@ router.get('/reports', (req, res, next) => {
 })
 
 // Get report by report id
-router.get('/reports/id/:id', (req, res, next) => {
+router.get('/reports/:id', (req, res, next) => {
     reportHandler.getReportById(req.params.id)
     .then((result) => {
         return res.json(result)
@@ -102,6 +115,8 @@ router.get('/reports/id/:id', (req, res, next) => {
 router.get('/reports/type/:type', (req, res, next) => {
     reportHandler.getReportsByType(reportTypes[req.params.type])
     .then((results) => {
+        if(results.length == 0)
+            return res.status(400).json({msg: "No reports of this type."})
         return res.json(results)
     })
     .catch((e) => {
@@ -116,9 +131,14 @@ router.get('/reports/range', (req, res, next) => {
     var right = req.query.right
     var top = req.query.top
     var bottom = req.query.bottom
-
+ 
+    // if(left == "" || right == "" || top == "" || bottom == "")
+    //     return res.status(400).json({msg: "Missing parameters. Please input range."})
+ß
     reportHandler.getReportsByBorder(left,right,bottom,top)
     .then((results) => {
+        if(results == undefined)
+            return res.status(400).json({msg: "Something went wrong. Please try again."})
         return res.json(results)
     })
     .catch((e) => {
@@ -127,7 +147,7 @@ router.get('/reports/range', (req, res, next) => {
     })
 })
 
-//
+// New report form
 router.get('/reports/new', (req, res, next) => {
     return res.send('Report form here')
 })
@@ -148,6 +168,62 @@ router.post('/reports/new', (req, res, next) => {
     .catch((e) => {
         return res.status(400).json({msg: "Something went wrong. Check your info and try again."})
     })
+})
+
+/* COMMENTS */
+
+// Get all comments
+router.get('/comments', (req, res, next) => {
+    commentHandler.getComments()
+    .then((results) => {
+        return res.json(results)
+    })
+    .catch((e) => {return res.status(400).json({msg: "Something went wrong. Try again."})})
+})
+
+// Get comments by report id
+router.get('/comments/report/:id', (req, res, next) => {
+    commentHandler.getCommentsByReportId(req.params.id)
+    .then((results) => {
+        if(results.length == 0)
+            return res.status(400).json({msg: "No comment found."})
+        return res.json(results)
+    })
+    .catch((e) => {
+        console.log(e)
+        return res.status(400).json({msg: "Sometçhing went wrong. Try again."})
+    })
+
+})
+
+// Get comments by user id
+router.get('/comments/user/:id', (req, res, next) => {
+    commentHandler.getCommentsByUserId(req.params.id)
+    .then((results) => {
+        if(results.length == 0)
+            return res.status(400).json({msg: "No comment found."})
+        return res.json(results)
+    })
+    .catch((e) => {
+        console.log(e)
+        return res.status(400).json({msg: "Something went wrong. Try again."})})
+})
+
+// Add new comment
+router.post('/comments/new', (req, res, next) => {
+    var newComment = {
+        userId: req.body.user_id,
+        reportId: req.body.report_id,
+        text: req.body.text
+    }
+
+    commentHandler.addComment(newComment)
+    .then( (result) => {
+        return res.json({msg: "Success!"})
+    })
+    .catch((e) => {
+        console.log(e)
+        return res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
 })
 
 module.exports = router;
