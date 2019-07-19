@@ -39,7 +39,7 @@ function getReporterId(reportId){
 }
 
 function getReportById(reportId){
-    return knex.raw('SELECT type, votes, latitude, longitude FROM reports WHERE id = ?',[reportId])
+    return knex.raw('SELECT id, type, votes, latitude, longitude FROM reports WHERE id = ?',[reportId])
     .then((row) => {
         return Promise.resolve(row[0][0])
     })
@@ -53,7 +53,7 @@ function incrementVote(reportId){
 }
 
 function getReportsByBorder(xl, xu, yl, yu){
-    return knex.raw('SELECT newpoints.type, users.id as user_id, newpoints.latitude, newpoints.longitude FROM (SELECT * FROM reports WHERE latitude > ? and latitude < ? and longitude > ? and longitude < ?) as newpoints INNER JOIN users on newpoints.user_id = users.id', [xl, xu, yl, yu])
+    return knex.raw('SELECT newpoints.id, newpoints.type, users.id as user_id, newpoints.latitude, newpoints.longitude FROM (SELECT * FROM reports WHERE latitude > ? and latitude < ? and longitude > ? and longitude < ?) as newpoints INNER JOIN users on newpoints.user_id = users.id', [xl, xu, yl, yu])
     .then((row) => {
         return Promise.resolve(row[0])
     })
