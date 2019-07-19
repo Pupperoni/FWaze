@@ -87,6 +87,22 @@ router.post('/ads/new', (req, res, next) => {
 
 /* REPORTS */
 
+// Get reports by border range
+router.get('/reports/range', (req, res, next) => {
+    var left = req.query.left
+    var right = req.query.right
+    var top = req.query.top
+    var bottom = req.query.bottom
+    reportHandler.getReportsByBorder(left,right,bottom,top)
+    .then((results) => {
+        return res.json(results)
+    })
+    .catch((e) => {
+        console.log(e)
+        return res.status(400).json({msg: "Something went wrong. Please try again."})
+    })
+})
+
 // Get all reports
 router.get('/reports', (req, res, next) => {
     reportHandler.getAllReports()
@@ -125,27 +141,7 @@ router.get('/reports/type/:type', (req, res, next) => {
     })
 })
 
-// Get reports by border range
-router.get('/reports/range', (req, res, next) => {
-    var left = req.query.left
-    var right = req.query.right
-    var top = req.query.top
-    var bottom = req.query.bottom
- 
-    // if(left == "" || right == "" || top == "" || bottom == "")
-    //     return res.status(400).json({msg: "Missing parameters. Please input range."})
-ß
-    reportHandler.getReportsByBorder(left,right,bottom,top)
-    .then((results) => {
-        if(results == undefined)
-            return res.status(400).json({msg: "Something went wrong. Please try again."})
-        return res.json(results)
-    })
-    .catch((e) => {
-        console.log(e)
-        return res.status(400).json({msg: "Something went wrong. Please try again."})
-    })
-})
+
 
 // New report form
 router.get('/reports/new', (req, res, next) => {
