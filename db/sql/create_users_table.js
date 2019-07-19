@@ -2,7 +2,7 @@ var knex = require('../knex')
 
 // Creates a user table
 knex.schema.createTable('users', (table) => {
-    table.increments()
+    table.increments('id').primary()
     table.string('name').notNullable()
     table.string('email').notNullable()
     table.integer('role').notNullable()

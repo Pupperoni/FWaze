@@ -4,27 +4,32 @@ var userHandler = require('../db/sql/knexusers')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  var results = userHandler.getAllUsers()
-  results.map( (row) => {
-    res.json(row)
+  userHandler.getAllUsers()
+  .then((results) => {
+    return res.json(results)
   })
-  .catch(() => {})  // Fix this: response headers set again after being sent
+  .catch((e) => {
+    return res.json({msg: "Something went wrong. Check the error and try again", err:e})
+  })
 });
 
 // Get single user
 router.get('/:id', (req, res, next) => {
-  var results = userHandler.getUserById(req.params.id)
-  results.map( (row) => {
-    res.json(row)
+  userHandler.getUserById(req.params.id)
+  .then((results) => {
+    if(results.length == 0)
+      return res.json({msg: "Something went wrong. Check the error and try again"})
+    return res.json(results[0])  // result sent as a list so we take the first (and only) element
   })
-  .catch(() => {})  // Fix this: response headers set again after being sent
-
+  .catch((e) => {
+    return res.json({msg: "Something went wrong. Check the error and try again", err:e,err:e})
+  })
 })
 
-/* GET login form. */
-router.get('/login', function(req, res, next) {
-  res.send('Insert form here')
-});
+// User creation form
+router.get('/new', (req, res) => {
+  res.send("New user form here")
+})
 
 // Create new user account
 router.post('/new', (req, res) => {
@@ -35,8 +40,13 @@ router.post('/new', (req, res) => {
   }
 
   userHandler.addUser(newMember)
-  .then( () => {res.json({name: newMember.name, email: newMember.email, role: newMember.role})})
-  .catch( () => {res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
+  .then( (result) => {return res.json(result)})
+  .catch( () => {return res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
 })
+
+/* GET login form. */
+router.get('/login', function(req, res, next) {
+  res.send('Insert form here')
+});
 
 module.exports = router;
