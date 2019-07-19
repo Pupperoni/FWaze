@@ -35,9 +35,18 @@ function getUserRole(id){
     })
 }
 
+// Fetch name of a user by id
+function getUserName(id){
+    return knex.raw('SELECT name FROM users WHERE id = ?', [id])
+    .then((row) => {
+        return Promise.resolve(row[0][0])
+    })
+}
+
 module.exports = {
     addUser: addUser,
     getAllUsers: getAllUsers,
     getUserById: getUserById,
-    getUserRole: getUserRole
+    getUserRole: getUserRole,
+    getUserName: getUserName
 }
