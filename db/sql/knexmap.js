@@ -29,11 +29,15 @@ function getAds(){
 }
 
 function getAdById(id){
-    // return knex.raw('SELECT caption')
+    return knex.raw('SELECT advertisements.caption, advertisements.latitude, advertisements.longitude, users.name FROM advertisements inner join users on users.id = advertisements.user_id WHERE advertisements.id = ?', [id])
+    .then((row) => {
+        return Promise.resolve(row[0][0])
+    })
 }
 
 module.exports = {
     addAd: addAd,
     getAds: getAds,
+    getAdById: getAdById,
 
 }

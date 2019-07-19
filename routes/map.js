@@ -19,7 +19,14 @@ router.get('/ads', (req, res, next) => {
 
 // Get ad by id
 router.get('/ads/:id', (req, res, next) => {
-    res.send(`Ad ${req.params.id} here`)
+    mapHandler.getAdById(req.params.id)
+    .then((result) => {
+        return res.json(result)
+    })
+    .catch((e) => {
+        console.log(e)
+        return res.status(400).json({msg: "Something went wrong. Try again."})})
+
 })
 
 // Add new advertisement
