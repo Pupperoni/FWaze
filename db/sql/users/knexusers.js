@@ -1,4 +1,4 @@
-var knex = require('../knex')
+var knex = require('../../knex')
 
 // Fetch all user names and emails
 function getAllUsers(){

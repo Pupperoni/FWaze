@@ -1,16 +1,19 @@
 const express = require('express')
 const router = express.Router()
-const mapHandler = require('../db/sql/knexmap')
-const userHandler = require('../db/sql/knexusers')
+const adHandler = require('../db/sql/map/knexadvertisements')
+const reportHandler = require('../db/sql/map/knexreports')
+const userHandler = require('../db/sql/users/knexusers')
 
 // Display map
 router.get('/', (req, res, next) => {
     res.send("Welcome to map | FWaze")
 })
 
+/* ADVERTISEMENTS */
+
 // Get all ads
 router.get('/ads', (req, res, next) => {
-    mapHandler.getAds()
+    adHandler.getAds()
     .then((results) => {
         return res.json(results)
     })
@@ -19,7 +22,7 @@ router.get('/ads', (req, res, next) => {
 
 // Get ad by id
 router.get('/ads/:id', (req, res, next) => {
-    mapHandler.getAdById(req.params.id)
+    adHandler.getAdById(req.params.id)
     .then((result) => {
         return res.json(result)
     })
@@ -45,7 +48,7 @@ router.post('/ads/new', (req, res, next) => {
             longitude: req.body.longitude
         }
 
-        mapHandler.addAd(newAd)
+        adHandler.addAd(newAd)
         .then( (result) => {
             return res.json({msg: "Success!", caption: newAd.caption})
         })
@@ -58,4 +61,33 @@ router.post('/ads/new', (req, res, next) => {
         return res.status(400).json({msg: "Something went wrong. Check your info and try again."})
     })
 })
+
+/* REPORTS */
+
+// Get all reports
+router.get('/reports', (req, res, next) => {
+    return res.send("Report list here")
+})
+
+// Get report by report id
+router.get('/reports/:id', (req, res, next) => {
+    return res.send(`Report ${req.params.id} here`)
+})
+
+//
+router.get('/reports/new', (req, res, next) => {
+    return res.send('Report form here')
+})
+
+// Add new report
+router.post('/reports/new', (req, res, next) => {
+    // return res.send('Add new report')
+     var newReport = {
+        type: req.body.type,
+        userId: req.body.user_id,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude
+    }
+})
+
 module.exports = router;

@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var userHandler = require('../db/sql/knexusers')
+var userHandler = require('../db/sql/users/knexusers')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
