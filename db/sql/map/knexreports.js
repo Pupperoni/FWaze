@@ -47,8 +47,8 @@ function getReportById(id){
 
 function getReportsByBorder(xl, xu, yl, yu){
 
-    return knex.raw('SELECT newpoints.type, users.id, newpoints.latitude, newpoints.longitude FROM (SELECT * FROM reports WHERE latitude > ? and latitude < ? and longitude > ? and longitude < ?) as newpoints INNER JOIN users on newpoints.user_id = users.id', [xl, xu, yl, yu])
-    .then((row) => {ßß
+    return knex.raw('SELECT newpoints.type, users.id as user_id, newpoints.latitude, newpoints.longitude FROM (SELECT * FROM reports WHERE latitude > ? and latitude < ? and longitude > ? and longitude < ?) as newpoints INNER JOIN users on newpoints.user_id = users.id', [xl, xu, yl, yu])
+    .then((row) => {
         return Promise.resolve(row[0])
     })
 }

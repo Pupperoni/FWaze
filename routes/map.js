@@ -112,7 +112,12 @@ router.get('/reports/type/:type', (req, res, next) => {
 
 // Get reports by border range
 router.get('/reports/range', (req, res, next) => {
-    reportHandler.getReportsByBorder(50,120,100,150)
+    var left = req.query.left
+    var right = req.query.right
+    var top = req.query.top
+    var bottom = req.query.bottom
+
+    reportHandler.getReportsByBorder(left,right,bottom,top)
     .then((results) => {
         return res.json(results)
     })
