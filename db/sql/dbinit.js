@@ -24,8 +24,7 @@ var sampleAds = [{
 },{
     caption: "Dimmsdale Dimmadome Rental",
     user_id: 4
-}
-]
+}]
 
 // Creates a user table
 knex.schema.createTable('users', (table) => {
@@ -52,6 +51,14 @@ knex.schema.createTable('users', (table) => {
     table.integer('user_id').unsigned().references('users.id')
     table.float('latitude',10,6)
     table.float('longitude',10,6)
+    table.timestamp('created_at').defaultTo(knex.fn.now())
+    table.timestamp('updated_at').defaultTo(knex.fn.now())
+})
+.createTable('comments', (table) => {
+    table.increments('id').primary()
+    table.integer('user_id').unsigned().references('users.id')
+    table.integer('report_id').unsigned().references('reports.id')
+    table.string('text')
     table.timestamp('created_at').defaultTo(knex.fn.now())
     table.timestamp('updated_at').defaultTo(knex.fn.now())
 })
