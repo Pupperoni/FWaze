@@ -87,12 +87,12 @@ router.post('/ads/new', (req, res, next) => {
 
 /* REPORTS */
 
-// Get reports by border range
+// Get reports by border range (?tleft=50,150&bleft=50,100&tright=120,150&bright=120,100)
 router.get('/reports/range', (req, res, next) => {
-    var left = req.query.left
-    var right = req.query.right
-    var top = req.query.top
-    var bottom = req.query.bottom
+    var left = parseInt(req.query.tleft.split(",")[0])
+    var right = parseInt(req.query.bright.split(",")[0])
+    var top = parseInt(req.query.tleft.split(",")[1])
+    var bottom = parseInt(req.query.bright.split(",")[1])
     reportHandler.getReportsByBorder(left,right,bottom,top)
     .then((results) => {
         return res.json(results)
@@ -141,8 +141,6 @@ router.get('/reports/type/:type', (req, res, next) => {
     })
 })
 
-
-
 // New report form
 router.get('/reports/new', (req, res, next) => {
     return res.send('Report form here')
@@ -162,6 +160,7 @@ router.post('/reports/new', (req, res, next) => {
         return res.json({msg: "Success"})
     })
     .catch((e) => {
+        console.log(e)
         return res.status(400).json({msg: "Something went wrong. Check your info and try again."})
     })
 })
