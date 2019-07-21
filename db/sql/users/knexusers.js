@@ -2,7 +2,7 @@ var knex = require('../../knex')
 
 // Fetch all user names and emails
 function getAllUsers(){
-    return knex.raw('SELECT name, email FROM users')
+    return knex.raw('SELECT id, name, email FROM users')
     .then((row) => {
         // for some reason, the sql query is also sent as the 2nd element
         // so we return only the first
@@ -12,7 +12,7 @@ function getAllUsers(){
 
 // Fetch a user's name and email
 function getUserById(id){
-    return knex.raw('SELECT name, email FROM users WHERE id = ?', [id])
+    return knex.raw('SELECT id, name, email FROM users WHERE id = ?', [id])
     .then((row) => {
         return Promise.resolve(row[0][0])
     })
