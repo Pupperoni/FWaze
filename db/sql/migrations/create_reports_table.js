@@ -1,4 +1,4 @@
-var knex = require('../knex')
+var knex = require('../../knex')
 
 /* Report types:
     0 - Traffic jam

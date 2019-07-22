@@ -1,4 +1,4 @@
-var knex = require('../knex')
+var knex = require('../../knex')
 
 // Creates a advertisement table
 knex.schema.createTable('advertisements', (table) => {

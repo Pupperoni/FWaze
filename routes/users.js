@@ -1,52 +1,22 @@
 var express = require('express');
 var router = express.Router();
-var userHandler = require('../db/sql/users/knexusers')
-
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  userHandler.getAllUsers()
-  .then((results) => {
-    return res.json(results)
-  })
-  .catch((e) => {
-    return res.status(400).json({msg: "Something went wrong. Check the error and try again"})
-  })
-});
-
-// Get single user
-router.get('/:id', (req, res, next) => {
-  userHandler.getUserById(req.params.id)
-  .then((results) => {
-    if(results == undefined)
-      return res.status(400).json({msg: "This user does not exist!"})
-    return res.json(results)  // result sent as a list so we take the first (and only) element
-  })
-  .catch((e) => {
-    return res.status(400).json({msg: "Something went wrong. Check the error and try again"})
-  })
-})
+var userHandler = require('../controllers/users/users_controller')
 
 // User creation form
-router.get('/new', (req, res) => {
-  res.send("New user form here")
-})
+router.get('/new', (req, res, next) => {res.send("New user form here")})
 
 // Create new user account
-router.post('/new', (req, res) => {
-  var newMember = {
-      name: req.body.name,
-      email: req.body.email,
-      role: req.body.role
-  }
-
-  userHandler.addUser(newMember)
-  .then( (result) => {return res.json({msg: "Success"})})
-  .catch( () => {return res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
-})
+router.post('/new', (req, res, next) => {userHandler.addUser(req, res, next)});
 
 /* GET login form. */
 router.get('/login', function(req, res, next) {
   res.send('Insert form here')
 });
+
+// Get single user
+router.get('/:id', (req, res, next) => {userHandler.getUserById(req, res, next)});
+
+/* GET users listing. */
+router.get('/', (req, res, next) => {userHandler.getAllUsers(req, res, next)});
 
 module.exports = router;

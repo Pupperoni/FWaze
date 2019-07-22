@@ -1,4 +1,4 @@
-var knex = require('../knex')
+var knex = require('../../knex')
 
 // Creates a user table
 knex.schema.createTable('users', (table) => {

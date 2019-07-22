@@ -1,4 +1,4 @@
-var knex = require('../knex')
+var knex = require('../../knex')
 
 knex.schema.createTable('comments', (table) => {
     table.increments('id').primary()

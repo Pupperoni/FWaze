@@ -1,4 +1,4 @@
-var knex = require('../knex')
+var knex = require('../../knex')
 
 var sampleUsers = [{
     name: "Robert Downey Jr.",
