@@ -14,6 +14,7 @@ const Handler = {
     getAdById(req, res, next) {
         queryHandler.getAdById(req.params.id)
         .then((result) => {
+            if(!result) return res.status(400).json({msg: "This ad does not exist!"})
             return res.json(result)
         })
         .catch((e) => {

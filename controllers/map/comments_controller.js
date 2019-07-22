@@ -1,4 +1,6 @@
 const queryHandler = require('../../db/sql/map/comments.repository')
+const userHandler = require('../../db/sql/users/users.repository')
+const reportHandler = require('../../db/sql/map/reports.repository')
 
 const Handler = {
 
@@ -12,8 +14,9 @@ const Handler = {
 
     getCommentById(req, res, next) {
         queryHandler.getCommentById(req.params.id)
-        .then((results) => {
-            return res.json(results)
+        .then((result) => {
+            if(!result) return res.status(400).json({msg: "This comment does not exist!"})
+            return res.json(result)
         })
         .catch((e) => {return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
@@ -51,12 +54,13 @@ const Handler = {
         }
     
         queryHandler.addComment(newComment)
-        .then( (result) => {
+        .then( (result3) => {
             return res.json({msg: "Success!"})
         })
         .catch((e) => {
             console.log(e)
-            return res.status(400).json({msg: "Something went wrong. Check your info and try again."})})
+            return res.status(400).json({msg: "Something went wrong. Check your info and try again."})
+        })
     }
 }
 

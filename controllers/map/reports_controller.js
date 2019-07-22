@@ -1,4 +1,5 @@
 const queryHandler = require('../../db/sql/map/reports.repository')
+const userHandler = require('../../db/sql/users/users.repository')
 
 const reportTypes = {
     traffic_jam: 0,
@@ -27,6 +28,7 @@ const Handler = {
     getReportById(req, res, next) {
         queryHandler.getReportById(req.params.id)
         .then((result) => {
+            if(!result) return res.status(400).json({msg: "This report does not exist!"})
             return res.json(result)
         })
         .catch((e) => {
@@ -37,10 +39,9 @@ const Handler = {
 
     getReportsByUserId(req, res, next) {
         queryHandler.getReportsByUserId(req.params.id)
-        .then((result) => {
-            if(result == undefined)
-                return res.status(400).json({msg: `User ${req.params.id} had no ads!`})
-            return res.json(result)
+        .then((results) => {
+            if(results.length == 0) return res.status(400).json({msg: `User ${req.params.id} had no ads!`})
+            return res.json(results)
         })
         .catch((e) => {
             console.log(e)
@@ -76,20 +77,30 @@ const Handler = {
     },
 
     addReport(req, res, next) {
-        var newReport = {
-           type: req.body.type,
-           userId: req.body.user_id,
-           latitude: req.body.latitude,
-           longitude: req.body.longitude
-       }
-       queryHandler.addReport(newReport)
-       .then((result) => {
-           return res.json({msg: "Success"})
-       })
-       .catch((e) => {
-           console.log(e)
-           return res.status(400).json({msg: "Something went wrong. Check your info and try again."})
-       })
+
+        userHandler.getUserById(req.body.user_id)
+        .then((result) => {
+            if(!result) return res.status(400).json({msg: `User does not exist!`})
+            else {
+                var newReport = {
+                    type: req.body.type,
+                    userId: req.body.user_id,
+                    latitude: req.body.latitude,
+                    longitude: req.body.longitude
+                }
+
+                if(newReport.type < 0 || newReport.type > 7) return res.status(400).json({msg: `Invalid type.`})
+               
+               queryHandler.addReport(newReport)
+               .then((result) => {
+                   return res.json({msg: "Success"})
+               })
+               .catch((e) => {
+                   console.log(e)
+                   return res.status(400).json({msg: "Something went wrong. Check your info and try again."})
+               })
+            }
+        })        
    }
 }
 

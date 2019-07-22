@@ -14,7 +14,7 @@ const Handler = {
     getUserById(req, res, next) {
         queryHandler.getUserById(req.params.id)
         .then((results) => {
-            if(results == undefined) return res.status(400).json({msg: "This user does not exist!"})
+            if(!results) return res.status(400).json({msg: "This user does not exist!"})
             return res.json(results)
         })
         .catch((e) => {
