@@ -1,6 +1,4 @@
 const queryHandler = require('../../db/sql/map/comments.repository')
-const userHandler = require('../../db/sql/users/users.repository')
-const reportHandler = require('../../db/sql/map/reports.repository')
 
 const Handler = {
 
