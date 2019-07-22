@@ -87,12 +87,13 @@ router.post('/ads/new', (req, res, next) => {
 
 /* REPORTS */
 
-// Get reports by border range (?tleft=50,150&bleft=50,100&tright=120,150&bright=120,100)
+// Get reports by border range (?tleft=50,150&bright=120,100)
 router.get('/reports/range', (req, res, next) => {
     var left = parseInt(req.query.tleft.split(",")[0])
     var right = parseInt(req.query.bright.split(",")[0])
     var top = parseInt(req.query.tleft.split(",")[1])
     var bottom = parseInt(req.query.bright.split(",")[1])
+    console.log(`${left},${right},${top},${bottom}`)
     reportHandler.getReportsByBorder(left,right,bottom,top)
     .then((results) => {
         return res.json(results)
@@ -154,7 +155,6 @@ router.post('/reports/new', (req, res, next) => {
         latitude: req.body.latitude,
         longitude: req.body.longitude
     }
-
     reportHandler.addReport(newReport)
     .then((result) => {
         return res.json({msg: "Success"})

@@ -11,21 +11,21 @@ var knex = require('../../knex')
     7 - Major accident */
 
 function addReport(reportData){
-    return knex.raw('INSERT INTO reports (type, user_id, latitude, longitude) VALUES (?,?,?,?)', [reportData.type, reportData.userId, reportData.latitude, reportData.longitude])
+    return knex.raw("INSERT INTO reports (type, user_id, position) VALUES (?,?,ST_PointFromText('POINT(? ?)'))", [reportData.type, reportData.userId, reportData.latitude, reportData.longitude])
     .then((row) => {
         return Promise.resolve(row[0])
     })
 }
 
 function getAllReports(){
-    return knex.raw('SELECT id, type, votes, latitude, longitude FROM reports')
+    return knex.raw('SELECT id, type, votes, position FROM reports')
     .then((row) => {
         return Promise.resolve(row[0])
     })
 }
 
 function getReportsByType(type){
-    return knex.raw('SELECT id, votes, latitude, longitude FROM reports WHERE reports.type = ?', [type])
+    return knex.raw('SELECT id, votes, position FROM reports WHERE reports.type = ?', [type])
     .then((row) => {
         return Promise.resolve(row[0])
     })
@@ -39,7 +39,7 @@ function getReporterId(reportId){
 }
 
 function getReportById(reportId){
-    return knex.raw('SELECT id, type, votes, latitude, longitude FROM reports WHERE id = ?',[reportId])
+    return knex.raw('SELECT id, type, votes, position FROM reports WHERE id = ?',[reportId])
     .then((row) => {
         return Promise.resolve(row[0][0])
     })
@@ -53,7 +53,7 @@ function incrementVote(reportId){
 }
 
 function getReportsByBorder(xl, xu, yl, yu){
-    return knex.raw('SELECT newpoints.id, newpoints.type, users.id as user_id, newpoints.latitude, newpoints.longitude FROM (SELECT * FROM reports WHERE latitude > ? and latitude < ? and longitude > ? and longitude < ?) as newpoints INNER JOIN users on newpoints.user_id = users.id', [xl, xu, yl, yu])
+    return knex.raw("SELECT newpoints.id, newpoints.type, users.id as user_id, newpoints.position FROM (SELECT * FROM reports WHERE ST_Contains(ST_GeomFromText('POLYGON((? ?, ? ?, ? ?, ? ?, ? ?))'), position)) as newpoints INNER JOIN users on newpoints.user_id = users.id", [xl, yl, xu, yl, xu, yu, xl, yu, xl, yl])
     .then((row) => {
         return Promise.resolve(row[0])
     })
