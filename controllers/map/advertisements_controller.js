@@ -3,6 +3,7 @@ const userHandler = require('../../db/sql/users/users.repository')
 
 const Handler = {
 
+    // Get all ads
     getAllAds(req, res, next) {
         queryHandler.getAds()
         .then((results) => {
@@ -11,6 +12,7 @@ const Handler = {
         .catch((e) => {return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
 
+    // Get ad by ad it
     getAdById(req, res, next) {
         queryHandler.getAdById(req.params.id)
         .then((result) => {
@@ -22,6 +24,7 @@ const Handler = {
             return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
 
+    // Get ads by user id
     getAdByUserId(req, res, next) {
         queryHandler.getAdByUserId(req.params.id)
         .then((result) => {
@@ -34,6 +37,7 @@ const Handler = {
             return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
 
+    // Get all ads enclosed in an area
     getAdsByRange(req, res, next) {
         var left = parseInt(req.query.tleft.split(",")[0])
         var right = parseInt(req.query.bright.split(",")[0])
@@ -49,6 +53,7 @@ const Handler = {
         })
     },
 
+    // Add an ad (only for users with role = 1)
     addAd(req, res, next) {
         // Check user role (must be advertiser)
         userHandler.getUserRole(req.body.user_id)

@@ -2,6 +2,7 @@ const queryHandler = require('../../db/sql/users/users.repository')
 
 const Handler = {
 
+    // Get all user info
     getAllUsers(req, res, next) {
         queryHandler.getAllUsers()
         .then((results) => { return res.json(results) })
@@ -11,6 +12,7 @@ const Handler = {
         })
     },
 
+    // Get user by user id
     getUserById(req, res, next) {
         queryHandler.getUserById(req.params.id)
         .then((results) => {
@@ -22,6 +24,7 @@ const Handler = {
         })
     },
 
+    // Add a new user
     addUser(req, res, next) {
         var newMember = {
             name: req.body.name,

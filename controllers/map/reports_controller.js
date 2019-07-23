@@ -14,6 +14,7 @@ const reportTypes = {
 
 const Handler = {
 
+    // Get all reports
     getAllReports(req, res, next) {
         queryHandler.getAllReports()
         .then((results) => {
@@ -25,6 +26,7 @@ const Handler = {
         })
     },
 
+    // Get report by report id
     getReportById(req, res, next) {
         queryHandler.getReportById(req.params.id)
         .then((result) => {
@@ -37,6 +39,7 @@ const Handler = {
         })
     },
 
+    // Get reports by user id (list down all reports made by a user)
     getReportsByUserId(req, res, next) {
         queryHandler.getReportsByUserId(req.params.id)
         .then((results) => {
@@ -48,6 +51,7 @@ const Handler = {
             return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
 
+    // Get all reports of a specific type
     getReportsByType(req, res, next) {
         queryHandler.getReportsByType(reportTypes[req.params.type])
         .then((results) => {
@@ -61,6 +65,7 @@ const Handler = {
         })
     },
 
+    // Get all reports enclosed in an area
     getReportsByRange(req, res, next) {
         var left = parseInt(req.query.tleft.split(",")[0])
         var right = parseInt(req.query.bright.split(",")[0])
@@ -76,6 +81,7 @@ const Handler = {
         })
     },
 
+    // Add a new report
     addReport(req, res, next) {
 
         userHandler.getUserById(req.body.user_id)

@@ -2,6 +2,7 @@ const queryHandler = require('../../db/sql/map/comments.repository')
 
 const Handler = {
 
+    // Get all comments
     getAllComments(req, res, next) {
         queryHandler.getComments()
         .then((results) => {
@@ -10,6 +11,7 @@ const Handler = {
         .catch((e) => {return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
 
+    // Get comment by comment id
     getCommentById(req, res, next) {
         queryHandler.getCommentById(req.params.id)
         .then((result) => {
@@ -19,6 +21,7 @@ const Handler = {
         .catch((e) => {return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
 
+    // Get comments by report id (list down all comments on a report)
     getCommentByReportId(req, res, next) {
         queryHandler.getCommentsByReportId(req.params.id)
         .then((results) => {
@@ -32,6 +35,7 @@ const Handler = {
         })
     },
 
+    // Get comments by user id (list down all comments made by a user)
     getCommentByUserId(req, res, next) {
         queryHandler.getCommentsByUserId(req.params.id)
         .then((results) => {
@@ -44,6 +48,7 @@ const Handler = {
             return res.status(400).json({msg: "Something went wrong. Try again."})})
     },
 
+    // Add a comment
     addComment(req, res, next) {
         var newComment = {
             userId: req.body.user_id,
