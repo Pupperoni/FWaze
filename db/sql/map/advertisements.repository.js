@@ -16,7 +16,7 @@ const Handler = {
     return knex
       .raw(
         "INSERT INTO advertisements (caption, user_id, position) VALUES (?,?,ST_PointFromText('POINT(? ?)'))",
-        [adData.caption, adData.userId, adData.latitude, adData.longitude]
+        [adData.caption, adData.userId, adData.longitude, adData.latitude]
       )
       .then(row => {
         return Promise.resolve(row[0]);

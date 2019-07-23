@@ -8,8 +8,8 @@ const Handler = {
         [
           reportData.type,
           reportData.userId,
-          reportData.latitude,
-          reportData.longitude
+          reportData.longitude,
+          reportData.latitude
         ]
       )
       .then(row => {
