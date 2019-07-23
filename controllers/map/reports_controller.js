@@ -73,6 +73,7 @@ const Handler = {
         var bottom = parseInt(req.query.bright.split(",")[1])
         queryHandler.getReportsByBorder(left,right,bottom,top)
         .then((results) => {
+            if(results.length == 0) return res.status(400).json({msg: "No reports found."})
             return res.json(results)
         })
         .catch((e) => {
@@ -80,6 +81,24 @@ const Handler = {
             return res.status(400).json({msg: "Something went wrong. Please try again."})
         })
     },
+
+    // Get all reports enclosed in an area of a specific type
+    getReportsByTypeRange(req, res, next) {
+        var left = parseInt(req.query.tleft.split(",")[0])
+        var right = parseInt(req.query.bright.split(",")[0])
+        var top = parseInt(req.query.tleft.split(",")[1])
+        var bottom = parseInt(req.query.bright.split(",")[1])
+        queryHandler.getReportsByTypeBorder(reportTypes[req.params.type],left,right,bottom,top)
+        .then((results) => {
+            if(results.length == 0) return res.status(400).json({msg: "No reports found."})
+            return res.json(results)
+        })
+        .catch((e) => {
+            console.log(e)
+            return res.status(400).json({msg: "Something went wrong. Please try again."})
+        })
+    },
+
 
     // Add a new report
     addReport(req, res, next) {

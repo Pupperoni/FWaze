@@ -40,6 +40,9 @@ router.get('/reports/user/:id', (req, res, next) => { reportHandler.getReportsBy
 // Get report by report id
 router.get('/reports/:id', (req, res, next) => { reportHandler.getReportById(req, res, next)})
 
+// Get reports by type and range
+router.get('/reports/type/:type/range', (req, res, next) => { reportHandler.getReportsByTypeRange(req, res, next) })
+
 // Get reports by type
 router.get('/reports/type/:type', (req, res, next) => { reportHandler.getReportsByType(req, res, next) })
 

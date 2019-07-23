@@ -57,6 +57,13 @@ const Handler = {
             return Promise.resolve(row[0])
         })
     },
+
+    getReportsByTypeBorder(type, xl, xu, yl, yu){
+        return knex.raw("SELECT newpoints.id, newpoints.type, users.id as user_id, newpoints.position FROM (SELECT * FROM reports WHERE type = ? and ST_Contains(ST_GeomFromText('POLYGON((? ?, ? ?, ? ?, ? ?, ? ?))'), position)) as newpoints INNER JOIN users on newpoints.user_id = users.id", [type, xl, yl, xu, yl, xu, yu, xl, yu, xl, yl])
+        .then((row) => {
+            return Promise.resolve(row[0])
+        })
+    },
 }
 
 
