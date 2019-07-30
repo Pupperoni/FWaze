@@ -36,7 +36,7 @@ const Handler = {
     };
 
     queryHandler
-      .addUser(newMember)
+      .createUser(newMember)
       .then(result => {
         return res.json({ msg: "Success" });
       })
