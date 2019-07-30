@@ -6,7 +6,9 @@ const Handler = {
     queryHandler
       .getAllUsers()
       .then(results => {
-        return res.json(results);
+        if (results.length == 0)
+          return res.status(400).json({ msg: "No users found" });
+        return res.json({ users: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -32,6 +34,7 @@ const Handler = {
     var newMember = {
       name: req.body.name,
       email: req.body.email,
+      password: req.body.password,
       role: req.body.role
     };
 
