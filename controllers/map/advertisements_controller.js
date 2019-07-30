@@ -30,18 +30,26 @@ const Handler = {
 
   // Get ads by user id
   getAdsByUserId(req, res, next) {
-    queryHandler
-      .getAdByUserId(req.params.id)
-      .then(results => {
-        if (results.length == 0)
-          return res
-            .status(400)
-            .json({ msg: `User ${req.params.id} had no ads!` });
-        return res.json({ data: results });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
+    userHandler.getUserById(req.params.id).then(result => {
+      if (!result)
+        return res
+          .status(400)
+          .json({ msg: `User ${req.params.id} does not exist` });
+      else {
+        queryHandler
+          .getAdByUserId(req.params.id)
+          .then(results => {
+            if (results.length == 0)
+              return res
+                .status(400)
+                .json({ msg: `User ${req.params.id} had no ads!` });
+            return res.json({ data: results });
+          })
+          .catch(e => {
+            return res.status(500).json({ err: e });
+          });
+      }
+    });
   },
 
   // Get all ads enclosed in an area
