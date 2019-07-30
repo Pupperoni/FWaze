@@ -18,7 +18,9 @@ const Handler = {
 
   getComments() {
     return knex
-      .raw("SELECT id, user_id, report_id, text FROM comments")
+      .raw(
+        "SELECT comments.id, user_id, users.name, report_id, text FROM comments INNER JOIN users ON user_id = users.id"
+      )
       .then(row => {
         return Promise.resolve(row[0]);
       });
@@ -26,9 +28,10 @@ const Handler = {
 
   getCommentById(commentId) {
     return knex
-      .raw("SELECT id, user_id, report_id, text FROM comments WHERE id = ?", [
-        commentId
-      ])
+      .raw(
+        "SELECT comments.id, user_id, users.name report_id, text FROM comments INNER JOIN users ON user_id = users.id WHERE comments.id = ?",
+        [commentId]
+      )
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
@@ -40,7 +43,7 @@ const Handler = {
   getCommentsByReportId(reportId) {
     return knex
       .raw(
-        "SELECT id, user_id, report_id, text FROM comments WHERE report_id = ?",
+        "SELECT comments.id, user_id, users.name, report_id, text FROM comments INNER JOIN users ON user_id = users.id WHERE report_id = ?",
         [reportId]
       )
       .then(row => {
@@ -54,7 +57,7 @@ const Handler = {
   getCommentsByUserId(userId) {
     return knex
       .raw(
-        "SELECT id, user_id, report_id, text FROM comments WHERE user_id = ?",
+        "SELECT comments.id, user_id, users.name, report_id, text FROM comments INNER JOIN users ON user_id = users.id WHERE user_id = ?",
         [userId]
       )
       .then(row => {
