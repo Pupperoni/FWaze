@@ -41,14 +41,22 @@ const Handler = {
 
   // Get reports by user id (list down all reports made by a user)
   getReportsByUserId(req, res, next) {
-    queryHandler
-      .getReportsByUserId(req.params.id)
-      .then(results => {
-        if (results.length == 0)
+    userHandler
+      .getUserById(req.params.id)
+      .then(result => {
+        if (!result)
           return res
             .status(400)
-            .json({ msg: `User ${req.params.id} had no ads!` });
-        return res.json(results);
+            .json({ msg: `User ${req.params.id} does not exist!` });
+        else {
+          queryHandler.getReportsByUserId(req.params.id).then(results => {
+            if (results.length == 0)
+              return res
+                .status(400)
+                .json({ msg: `User ${req.params.id} has no reports!` });
+            return res.json(results);
+          });
+        }
       })
       .catch(e => {
         return res.status(500).json({ err: e });
