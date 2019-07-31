@@ -2,7 +2,6 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-var session = require("express-session");
 var cors = require("cors");
 
 var indexRouter = require("./routes/index");
@@ -10,14 +9,6 @@ var usersRouter = require("./routes/users");
 var mapRouter = require("./routes/map");
 
 var app = express();
-
-app.use(
-  session({
-    secret: "secret",
-    resave: true,
-    saveUninitialized: true
-  })
-);
 
 app.use(logger("dev"));
 app.use(express.json());

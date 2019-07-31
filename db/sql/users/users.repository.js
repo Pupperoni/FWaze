@@ -91,7 +91,9 @@ const Handler = {
 
   getUserByName(name) {
     return knex
-      .raw("SELECT id, name, password FROM users WHERE name=?", [name])
+      .raw("SELECT id, name, password, email, role FROM users WHERE name=?", [
+        name
+      ])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })

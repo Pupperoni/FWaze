@@ -112,9 +112,15 @@ const Handler = {
           }
           bcrypt.compare(password, result.password).then(isMatch => {
             if (isMatch) {
-              req.session.loggedin = true;
-              req.session.user_id = result.id;
-              res.json({ msg: "Login success", sess: req.session });
+              return res.json({
+                msg: "Login success",
+                user: {
+                  id: result.id,
+                  name: result.name,
+                  email: result.email,
+                  role: result.role
+                }
+              });
             } else {
               return res.status(400).json({ msg: "Login failed" });
             }
