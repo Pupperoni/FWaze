@@ -1,5 +1,7 @@
 const queryHandler = require("../../db/sql/users/users.repository");
 
+var bcrypt = require("bcryptjs");
+
 const Handler = {
   // Get all user info
   getAllUsers(req, res, next) {
@@ -38,14 +40,22 @@ const Handler = {
       role: req.body.role
     };
 
-    queryHandler
-      .createUser(newMember)
-      .then(result => {
-        return res.json({ msg: "Success" });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
+    // Hash password
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(newMember.password, salt, (err, hash) => {
+        if (err) throw err;
+        newMember.password = hash;
+        // Save user to DB
+        queryHandler
+          .createUser(newMember)
+          .then(result => {
+            return res.json({ msg: "Success" });
+          })
+          .catch(e => {
+            return res.status(500).json({ err: e });
+          });
       });
+    });
   },
 
   // Log in a user

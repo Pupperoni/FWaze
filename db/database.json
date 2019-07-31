@@ -1,0 +1,27 @@
+{
+  "defaultEnv": "local",
+  "local": {
+    "driver": "mysql",
+    "user": "root",
+    "password": "root",
+    "host": "localhost",
+    "database": "testDB",
+    "multipleStatements": true
+  },
+  "dev-start": {
+    "driver": "mysql",
+    "user": "root",
+    "password": "root",
+    "host": "fwaze_db_server",
+    "multipleStatements": true
+  },
+  "dev": {
+    "driver": "mysql",
+    "user": "root",
+    "password": "root",
+    "host": "fwaze_db_server",
+    "database": "fwaze_db",
+    "multipleStatements": true
+  },
+  "sql-file": true
+}
