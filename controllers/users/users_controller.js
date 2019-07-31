@@ -21,7 +21,7 @@ const Handler = {
       .then(results => {
         if (results.length == 0)
           return res.status(400).json({ msg: "No users found" });
-        return res.json({ users: results });
+        return res.json({ users: results, sess: req.session });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -35,7 +35,7 @@ const Handler = {
       .then(results => {
         if (!results)
           return res.status(400).json({ msg: "This user does not exist!" });
-        return res.json(results);
+        return res.json({ user: results, sess: req.session });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -60,7 +60,7 @@ const Handler = {
         queryHandler
           .createUser(newMember)
           .then(result => {
-            return res.json({ msg: "Success" });
+            return res.json({ msg: "Success", sess: req.session });
           })
           .catch(e => {
             return res.status(500).json({ err: e });
@@ -89,7 +89,7 @@ const Handler = {
         queryHandler
           .updateUser(memberData)
           .then(result => {
-            return res.json({ msg: "Success" });
+            return res.json({ msg: "Success", sess: req.session });
           })
           .catch(e => {
             return res.status(500).json({ err: e });
@@ -99,7 +99,34 @@ const Handler = {
   },
 
   // Log in a user
-  loginUser(req, res, next) {}
+  loginUser(req, res, next) {
+    var name = req.body.name;
+    var password = req.body.password;
+
+    if (name && password && name !== "" && password !== "") {
+      queryHandler
+        .getUserByName(name)
+        .then(result => {
+          if (!result) {
+            return res.status(400).json({ msg: "Login failed" });
+          }
+          bcrypt.compare(password, result.password).then(isMatch => {
+            if (isMatch) {
+              req.session.loggedin = true;
+              req.session.user_id = result.id;
+              res.json({ msg: "Login success", sess: req.session });
+            } else {
+              return res.status(400).json({ msg: "Login failed" });
+            }
+          });
+        })
+        .catch(e => {
+          return res.status(500).json({ err: e });
+        });
+    } else {
+      return res.status(400).json({ msg: "Missing or invalid details" });
+    }
+  }
 };
 
 module.exports = Handler;

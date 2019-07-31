@@ -87,6 +87,17 @@ const Handler = {
       .catch(e => {
         throw e;
       });
+  },
+
+  getUserByName(name) {
+    return knex
+      .raw("SELECT id, name, password FROM users WHERE name=?", [name])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
   }
 };
 
