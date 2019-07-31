@@ -60,7 +60,7 @@ const Handler = {
         queryHandler
           .createUser(newMember)
           .then(result => {
-            return res.json({ msg: "Success", sess: req.session });
+            return res.json({ msg: "Success" });
           })
           .catch(e => {
             return res.status(500).json({ err: e });
