@@ -45,6 +45,26 @@ const Handler = {
       });
   },
 
+  // Update user details
+  updateUser(user) {
+    return knex
+      .raw(
+        "UPDATE users SET name = ?, email = ?, password = ?, role = ?, avatar = ? WHERE users.id = ?",
+        user.name,
+        user.email,
+        user.password,
+        user.role,
+        user.avatar,
+        user.id
+      )
+      .then(row => {
+        return Promise.resolve(row[0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
   // Fetch role of a user by id
   getUserRole(id) {
     return knex

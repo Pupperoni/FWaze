@@ -1,6 +1,17 @@
 const queryHandler = require("../../db/sql/users/users.repository");
-
+const multer = require("multer");
 var bcrypt = require("bcryptjs");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "/uploads/profile_pictures");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + "-" + Date.now() + ".png");
+  }
+});
+
+const upload = multer({ storage: storage });
 
 const Handler = {
   // Get all user info
@@ -48,6 +59,35 @@ const Handler = {
         // Save user to DB
         queryHandler
           .createUser(newMember)
+          .then(result => {
+            return res.json({ msg: "Success" });
+          })
+          .catch(e => {
+            return res.status(500).json({ err: e });
+          });
+      });
+    });
+  },
+
+  // Edit user details
+  updateUser(req, res, next) {
+    var memberData = {
+      id: req.params.id,
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      avatar: req.file.path,
+      role: req.body.role
+    };
+
+    // Hash password
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(memberData.password, salt, (err, hash) => {
+        if (err) throw err;
+        memberData.password = hash;
+        // Save details to DB
+        queryHandler
+          .updateUser(memberData)
           .then(result => {
             return res.json({ msg: "Success" });
           })
