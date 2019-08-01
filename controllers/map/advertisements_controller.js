@@ -7,7 +7,7 @@ const Handler = {
     queryHandler
       .getAds()
       .then(results => {
-        return res.json({ data: results });
+        return res.json({ ads: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -21,7 +21,7 @@ const Handler = {
       .then(result => {
         if (!result)
           return res.status(400).json({ msg: "This ad does not exist!" });
-        return res.json({ data: result });
+        return res.json({ ad: result });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -43,7 +43,7 @@ const Handler = {
               return res
                 .status(400)
                 .json({ msg: `User ${req.params.id} had no ads!` });
-            return res.json({ data: results });
+            return res.json({ ads: results });
           });
         }
       })
@@ -61,7 +61,7 @@ const Handler = {
     queryHandler
       .getAdsByBorder(left, right, bottom, top)
       .then(results => {
-        return res.json({ data: results });
+        return res.json({ ads: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -71,10 +71,12 @@ const Handler = {
   // Add an ad (only for users with role = 1)
   createAd(req, res, next) {
     // Check user role (must be advertiser)
+
     userHandler
       .getUserRole(req.body.user_id)
       .then(result => {
         var role = result.role;
+
         if (role != 1)
           return res
             .status(400)
@@ -87,9 +89,8 @@ const Handler = {
           latitude: req.body.latitude,
           longitude: req.body.longitude
         };
-
         queryHandler
-          .postAd(newAd)
+          .createAd(newAd)
           .then(result => {
             return res.json({ msg: "Success!", caption: newAd.caption });
           })
