@@ -9,7 +9,7 @@ router.post("/new", userHandler.createUser);
 router.post("/login", userHandler.loginUser);
 
 // Edit user account
-router.put("/:id/edit", userHandler.updateUser);
+router.put("/edit", userHandler.updateUser);
 
 // Get single user
 router.get("/:id", userHandler.getUserById);

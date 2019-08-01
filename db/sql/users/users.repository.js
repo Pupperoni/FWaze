@@ -49,18 +49,14 @@ const Handler = {
   updateUser(user) {
     return knex
       .raw(
-        "UPDATE users SET name = ?, email = ?, password = ?, role = ?, avatar = ? WHERE users.id = ?",
-        user.name,
-        user.email,
-        user.password,
-        user.role,
-        user.avatar,
-        user.id
+        "UPDATE users SET name = ?, email = ?, role = ? WHERE users.id = ?",
+        [user.name, user.email, user.role, user.id]
       )
       .then(row => {
         return Promise.resolve(row[0]);
       })
       .catch(e => {
+        console.log(e);
         throw e;
       });
   },

@@ -72,30 +72,36 @@ const Handler = {
   // Edit user details
   updateUser(req, res, next) {
     var memberData = {
-      id: req.params.id,
+      id: req.body.id,
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password,
-      avatar: req.file.path,
       role: req.body.role
     };
-
-    // Hash password
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(memberData.password, salt, (err, hash) => {
-        if (err) throw err;
-        memberData.password = hash;
-        // Save details to DB
-        queryHandler
-          .updateUser(memberData)
-          .then(result => {
-            return res.json({ msg: "Success", sess: req.session });
-          })
-          .catch(e => {
-            return res.status(500).json({ err: e });
-          });
+    console.log(memberData);
+    queryHandler
+      .updateUser(memberData)
+      .then(result => {
+        return res.json({ msg: "Success" });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
       });
-    });
+    // // Hash password
+    // bcrypt.genSalt(10, (err, salt) => {
+    //   bcrypt.hash(memberData.password, salt, (err, hash) => {
+    //     if (err) throw err;
+    //     memberData.password = hash;
+    //     // Save details to DB
+    //     queryHandler
+    //       .updateUser(memberData)
+    //       .then(result => {
+    //         return res.json({ msg: "Success", sess: req.session });
+    //       })
+    //       .catch(e => {
+    //         return res.status(500).json({ err: e });
+    //       });
+    //   });
+    // });
   },
 
   // Log in a user
