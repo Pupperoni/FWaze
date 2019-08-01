@@ -18,7 +18,7 @@ const Handler = {
     queryHandler
       .getAllReports()
       .then(results => {
-        return res.json({ data: results });
+        return res.json({ reports: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -32,7 +32,7 @@ const Handler = {
       .then(result => {
         if (!result)
           return res.status(400).json({ msg: "This report does not exist!" });
-        return res.json({ data: result });
+        return res.json({ report: result });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -54,7 +54,7 @@ const Handler = {
               return res
                 .status(400)
                 .json({ msg: `User ${req.params.id} has no reports!` });
-            return res.json(results);
+            return res.json({ reports: results });
           });
         }
       })
@@ -70,7 +70,7 @@ const Handler = {
       .then(results => {
         if (results.length == 0)
           return res.status(400).json({ msg: "No reports of this type." });
-        return res.json({ data: results });
+        return res.json({ reports: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -88,7 +88,7 @@ const Handler = {
       .then(results => {
         if (results.length == 0)
           return res.status(400).json({ msg: "No reports found." });
-        return res.json({ data: results });
+        return res.json({ reports: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -112,7 +112,7 @@ const Handler = {
       .then(results => {
         if (results.length == 0)
           return res.status(400).json({ msg: "No reports found." });
-        return res.json({ data: results });
+        return res.json({ reports: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
