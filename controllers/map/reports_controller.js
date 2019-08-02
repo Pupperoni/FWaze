@@ -9,7 +9,8 @@ const reportTypes = {
   car_stopped: 4,
   construction: 5,
   minor_accident: 6,
-  major_accident: 7
+  major_accident: 7,
+  others: 8
 };
 
 const Handler = {
@@ -113,6 +114,45 @@ const Handler = {
         if (results.length == 0)
           return res.status(400).json({ msg: "No reports found." });
         return res.json({ reports: results });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Add vote instance
+  addVote(req, res, next) {
+    console.log("hi");
+    queryHandler
+      .addVote(req.body.report_id, req.body.user_id)
+      .then(results => {
+        console.log(results);
+        return res.json({ msg: "Success" });
+      })
+      .catch(e => {
+        console.log(e);
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Remove vote instance
+  deleteVote(req, res, next) {
+    queryHandler
+      .removeVote(req.body.report_id, req.body.user_id)
+      .then(results => {
+        return res.json({ msg: "Success" });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Get vote count
+  getVoteCount(req, res, next) {
+    queryHandler
+      .getVoteCount(req.params.reportId)
+      .then(results => {
+        return res.json({ votes: results["COUNT(*)"] });
       })
       .catch(e => {
         return res.status(500).json({ err: e });

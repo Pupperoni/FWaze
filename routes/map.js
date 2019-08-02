@@ -28,11 +28,17 @@ router.post("/ads/new", adHandler.createAd);
 
 /* REPORTS */
 
+// Update votes count of report up
+router.put("/reports/up", reportHandler.addVote);
+
+// Update votes count of report down
+router.put("/reports/down", reportHandler.deleteVote);
+
+// Get vote count
+router.get("/reports/:reportId/votes", reportHandler.getVoteCount);
+
 // Get reports by border range (?tleft=50,150&bright=120,100)
 router.get("/reports/range", reportHandler.getReportsByRange);
-
-// Get all reports
-router.get("/reports", reportHandler.getAllReports);
 
 // Get reports by user id
 router.get("/reports/user/:id", reportHandler.getReportsByUserId);
@@ -46,13 +52,11 @@ router.get("/reports/type/:type/range", reportHandler.getReportsByTypeRange);
 // Get reports by type
 router.get("/reports/type/:type", reportHandler.getReportsByType);
 
-// New report form
-router.get("/reports/new", (req, res, next) => {
-  return res.send("Report form here");
-});
-
 // Add new report
 router.post("/reports/new", reportHandler.createReport);
+
+// Get all reports
+router.get("/reports", reportHandler.getAllReports);
 
 /* COMMENTS */
 

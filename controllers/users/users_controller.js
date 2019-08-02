@@ -1,17 +1,6 @@
 const queryHandler = require("../../db/sql/users/users.repository");
-const multer = require("multer");
+
 var bcrypt = require("bcryptjs");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "/uploads/profile_pictures");
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + "-" + Date.now() + ".png");
-  }
-});
-
-const upload = multer({ storage: storage });
 
 const Handler = {
   // Get all user info
@@ -71,6 +60,7 @@ const Handler = {
 
   // Edit user details
   updateUser(req, res, next) {
+    console.log(req.file);
     var memberData = {
       id: req.body.id,
       name: req.body.name,
