@@ -31,12 +31,10 @@ const Handler = {
   createUser(user) {
     // return knex('users').insert(user)
     return knex
-      .raw("INSERT INTO users (name, email, password, role) VALUES (?,?,?,?)", [
-        user.name,
-        user.email,
-        user.password,
-        user.role
-      ])
+      .raw(
+        "INSERT INTO users (id, name, email, password, role) VALUES (?,?,?,?,?)",
+        [user.id, user.name, user.email, user.password, user.role]
+      )
       .then(row => {
         return Promise.resolve(row[0]);
       })

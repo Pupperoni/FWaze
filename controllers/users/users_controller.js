@@ -14,7 +14,7 @@ const Handler = {
       .then(results => {
         if (results.length == 0)
           return res.status(400).json({ msg: "No users found" });
-        return res.json({ users: results, sess: req.session });
+        return res.json({ users: results });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -23,22 +23,28 @@ const Handler = {
 
   // Get user by user id
   getUserById(req, res, next) {
-    queryHandler
-      .getUserById(req.params.id)
-      .then(results => {
-        if (!results)
-          return res.status(400).json({ msg: "This user does not exist!" });
-        return res.json({ user: results, sess: req.session });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
+    // Redis get
+    var result = redis.hgetall(`user:${req.params.id}`);
+    console.log(result);
+    if (!result)
+      return res.status(400).json({ msg: "This user does not exist!" });
+    return res.json({ user: result });
+
+    // MySQL get
+    // queryHandler
+    //   .getUserById(req.params.id)
+    //   .then(result => {
+    //     if (!result)
+    //       return res.status(400).json({ msg: "This user does not exist!" });
+    //     return res.json({ user: result });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
   },
 
   // Add a new user
   createUser(req, res, next) {
-    // Create shortID
-
     var newMember = {
       id: shortid.generate(),
       name: req.body.name,
@@ -48,11 +54,13 @@ const Handler = {
     };
 
     console.log(`New user ID: ${newMember.id}`);
+
     // Hash password
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(newMember.password, salt, (err, hash) => {
         if (err) throw err;
         newMember.password = hash;
+
         // Save user to MySQL DB
         queryHandler
           .createUser(newMember)
