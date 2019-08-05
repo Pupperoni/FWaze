@@ -24,11 +24,12 @@ const Handler = {
   // Get user by user id
   getUserById(req, res, next) {
     // Redis get
-    var result = redis.hgetall(`user:${req.params.id}`);
-    console.log(result);
-    if (!result)
-      return res.status(400).json({ msg: "This user does not exist!" });
-    return res.json({ user: result });
+    redis.hgetall(`user:${req.params.id}`).then(result => {
+      console.log(result);
+      if (!result)
+        return res.status(400).json({ msg: "This user does not exist!" });
+      return res.json({ user: result });
+    });
 
     // MySQL get
     // queryHandler
