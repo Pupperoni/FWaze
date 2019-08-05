@@ -1,6 +1,10 @@
 const queryHandler = require("../../db/sql/users/users.repository");
 
 var bcrypt = require("bcryptjs");
+var Redis = require("ioredis");
+var redis = Redis();
+
+var shortid = require("shortid");
 
 const Handler = {
   // Get all user info
@@ -33,19 +37,23 @@ const Handler = {
 
   // Add a new user
   createUser(req, res, next) {
+    // Create shortID
+
     var newMember = {
+      id: shortid.generate(),
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
       role: req.body.role
     };
 
+    console.log(`New user ID: ${newMember.id}`);
     // Hash password
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(newMember.password, salt, (err, hash) => {
         if (err) throw err;
         newMember.password = hash;
-        // Save user to DB
+        // Save user to MySQL DB
         queryHandler
           .createUser(newMember)
           .then(result => {
@@ -54,6 +62,29 @@ const Handler = {
           .catch(e => {
             return res.status(500).json({ err: e });
           });
+
+        // Save to redis as hash
+        // user:${id} = {
+        //     id: String,
+        //     name: String,
+        //     email: String,
+        //     password: String,
+        //     role: number
+        // }
+
+        redis.hmset(
+          `user:${newMember.id}`,
+          id,
+          newMember.id,
+          name,
+          newMember.name,
+          email,
+          newMember.email,
+          password,
+          newMember.password,
+          role,
+          newMember.role
+        );
       });
     });
   },
