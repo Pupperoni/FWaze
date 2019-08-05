@@ -37,6 +37,9 @@ router.put("/reports/down", reportHandler.deleteVote);
 // Get vote count
 router.get("/reports/:reportId/votes", reportHandler.getVoteCount);
 
+// Get user and vote pair (if exists)
+router.get("/reports/:reportId/voted/:userId", reportHandler.getUserVotePair);
+
 // Get reports by border range (?tleft=50,150&bright=120,100)
 router.get("/reports/range", reportHandler.getReportsByRange);
 

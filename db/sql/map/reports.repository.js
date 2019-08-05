@@ -59,6 +59,20 @@ const Handler = {
       });
   },
 
+  getUserVotePair(reportId, userId) {
+    return knex
+      .raw("SELECT * FROM upvotes WHERE report_id = ? and user_id = ?", [
+        reportId,
+        userId
+      ])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
   getAllReports() {
     return knex
       .raw(

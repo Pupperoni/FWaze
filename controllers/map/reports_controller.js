@@ -122,11 +122,9 @@ const Handler = {
 
   // Add vote instance
   addVote(req, res, next) {
-    console.log("hi");
     queryHandler
       .addVote(req.body.report_id, req.body.user_id)
       .then(results => {
-        console.log(results);
         return res.json({ msg: "Success" });
       })
       .catch(e => {
@@ -159,6 +157,18 @@ const Handler = {
       });
   },
 
+  // Get user and vote report pair
+  getUserVotePair(req, res, next) {
+    queryHandler
+      .getUserVotePair(req.params.reportId, req.params.userId)
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(e => {
+        console.log(e);
+        return res.status(500).json({ err: e });
+      });
+  },
   // Add a new report
   createReport(req, res, next) {
     userHandler.getUserById(req.body.user_id).then(result => {
