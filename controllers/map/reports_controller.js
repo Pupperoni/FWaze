@@ -23,6 +23,7 @@ const Handler = {
     queryHandler
       .getAllReports()
       .then(results => {
+        console.log(results);
         return res.json({ reports: results });
       })
       .catch(e => {
@@ -40,34 +41,9 @@ const Handler = {
 
         // count number of votes in a report
         redis.scard(`report:${req.params.id}:upvoters`).then(count => {
-          console.log(count);
           result.votes = count;
           return res.json({ report: result });
         });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
-  },
-
-  // Get reports by user id (list down all reports made by a user)
-  getReportsByUserId(req, res, next) {
-    userHandler
-      .getUserById(req.params.id)
-      .then(result => {
-        if (!result)
-          return res
-            .status(400)
-            .json({ msg: `User ${req.params.id} does not exist!` });
-        else {
-          queryHandler.getReportsByUserId(req.params.id).then(results => {
-            if (results.length == 0)
-              return res
-                .status(400)
-                .json({ msg: `User ${req.params.id} has no reports!` });
-            return res.json({ reports: results });
-          });
-        }
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -133,12 +109,12 @@ const Handler = {
   // Add vote instance
   addVote(req, res, next) {
     // Add to redis
-    redis.sadd(`user:${req.body.user_id}:upvoting`, req.body.report_id);
-    redis.sadd(`report:${req.body.report_id}:upvoters`, req.body.user_id);
+    redis.sadd(`user:${req.body.userId}:upvoting`, req.body.reportId);
+    redis.sadd(`report:${req.body.reportId}:upvoters`, req.body.userId);
 
     // Add to mySQL
     queryHandler
-      .addVote(req.body.report_id, req.body.user_id)
+      .addVote(req.body.reportId, req.body.userId)
       .then(results => {
         return res.json({ msg: "Success" });
       })
@@ -150,11 +126,11 @@ const Handler = {
 
   // Remove vote instance
   deleteVote(req, res, next) {
-    redis.srem(`user:${req.body.user_id}:upvoting`, req.body.report_id);
-    redis.srem(`report:${req.body.report_id}:upvoters`, req.body.user_id);
+    redis.srem(`user:${req.body.userId}:upvoting`, req.body.reportId);
+    redis.srem(`report:${req.body.reportId}:upvoters`, req.body.userId);
 
     queryHandler
-      .removeVote(req.body.report_id, req.body.user_id)
+      .removeVote(req.body.reportId, req.body.userId)
       .then(results => {
         return res.json({ msg: "Success" });
       })
@@ -180,35 +156,22 @@ const Handler = {
     redis
       .sismember(`report:${req.params.reportId}:upvoters`, req.params.userId)
       .then(result => {
-        console.log(result);
         return res.json(result);
       })
       .catch(e => {
         console.log(e);
         return res.status(500).json({ err: e });
       });
-
-    // queryHandler
-    //   .getUserVotePair(req.params.reportId, req.params.userId)
-    //   .then(result => {
-    //     return res.json(result);
-    //   })
-    //   .catch(e => {
-    //     console.log(e);
-    //     return res.status(500).json({ err: e });
-    //   });
   },
 
   // Add a new report
   createReport(req, res, next) {
-    redis.hgetall(`user:${req.params.user_id}`).then(user => {
+    redis.hgetall(`user:${req.body.userId}`).then(user => {
       // Check if user exists
       if (!user) return res.status(400).json({ msg: `User does not exist!` });
-
       var newReport = {
         id: shortid.generate(),
         type: req.body.type,
-        userId: req.body.user_id,
         latitude: req.body.latitude,
         longitude: req.body.longitude
       };
@@ -221,8 +184,10 @@ const Handler = {
         `report:${newReport.id}`,
         `id`,
         newReport.id,
-        `user_id`,
-        newReport.userId,
+        `userId`,
+        user.id,
+        `userName`,
+        user.name,
         `longitude`,
         newReport.longitude,
         `latitude`,
@@ -235,7 +200,7 @@ const Handler = {
       queryHandler
         .createReport(newReport)
         .then(result => {
-          return res.json({ msg: "Success" });
+          return res.json({ msg: "Success", data: newReport });
         })
         .catch(e => {
           return res.status(500).json({ err: e });

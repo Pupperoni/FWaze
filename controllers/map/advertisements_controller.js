@@ -32,30 +32,6 @@ const Handler = {
       });
   },
 
-  // Get ads by user id
-  getAdsByUserId(req, res, next) {
-    userHandler
-      .getUserById(req.params.id)
-      .then(result => {
-        if (!result)
-          return res
-            .status(400)
-            .json({ msg: `User ${req.params.id} does not exist` });
-        else {
-          queryHandler.getAdByUserId(req.params.id).then(results => {
-            if (results.length == 0)
-              return res
-                .status(400)
-                .json({ msg: `User ${req.params.id} had no ads!` });
-            return res.json({ ads: results });
-          });
-        }
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
-  },
-
   // Get all ads enclosed in an area
   getAdsByRange(req, res, next) {
     var left = parseInt(req.query.tleft.split(",")[0]);
@@ -76,7 +52,7 @@ const Handler = {
   createAd(req, res, next) {
     // Check user role (must be advertiser)
     redis
-      .hgetall(`user:${req.body.user_id}`)
+      .hgetall(`user:${req.body.userId}`)
       .then(user => {
         if (!user)
           return res.status(400).json({ msg: "This user does not exist!" });
@@ -89,7 +65,7 @@ const Handler = {
         var newAd = {
           id: shortid.generate(),
           caption: req.body.caption,
-          userId: req.body.user_id,
+          userId: req.body.userId,
           latitude: req.body.latitude,
           longitude: req.body.longitude
         };
@@ -101,7 +77,7 @@ const Handler = {
           newAd.id,
           "caption",
           newAd.caption,
-          "user_id",
+          "userId",
           newAd.userId,
           "longitude",
           newAd.longitude,
@@ -113,7 +89,7 @@ const Handler = {
         queryHandler
           .createAd(newAd)
           .then(result => {
-            return res.json({ msg: "Success!", caption: newAd.caption });
+            return res.json({ msg: "Success!", data: newAd });
           })
           .catch(e => {
             console.log(e);

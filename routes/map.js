@@ -20,9 +20,6 @@ router.get("/ads", adHandler.getAllAds);
 // Get ad by id
 router.get("/ads/:id", adHandler.getAdById);
 
-// Get ad by user id
-router.get("/ads/user/:id", adHandler.getAdsByUserId);
-
 // Add new advertisement
 router.post("/ads/new", adHandler.createAd);
 
@@ -42,9 +39,6 @@ router.get("/reports/:reportId/voted/:userId", reportHandler.getUserVotePair);
 
 // Get reports by border range (?tleft=50,150&bright=120,100)
 router.get("/reports/range", reportHandler.getReportsByRange);
-
-// Get reports by user id
-router.get("/reports/user/:id", reportHandler.getReportsByUserId);
 
 // Get report by report id
 router.get("/reports/:id", reportHandler.getReportById);

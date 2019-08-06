@@ -28,7 +28,6 @@ const Handler = {
       .hgetall(`user:${req.params.id}`)
       .then(result => {
         result.role = parseInt(result.role);
-        console.log(result);
         if (!result)
           return res.status(400).json({ msg: "This user does not exist!" });
         return res.json({ user: result });
@@ -95,7 +94,7 @@ const Handler = {
         queryHandler
           .createUser(newMember)
           .then(result => {
-            return res.json({ msg: "Success" });
+            return res.json({ msg: "Success", data: newMember });
           })
           .catch(e => {
             return res.status(500).json({ err: e });
@@ -129,7 +128,7 @@ const Handler = {
     queryHandler
       .updateUser(memberData)
       .then(result => {
-        return res.json({ msg: "Success" });
+        return res.json({ msg: "Success", data: memberData });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
