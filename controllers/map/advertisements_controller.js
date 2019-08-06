@@ -20,9 +20,11 @@ const Handler = {
 
   // Get ad by ad id
   getAdById(req, res, next) {
+    console.log(req.params.id);
     redis
       .hgetall(`ad:${req.params.id}`)
       .then(result => {
+        console.log(result);
         if (!result)
           return res.status(400).json({ msg: "This ad does not exist!" });
         return res.json({ ad: result });
@@ -64,8 +66,6 @@ const Handler = {
         // Creating ad here
         var newAd = {
           id: shortid.generate(),
-          caption: req.body.caption,
-          userId: req.body.userId,
           latitude: req.body.latitude,
           longitude: req.body.longitude
         };
@@ -76,9 +76,11 @@ const Handler = {
           "id",
           newAd.id,
           "caption",
-          newAd.caption,
+          req.body.caption,
           "userId",
-          newAd.userId,
+          user.id,
+          "userName",
+          user.name,
           "longitude",
           newAd.longitude,
           "latitude",

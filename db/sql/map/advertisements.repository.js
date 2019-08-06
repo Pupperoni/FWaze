@@ -15,8 +15,8 @@ const Handler = {
   createAd(adData) {
     return knex
       .raw(
-        "INSERT INTO advertisements (id, caption, position) VALUES (?,?,ST_PointFromText('POINT(? ?)'))",
-        [adData.id, adData.caption, adData.longitude, adData.latitude]
+        "INSERT INTO advertisements (id, position) VALUES (?,ST_PointFromText('POINT(? ?)'))",
+        [adData.id, adData.longitude, adData.latitude]
       )
       .then(row => {
         return Promise.resolve(row[0]);

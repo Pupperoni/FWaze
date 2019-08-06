@@ -23,7 +23,6 @@ const Handler = {
     queryHandler
       .getAllReports()
       .then(results => {
-        console.log(results);
         return res.json({ reports: results });
       })
       .catch(e => {
