@@ -37,7 +37,13 @@ const Handler = {
       .then(result => {
         if (!result)
           return res.status(400).json({ msg: "This report does not exist!" });
-        return res.json({ report: result });
+
+        // count number of votes in a report
+        redis.scard(`report:${req.params.id}:upvoters`).then(count => {
+          console.log(count);
+          result.votes = count;
+          return res.json({ report: result });
+        });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -126,6 +132,11 @@ const Handler = {
 
   // Add vote instance
   addVote(req, res, next) {
+    // Add to redis
+    redis.sadd(`user:${req.body.user_id}:upvoting`, req.body.report_id);
+    redis.sadd(`report:${req.body.report_id}:upvoters`, req.body.user_id);
+
+    // Add to mySQL
     queryHandler
       .addVote(req.body.report_id, req.body.user_id)
       .then(results => {
@@ -139,6 +150,9 @@ const Handler = {
 
   // Remove vote instance
   deleteVote(req, res, next) {
+    redis.srem(`user:${req.body.user_id}:upvoting`, req.body.report_id);
+    redis.srem(`report:${req.body.report_id}:upvoters`, req.body.user_id);
+
     queryHandler
       .removeVote(req.body.report_id, req.body.user_id)
       .then(results => {
@@ -163,15 +177,26 @@ const Handler = {
 
   // Get user and vote report pair
   getUserVotePair(req, res, next) {
-    queryHandler
-      .getUserVotePair(req.params.reportId, req.params.userId)
+    redis
+      .sismember(`report:${req.params.reportId}:upvoters`, req.params.userId)
       .then(result => {
+        console.log(result);
         return res.json(result);
       })
       .catch(e => {
         console.log(e);
         return res.status(500).json({ err: e });
       });
+
+    // queryHandler
+    //   .getUserVotePair(req.params.reportId, req.params.userId)
+    //   .then(result => {
+    //     return res.json(result);
+    //   })
+    //   .catch(e => {
+    //     console.log(e);
+    //     return res.status(500).json({ err: e });
+    //   });
   },
 
   // Add a new report
