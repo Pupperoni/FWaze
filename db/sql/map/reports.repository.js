@@ -4,8 +4,9 @@ const Handler = {
   createReport(reportData) {
     return knex
       .raw(
-        "INSERT INTO reports (type, user_id, position) VALUES (?,?,ST_PointFromText('POINT(? ?)'))",
+        "INSERT INTO reports (id, type, user_id, position) VALUES (?,?,?,ST_PointFromText('POINT(? ?)'))",
         [
+          reportData.id,
           reportData.type,
           reportData.userId,
           reportData.longitude,

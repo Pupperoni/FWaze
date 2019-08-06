@@ -1,6 +1,10 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
 const userHandler = require("../../db/sql/users/users.repository");
 
+var shortid = require("shortid");
+
+var Redis = require("ioredis");
+var redis = new Redis(process.env.REDIS_URL);
 const reportTypes = {
   traffic_jam: 0,
   heavy_traffic_jam: 1,
@@ -28,16 +32,21 @@ const Handler = {
 
   // Get report by report id
   getReportById(req, res, next) {
-    queryHandler
-      .getReportById(req.params.id)
-      .then(result => {
-        if (!result)
-          return res.status(400).json({ msg: "This report does not exist!" });
-        return res.json({ report: result });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
+    redis.hgetall(`report:${req.params.id}`).then(result => {
+      if (!result)
+        return res.status(400).json({ msg: "This report does not exist!" });
+      return res.json({ report: result });
+    });
+    // queryHandler
+    //   .getReportById(req.params.id)
+    //   .then(result => {
+    //     if (!result)
+    //       return res.status(400).json({ msg: "This report does not exist!" });
+    //     return res.json({ report: result });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
   },
 
   // Get reports by user id (list down all reports made by a user)
@@ -171,28 +180,45 @@ const Handler = {
   },
   // Add a new report
   createReport(req, res, next) {
-    userHandler.getUserById(req.body.user_id).then(result => {
-      if (!result) return res.status(400).json({ msg: `User does not exist!` });
-      else {
-        var newReport = {
-          type: req.body.type,
-          userId: req.body.user_id,
-          latitude: req.body.latitude,
-          longitude: req.body.longitude
-        };
+    redis.hgetall(`user:${user_id}`).then(user => {
+      // Check if user exists
+      if (!user) return res.status(400).json({ msg: `User does not exist!` });
 
-        if (newReport.type < 0 || newReport.type > 7)
-          return res.status(400).json({ msg: `Invalid type.` });
+      var newReport = {
+        id: shortid.generate(),
+        type: req.body.type,
+        userId: req.body.user_id,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude
+      };
 
-        queryHandler
-          .createReport(newReport)
-          .then(result => {
-            return res.json({ msg: "Success" });
-          })
-          .catch(e => {
-            return res.status(500).json({ err: e });
-          });
-      }
+      if (newReport.type < 0 || newReport.type > 8)
+        return res.status(400).json({ msg: `Invalid type.` });
+
+      // Add to redis
+      redis.hmset(
+        `report:${newReport.id}`,
+        `id`,
+        newReport.id,
+        `user_id`,
+        newReport.userId,
+        `longitude`,
+        newReport.longitude,
+        `latitude`,
+        newReport.latitude,
+        `type`,
+        newReport.type
+      );
+
+      // Add to MySQL
+      queryHandler
+        .createReport(newReport)
+        .then(result => {
+          return res.json({ msg: "Success" });
+        })
+        .catch(e => {
+          return res.status(500).json({ err: e });
+        });
     });
   }
 };

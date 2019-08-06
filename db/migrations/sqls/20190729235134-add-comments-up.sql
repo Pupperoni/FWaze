@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `report_id` int(10) unsigned DEFAULT NULL,
+  `id` varchar(15) NOT NULL,
+  `user_id` varchar(15) DEFAULT NULL,
+  `report_id` varchar(15) DEFAULT NULL,
   `text` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

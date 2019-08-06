@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS `reports`;
 CREATE TABLE `reports` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` varchar(15) NOT NULL,
   `type` int(11) NOT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
+  `user_id` varchar(15) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `position` point DEFAULT NULL,

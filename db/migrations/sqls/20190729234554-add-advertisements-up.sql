@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS `advertisements`;
 CREATE TABLE `advertisements` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` varchar(15) NOT NULL,
   `caption` varchar(255) NOT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
+  `user_id` varchar(15) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `position` point DEFAULT NULL,
