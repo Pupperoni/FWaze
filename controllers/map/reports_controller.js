@@ -32,21 +32,16 @@ const Handler = {
 
   // Get report by report id
   getReportById(req, res, next) {
-    redis.hgetall(`report:${req.params.id}`).then(result => {
-      if (!result)
-        return res.status(400).json({ msg: "This report does not exist!" });
-      return res.json({ report: result });
-    });
-    // queryHandler
-    //   .getReportById(req.params.id)
-    //   .then(result => {
-    //     if (!result)
-    //       return res.status(400).json({ msg: "This report does not exist!" });
-    //     return res.json({ report: result });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
+    redis
+      .hgetall(`report:${req.params.id}`)
+      .then(result => {
+        if (!result)
+          return res.status(400).json({ msg: "This report does not exist!" });
+        return res.json({ report: result });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
   },
 
   // Get reports by user id (list down all reports made by a user)
@@ -178,9 +173,10 @@ const Handler = {
         return res.status(500).json({ err: e });
       });
   },
+
   // Add a new report
   createReport(req, res, next) {
-    redis.hgetall(`user:${user_id}`).then(user => {
+    redis.hgetall(`user:${req.params.user_id}`).then(user => {
       // Check if user exists
       if (!user) return res.status(400).json({ msg: `User does not exist!` });
 

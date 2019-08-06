@@ -1,6 +1,10 @@
 const queryHandler = require("../../db/sql/map/advertisements.repository");
 const userHandler = require("../../db/sql/users/users.repository");
 
+var shortid = require("shortid");
+
+var Redis = require("ioredis");
+var redis = new Redis(process.env.REDIS_URL);
 const Handler = {
   // Get all ads
   getAllAds(req, res, next) {
@@ -16,8 +20,8 @@ const Handler = {
 
   // Get ad by ad id
   getAdById(req, res, next) {
-    queryHandler
-      .getAdById(req.params.id)
+    redis
+      .hgetall(`ad:${req.params.id}`)
       .then(result => {
         if (!result)
           return res.status(400).json({ msg: "This ad does not exist!" });
@@ -71,24 +75,41 @@ const Handler = {
   // Add an ad (only for users with role = 1)
   createAd(req, res, next) {
     // Check user role (must be advertiser)
-
-    userHandler
-      .getUserRole(req.body.user_id)
-      .then(result => {
-        var role = result.role;
-
-        if (role != 1)
+    redis
+      .hgetall(`user:${req.body.user_id}`)
+      .then(user => {
+        if (!user)
+          return res.status(400).json({ msg: "This user does not exist!" });
+        if (user.role != 1)
           return res
             .status(400)
-            .json({ msg: "Sorry. Only advertisers can post advertisements." });
+            .json({ msg: "Sorry. Only advertisers can post advertisements" });
 
         // Creating ad here
         var newAd = {
+          id: shortid.generate(),
           caption: req.body.caption,
           userId: req.body.user_id,
           latitude: req.body.latitude,
           longitude: req.body.longitude
         };
+
+        // Add to redis
+        redis.hmset(
+          `ad:${newAd.id}`,
+          "id",
+          newAd.id,
+          "caption",
+          newAd.caption,
+          "user_id",
+          newAd.userId,
+          "longitude",
+          newAd.longitude,
+          "latitude",
+          newAd.latitude
+        );
+
+        // Add to MySQL
         queryHandler
           .createAd(newAd)
           .then(result => {

@@ -24,12 +24,18 @@ const Handler = {
   // Get user by user id
   getUserById(req, res, next) {
     // Redis get
-    redis.hgetall(`user:${req.params.id}`).then(result => {
-      console.log(result);
-      if (!result)
-        return res.status(400).json({ msg: "This user does not exist!" });
-      return res.json({ user: result });
-    });
+    redis
+      .hgetall(`user:${req.params.id}`)
+      .then(result => {
+        result.role = parseInt(result.role);
+        console.log(result);
+        if (!result)
+          return res.status(400).json({ msg: "This user does not exist!" });
+        return res.json({ user: result });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
 
     // MySQL get
     // queryHandler
@@ -100,7 +106,7 @@ const Handler = {
 
   // Edit user details
   updateUser(req, res, next) {
-    console.log(req.file);
+    // console.log(req.file);
     var memberData = {
       id: req.body.id,
       name: req.body.name,
@@ -108,6 +114,18 @@ const Handler = {
       role: req.body.role
     };
     console.log(memberData);
+    // Update redis data
+    redis.hmset(
+      `user:${memberData.id}`,
+      "name",
+      memberData.name,
+      "email",
+      memberData.email,
+      "role",
+      memberData.role
+    );
+
+    // Update MySQL data
     queryHandler
       .updateUser(memberData)
       .then(result => {
