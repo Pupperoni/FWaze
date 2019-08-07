@@ -72,8 +72,6 @@ const Handler = {
     queryHandler
       .getReportsByBorder(left, right, bottom, top)
       .then(results => {
-        if (results.length == 0)
-          return res.status(400).json({ msg: "No reports found." });
         return res.json({ reports: results });
       })
       .catch(e => {
