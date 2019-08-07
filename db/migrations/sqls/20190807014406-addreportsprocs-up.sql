@@ -70,9 +70,10 @@ CREATE PROCEDURE GetReportsByBorder(
     IN yu VARCHAR(255)
 )
 BEGIN
+    SET @g = CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))");
     SELECT *
     FROM reports
-    WHERE ST_Contains(ST_GeomFromText(CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))")), position);
+    WHERE ST_Contains(ST_GeomFromText(@g), position);
 END;
 
 DROP PROCEDURE IF EXISTS GetReportsByTypeBorder;
@@ -85,7 +86,8 @@ CREATE PROCEDURE GetReportsByTypeBorder(
     IN yu VARCHAR(255)
 )
 BEGIN
+    SET @g = CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))");
     SELECT *
     FROM reports
-    WHERE `type` = reportType and ST_Contains(ST_GeomFromText(CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))")), position);
+    WHERE `type` = reportType and ST_Contains(ST_GeomFromText(@g), position);
 END;

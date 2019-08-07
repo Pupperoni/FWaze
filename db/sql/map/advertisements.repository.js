@@ -42,7 +42,7 @@ const Handler = {
     return knex
       .raw("CALL GetAdsByBorder(?,?,?,?)", [xl, xu, yl, yu])
       .then(row => {
-        return Promise.resolve(row[0]);
+        return Promise.resolve(row[0][0]);
       })
       .catch(e => {
         throw e;

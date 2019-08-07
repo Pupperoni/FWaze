@@ -36,7 +36,8 @@ CREATE PROCEDURE GetAdsByBorder(
     IN yu VARCHAR(255)
 )
 BEGIN
+    SET @g = CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))");
     SELECT *
     FROM advertisements
-    WHERE ST_Contains(ST_GeomFromText(CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))")), position);
+    WHERE ST_Contains(ST_GeomFromText(@g), position);
 END;

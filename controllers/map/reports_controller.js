@@ -65,10 +65,10 @@ const Handler = {
 
   // Get all reports enclosed in an area
   getReportsByRange(req, res, next) {
-    var left = parseInt(req.query.tleft.split(",")[0]);
-    var right = parseInt(req.query.bright.split(",")[0]);
-    var top = parseInt(req.query.tleft.split(",")[1]);
-    var bottom = parseInt(req.query.bright.split(",")[1]);
+    var right = req.query.tright.split(",")[1];
+    var left = req.query.bleft.split(",")[1];
+    var top = req.query.tright.split(",")[0];
+    var bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getReportsByBorder(left, right, bottom, top)
       .then(results => {
@@ -83,10 +83,10 @@ const Handler = {
 
   // Get all reports enclosed in an area of a specific type
   getReportsByTypeRange(req, res, next) {
-    var left = parseInt(req.query.tleft.split(",")[0]);
-    var right = parseInt(req.query.bright.split(",")[0]);
-    var top = parseInt(req.query.tleft.split(",")[1]);
-    var bottom = parseInt(req.query.bright.split(",")[1]);
+    var right = req.query.tright.split(",")[1];
+    var left = req.query.bleft.split(",")[1];
+    var top = req.query.tright.split(",")[0];
+    var bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getReportsByTypeBorder(
         reportTypes[req.params.type],

@@ -80,7 +80,7 @@ const Handler = {
     return knex
       .raw("CALL GetReportsByType(?)", [type])
       .then(row => {
-        return Promise.resolve(row[0]);
+        return Promise.resolve(row[0][0]);
       })
       .catch(e => {
         throw e;
@@ -102,7 +102,7 @@ const Handler = {
     return knex
       .raw("CALL GetReportsByBorder(?,?,?,?)", [xl, xu, yl, yu])
       .then(row => {
-        return Promise.resolve(row[0]);
+        return Promise.resolve(row[0][0]);
       })
       .catch(e => {
         throw e;
@@ -113,7 +113,7 @@ const Handler = {
     return knex
       .raw("CALL GetReportsByTypeBorder(?,?,?,?,?)", [type, xl, xu, yl, yu])
       .then(row => {
-        return Promise.resolve(row[0]);
+        return Promise.resolve(row[0][0]);
       })
       .catch(e => {
         throw e;

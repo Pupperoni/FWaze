@@ -36,10 +36,10 @@ const Handler = {
 
   // Get all ads enclosed in an area (tright = northeast)
   getAdsByRange(req, res, next) {
-    var right = req.query.tright.split(",")[0];
-    var left = req.query.bleft.split(",")[0];
-    var top = req.query.tright.split(",")[1];
-    var bottom = req.query.bleft.split(",")[1];
+    var right = req.query.tright.split(",")[1];
+    var left = req.query.bleft.split(",")[1];
+    var top = req.query.tright.split(",")[0];
+    var bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getAdsByBorder(left, right, bottom, top)
       .then(results => {
