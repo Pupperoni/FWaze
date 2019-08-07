@@ -3,9 +3,9 @@ var knex = require("../../knex");
 const Handler = {
   getAds() {
     return knex
-      .raw("SELECT * FROM advertisements")
+      .raw("CALL GetAllAds()")
       .then(row => {
-        return Promise.resolve(row[0]);
+        return Promise.resolve(row[0][0]);
       })
       .catch(e => {
         throw e;
@@ -14,10 +14,11 @@ const Handler = {
 
   createAd(adData) {
     return knex
-      .raw(
-        "INSERT INTO advertisements (id, position) VALUES (?,ST_PointFromText('POINT(? ?)'))",
-        [adData.id, adData.longitude, adData.latitude]
-      )
+      .raw("CALL CreateAd(?,?,?)", [
+        adData.id,
+        adData.longitude,
+        adData.latitude
+      ])
       .then(row => {
         return Promise.resolve(row[0]);
       })
@@ -28,7 +29,7 @@ const Handler = {
 
   getAdById(adId) {
     return knex
-      .raw("SELECT * FROM advertisements WHERE id = ?", [adId])
+      .raw("CALL GetAdById(?)", [adId])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
@@ -39,10 +40,7 @@ const Handler = {
 
   getAdsByBorder(xl, xu, yl, yu) {
     return knex
-      .raw(
-        "SELECT * FROM advertisements WHERE ST_Contains(ST_GeomFromText('POLYGON((? ?, ? ?, ? ?, ? ?, ? ?))'), position)",
-        [xl, yl, xu, yl, xu, yu, xl, yu, xl, yl]
-      )
+      .raw("CALL GetAdsByBorder(?,?,?,?)", [xl, xu, yl, yu])
       .then(row => {
         return Promise.resolve(row[0]);
       })
