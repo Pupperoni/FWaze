@@ -140,14 +140,18 @@ const Handler = {
 
   // Get vote count
   getVoteCount(req, res, next) {
-    queryHandler
-      .getVoteCount(req.params.reportId)
-      .then(results => {
-        return res.json({ votes: results["COUNT(*)"] });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
+    // count number of votes in a report
+    redis.scard(`report:${req.params.id}:upvoters`).then(count => {
+      return res.json({ result: count });
+    });
+    // queryHandler
+    //   .getVoteCount(req.params.reportId)
+    //   .then(results => {
+    //     return res.json({ votes: results["COUNT(*)"] });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
   },
 
   // Get user and vote report pair
