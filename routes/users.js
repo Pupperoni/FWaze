@@ -23,7 +23,12 @@ router.post("/login", userHandler.loginUser);
 
 // Edit user account
 router.put("/edit", upload.single("avatar"), userHandler.updateUser);
-// router.put("/edit", userHandler.updateUser);
+
+// Save home address
+router.put("/home", userHandler.addHomeAddress);
+
+// Save work address
+router.put("/work", userHandler.addWorkAddress);
 
 // Get image of user
 router.get("/:id/image", userHandler.getImage);

@@ -27,27 +27,27 @@ const Handler = {
     redis
       .hgetall(`user:${req.params.id}`)
       .then(result => {
-        result.role = parseInt(result.role);
         if (!result)
           return res.status(400).json({ msg: "This user does not exist!" });
-        return res.json({ user: result });
+        // Convert string role to int
+        result.role = parseInt(result.role);
+
+        // Get home address haha
+        redis.hgetall(`user:${req.params.id}:home`).then(home => {
+          if (home) result.home = home;
+          // Then get work address
+          redis.hgetall(`user:${req.params.id}:work`).then(work => {
+            if (work) result.work = work;
+            return res.json({ user: result });
+          });
+        });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
       });
-
-    // MySQL get
-    // queryHandler
-    //   .getUserById(req.params.id)
-    //   .then(result => {
-    //     if (!result)
-    //       return res.status(400).json({ msg: "This user does not exist!" });
-    //     return res.json({ user: result });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
   },
+
+  // Get profile picture of a user
   getImage(req, res, next) {
     var options = {
       root: "/usr/src/app/"
@@ -62,6 +62,56 @@ const Handler = {
       })
       .catch(e => {
         return res.status(500).json({ msg: "Error occurred", err: e });
+      });
+  },
+
+  // Set user's home address
+  addHomeAddress(req, res, next) {
+    if (!req.body.submit) {
+      return res.json({ data: "Request cancelled" });
+    }
+    redis.hmset(
+      `user:${req.body.id}:home`,
+      `latitude`,
+      req.body.latitude,
+      `longitude`,
+      req.body.longitude,
+      `address`,
+      req.body.address
+    );
+
+    queryHandler
+      .setHomeAd(req.body.id, req.body.address)
+      .then(result => {
+        return res.json({ data: result });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Set user's work address
+  addWorkAddress(req, res, next) {
+    if (!req.body.submit) {
+      return res.json({ data: "Request cancelled" });
+    }
+    redis.hmset(
+      `user:${req.body.id}:work`,
+      `latitude`,
+      req.body.latitude,
+      `longitude`,
+      req.body.longitude,
+      `address`,
+      req.body.address
+    );
+
+    queryHandler
+      .setWorkAd(req.body.id, req.body.address)
+      .then(result => {
+        return res.json({ data: result });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
       });
   },
 
@@ -82,27 +132,46 @@ const Handler = {
         newMember.password = hash;
 
         // Save to redis as hash
-        // user:${id} = {
-        //     id: String,
-        //     name: String,
-        //     email: String,
-        //     password: String,
-        //     role: number
-        // }
+        redis
+          .hmset(
+            `user:${newMember.id}`,
+            `id`,
+            newMember.id,
+            `name`,
+            newMember.name,
+            `email`,
+            newMember.email,
+            `password`,
+            newMember.password,
+            `role`,
+            newMember.role
+          )
+          .then(() => {
+            redis
+              .hmset(
+                `user:${newMember.id}:home`,
+                `latitude`,
+                "",
+                `longitude`,
+                "",
+                `address`,
+                ""
+              )
+              .then(() => {
+                redis.hmset(
+                  `user:${newMember.id}:work`,
+                  `latitude`,
+                  "",
+                  `longitude`,
+                  "",
+                  `address`,
+                  ""
+                );
+              });
+          });
 
-        redis.hmset(
-          `user:${newMember.id}`,
-          `id`,
-          newMember.id,
-          `name`,
-          newMember.name,
-          `email`,
-          newMember.email,
-          `password`,
-          newMember.password,
-          `role`,
-          newMember.role
-        );
+        // To access a user by his name, we store his id somewhere
+        redis.set(`user:name:${newMember.name}`, newMember.id);
 
         // Save user to MySQL DB
         queryHandler
@@ -160,22 +229,6 @@ const Handler = {
       .catch(e => {
         return res.status(500).json({ err: e });
       });
-    // // Hash password
-    // bcrypt.genSalt(10, (err, salt) => {
-    //   bcrypt.hash(memberData.password, salt, (err, hash) => {
-    //     if (err) throw err;
-    //     memberData.password = hash;
-    //     // Save details to DB
-    //     queryHandler
-    //       .updateUser(memberData)
-    //       .then(result => {
-    //         return res.json({ msg: "Success", sess: req.session });
-    //       })
-    //       .catch(e => {
-    //         return res.status(500).json({ err: e });
-    //       });
-    //   });
-    // });
   },
 
   // Log in a user
@@ -184,33 +237,68 @@ const Handler = {
     var password = req.body.password;
 
     if (name && password && name !== "" && password !== "") {
-      queryHandler
-        .getUserByName(name)
-        .then(result => {
-          if (!result) {
-            return res.status(400).json({ msg: "Login failed" });
-          }
-          bcrypt.compare(password, result.password).then(isMatch => {
-            if (isMatch) {
-              return res.json({
-                msg: "Login success",
-                user: {
-                  id: result.id,
-                  name: result.name,
-                  email: result.email,
-                  role: result.role
-                }
-              });
-            } else {
-              return res.status(400).json({ msg: "Login failed" });
-            }
+      redis.get(`user:name:${req.body.name}`).then(userId => {
+        if (!userId) return res.status(400).json({ msg: "Login failed" });
+        redis
+          .hgetall(`user:${userId}`)
+          .then(result => {
+            bcrypt.compare(password, result.password).then(isMatch => {
+              if (isMatch) {
+                // Get home address haha
+                redis.hgetall(`user:${userId}:home`).then(home => {
+                  if (home) result.home = home;
+                  // Then get work address
+                  redis.hgetall(`user:${userId}:work`).then(work => {
+                    console.log(work);
+                    if (work) result.work = work;
+                    return res.json({
+                      msg: "Login success",
+                      user: {
+                        id: result.id,
+                        name: result.name,
+                        email: result.email,
+                        role: result.role,
+                        home: result.home,
+                        work: result.work
+                      }
+                    });
+                  });
+                });
+              } else {
+                return res.status(400).json({ msg: "Login failed" });
+              }
+            });
+          })
+          .catch(e => {
+            return res.status(500).json({ err: e });
           });
-        })
-        .catch(e => {
-          return res.status(500).json({ err: e });
-        });
+      });
+      // queryHandler
+      //   .getUserByName(name)
+      //   .then(result => {
+      //     if (!result) {
+      //       return res.status(400).json({ msg: "Login failed" });
+      //     }
+      //     bcrypt.compare(password, result.password).then(isMatch => {
+      //       if (isMatch) {
+      //         return res.json({
+      //           msg: "Login success",
+      //           user: {
+      //             id: result.id,
+      //             name: result.name,
+      //             email: result.email,
+      //             role: result.role,
+      //             home: result.home,
+      //             work: result.work
+      //           }
+      //         });
+      //       } else {
+      //         return res.status(400).json({ msg: "Login failed" });
+      //       }
+      //     });
+      //   })
     } else {
-      return res.status(400).json({ msg: "Missing or invalid details" });
+      return res.status(400).json({ msg: "Login failed" });
     }
   }
 };

@@ -4,11 +4,11 @@ const Handler = {
   // Fetch all user names and emails
   getAllUsers(id) {
     return knex
-      .raw("SELECT id, name, email, role FROM users")
+      .raw("CALL GetAllUsers()")
       .then(row => {
         // for some reason, the sql query is also sent as the 2nd element
         // so we return only the first
-        return Promise.resolve(row[0]);
+        return Promise.resolve(row[0][0]);
       })
       .catch(e => {
         throw e;
@@ -19,6 +19,30 @@ const Handler = {
   getUserById(id) {
     return knex
       .raw("CALL GetUserById(?)", [id])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
+  // Set a home address for a user
+  setHomeAd(id, addr) {
+    return knex
+      .raw("CALL SetHomeAd(?,?)", [id, addr])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
+  // Set a work address for a user
+  setWorkAd(id, addr) {
+    return knex
+      .raw("CALL SetWorkAd(?,?)", [id, addr])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })

@@ -1,3 +1,11 @@
+DROP PROCEDURE IF EXISTS GetAllUsers;
+
+CREATE PROCEDURE GetAllUsers()
+BEGIN
+    SELECT *
+    FROM users;
+END;
+
 DROP PROCEDURE IF EXISTS GetUserById;
 
 CREATE PROCEDURE GetUserById(IN userId VARCHAR(15))
@@ -19,6 +27,28 @@ CREATE PROCEDURE CreateUser(
 BEGIN
     INSERT INTO users (id, name, email, password, role)
     VALUES (userId, userName, userEmail, userPassword, userRole);
+END;
+
+DROP PROCEDURE IF EXISTS SetHomeAd;
+
+CREATE PROCEDURE SetHomeAd(
+    IN userId VARCHAR(15),
+    IN addr VARCHAR(255)
+)
+BEGIN
+    UPDATE users SET home = addr
+    WHERE id = userId;
+END;
+
+DROP PROCEDURE IF EXISTS SetWorkAd;
+
+CREATE PROCEDURE SetWorkAd(
+    IN userId VARCHAR(15),
+    IN addr VARCHAR(255)
+)
+BEGIN
+    UPDATE users SET work = addr
+    WHERE id = userId;
 END;
 
 DROP PROCEDURE IF EXISTS UpdateUser;
