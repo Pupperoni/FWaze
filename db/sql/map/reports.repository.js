@@ -71,7 +71,6 @@ const Handler = {
         return Promise.resolve(row[0][0]);
       })
       .catch(e => {
-        console.log(e);
         throw e;
       });
   },

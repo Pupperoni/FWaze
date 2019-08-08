@@ -116,7 +116,6 @@ const Handler = {
         return res.json({ msg: "Success" });
       })
       .catch(e => {
-        console.log(e);
         return res.status(500).json({ err: e });
       });
   },
@@ -160,7 +159,6 @@ const Handler = {
         return res.json(result);
       })
       .catch(e => {
-        console.log(e);
         return res.status(500).json({ err: e });
       });
   },

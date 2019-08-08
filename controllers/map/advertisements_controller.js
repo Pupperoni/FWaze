@@ -20,11 +20,9 @@ const Handler = {
 
   // Get ad by ad id
   getAdById(req, res, next) {
-    console.log(req.params.id);
     redis
       .hgetall(`ad:${req.params.id}`)
       .then(result => {
-        console.log(result);
         if (!result)
           return res.status(400).json({ msg: "This ad does not exist!" });
         return res.json({ ad: result });
@@ -94,7 +92,6 @@ const Handler = {
             return res.json({ msg: "Success!", data: newAd });
           })
           .catch(e => {
-            console.log(e);
             return res.status(400).json({
               msg: "Something went wrong. Check your info and try again."
             });

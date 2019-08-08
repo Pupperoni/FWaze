@@ -55,14 +55,12 @@ const Handler = {
     redis
       .hgetall(`user:${req.params.id}`)
       .then(user => {
-        console.log(user);
         if (user) {
           if (user.avatarPath) return res.sendFile(user.avatarPath, options);
           else return res.json({ msg: "No file found" });
         } else return res.status(400).json({ msg: "User does not exist" });
       })
       .catch(e => {
-        console.log(e);
         return res.status(500).json({ msg: "Error occurred", err: e });
       });
   },
@@ -76,8 +74,6 @@ const Handler = {
       password: req.body.password,
       role: req.body.role
     };
-
-    console.log(`New user ID: ${newMember.id}`);
 
     // Hash password
     bcrypt.genSalt(10, (err, salt) => {
