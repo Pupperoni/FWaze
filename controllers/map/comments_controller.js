@@ -1,5 +1,7 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
 
+var shortid = require("shortid");
+
 const Handler = {
   // Get all comments
   getAllComments(req, res, next) {
@@ -58,15 +60,18 @@ const Handler = {
   // Add a comment
   createComment(req, res, next) {
     var newComment = {
-      userId: req.body.user_id,
-      reportId: req.body.report_id,
-      text: req.body.text
+      id: shortid.generate(),
+      userName: req.body.userName,
+      reportId: req.body.reportId,
+      body: req.body.body
     };
+
+    console.log(newComment);
 
     queryHandler
       .createComment(newComment)
-      .then(result3 => {
-        return res.json({ msg: "Success!" });
+      .then(result => {
+        return res.json({ msg: "Success!", comment: result });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
