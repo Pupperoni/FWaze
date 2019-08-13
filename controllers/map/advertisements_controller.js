@@ -48,6 +48,24 @@ const Handler = {
       });
   },
 
+  // Get profile picture of a user
+  getImage(req, res, next) {
+    var options = {
+      root: "/usr/src/app/"
+    };
+    redis
+      .hgetall(`ad:${req.params.id}`)
+      .then(ad => {
+        if (ad) {
+          if (ad.photoPath) return res.sendFile(ad.photoPath, options);
+          else return res.json({ msg: "No file found" });
+        } else return res.status(400).json({ msg: "Ad does not exist" });
+      })
+      .catch(e => {
+        return res.status(500).json({ msg: "Error occurred", err: e });
+      });
+  },
+
   // Add an ad (only for users with role = 1)
   createAd(req, res, next) {
     // Check user role (must be advertiser)
@@ -69,21 +87,41 @@ const Handler = {
         };
 
         // Add to redis
-        redis.hmset(
-          `ad:${newAd.id}`,
-          "id",
-          newAd.id,
-          "caption",
-          req.body.caption,
-          "userId",
-          user.id,
-          "userName",
-          user.name,
-          "longitude",
-          newAd.longitude,
-          "latitude",
-          newAd.latitude
-        );
+        if (req.file) {
+          redis.hmset(
+            `ad:${newAd.id}`,
+            "id",
+            newAd.id,
+            "caption",
+            req.body.caption,
+            "userId",
+            user.id,
+            "userName",
+            user.name,
+            "longitude",
+            newAd.longitude,
+            "latitude",
+            newAd.latitude,
+            "photoPath",
+            req.file.path
+          );
+        } else {
+          redis.hmset(
+            `ad:${newAd.id}`,
+            "id",
+            newAd.id,
+            "caption",
+            req.body.caption,
+            "userId",
+            user.id,
+            "userName",
+            user.name,
+            "longitude",
+            newAd.longitude,
+            "latitude",
+            newAd.latitude
+          );
+        }
 
         // Add to MySQL
         queryHandler

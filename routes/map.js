@@ -1,8 +1,21 @@
 const express = require("express");
+const multer = require("multer");
+
 const router = express.Router();
 const adHandler = require("../controllers/map/advertisements_controller");
 const reportHandler = require("../controllers/map/reports_controller");
 const commentHandler = require("../controllers/map/comments_controller");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/ads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.body.userId + "-" + Date.now() + ".png");
+  }
+});
+
+const upload = multer({ storage: storage });
 
 // Display map
 router.get("/", (req, res, next) => {
@@ -20,8 +33,11 @@ router.get("/ads", adHandler.getAllAds);
 // Get ad by id
 router.get("/ads/:id", adHandler.getAdById);
 
+// Get ad image
+router.get("/ads/:id/image", adHandler.getImage);
+
 // Add new advertisement
-router.post("/ads/new", adHandler.createAd);
+router.post("/ads/new", upload.single("photo"), adHandler.createAd);
 
 /* REPORTS */
 
