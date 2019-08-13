@@ -2,7 +2,7 @@ DROP PROCEDURE IF EXISTS GetAllAds;
 
 CREATE PROCEDURE GetAllAds()
 BEGIN
-    SELECT *
+    SELECT id, position
     FROM advertisements;
 END;
 
@@ -23,7 +23,7 @@ DROP PROCEDURE IF EXISTS GetAdById;
 
 CREATE PROCEDURE GetAdById(IN adId VARCHAR(15))
 BEGIN
-    SELECT *
+    SELECT id, position
     FROM advertisements;
 END;
 

@@ -85,43 +85,6 @@ const Handler = {
       .catch(e => {
         throw e;
       });
-  },
-
-  // Fetch role of a user by id
-  getUserRole(id) {
-    return knex
-      .raw("SELECT role FROM users WHERE id = ?", [id])
-      .then(row => {
-        return Promise.resolve(row[0][0]);
-      })
-      .catch(e => {
-        throw e;
-      });
-  },
-
-  // Fetch name of a user by id
-  getUserName(id) {
-    return knex
-      .raw("SELECT name FROM users WHERE id = ?", [id])
-      .then(row => {
-        return Promise.resolve(row[0][0]);
-      })
-      .catch(e => {
-        throw e;
-      });
-  },
-
-  getUserByName(name) {
-    return knex
-      .raw("SELECT id, name, password, email, role FROM users WHERE name=?", [
-        name
-      ])
-      .then(row => {
-        return Promise.resolve(row[0][0]);
-      })
-      .catch(e => {
-        throw e;
-      });
   }
 };
 

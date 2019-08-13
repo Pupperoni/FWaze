@@ -2,7 +2,7 @@ DROP PROCEDURE IF EXISTS GetAllUsers;
 
 CREATE PROCEDURE GetAllUsers()
 BEGIN
-    SELECT *
+    SELECT id, name, email, role, home, work
     FROM users;
 END;
 
@@ -10,7 +10,7 @@ DROP PROCEDURE IF EXISTS GetUserById;
 
 CREATE PROCEDURE GetUserById(IN userId VARCHAR(15))
 BEGIN
-    SELECT *
+    SELECT id, name, email, role, home, work
     FROM users
     WHERE id = userId;
 END;

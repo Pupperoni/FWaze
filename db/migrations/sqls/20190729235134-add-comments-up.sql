@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
   `id` varchar(15) NOT NULL,
+  `user_id` varchar(15) NOT NULL,
   `userName` varchar(255) DEFAULT NULL,
   `report_id` varchar(15) DEFAULT NULL,
   `body` varchar(255) DEFAULT NULL,

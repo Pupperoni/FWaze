@@ -61,6 +61,7 @@ const Handler = {
   createComment(req, res, next) {
     var newComment = {
       id: shortid.generate(),
+      userId: req.body.userId,
       userName: req.body.userName,
       reportId: req.body.reportId,
       body: req.body.body

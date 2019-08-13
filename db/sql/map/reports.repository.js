@@ -39,23 +39,9 @@ const Handler = {
       });
   },
 
-  getVoteCount(reportId) {
-    return knex
-      .raw("SELECT COUNT(*) FROM upvotes WHERE report_id = ?", [reportId])
-      .then(row => {
-        return Promise.resolve(row[0][0]);
-      })
-      .catch(e => {
-        throw e;
-      });
-  },
-
   getUserVotePair(reportId, userId) {
     return knex
-      .raw("SELECT * FROM upvotes WHERE report_id = ? and user_id = ?", [
-        reportId,
-        userId
-      ])
+      .raw("CALL GetUserVotePair(?,?)", [reportId, userId])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })

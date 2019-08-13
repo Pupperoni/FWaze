@@ -3,8 +3,9 @@ var knex = require("../../knex");
 const Handler = {
   createComment(commentData) {
     return knex
-      .raw("CALL CreateComment(?,?,?,?)", [
+      .raw("CALL CreateComment(?,?,?,?,?)", [
         commentData.id,
+        commentData.userId,
         commentData.userName,
         commentData.reportId,
         commentData.body
@@ -25,10 +26,7 @@ const Handler = {
 
   getCommentById(commentId) {
     return knex
-      .raw(
-        "SELECT comments.id, user_id, users.name report_id, text FROM comments INNER JOIN users ON user_id = users.id WHERE comments.id = ?",
-        [commentId]
-      )
+      .raw("CALL GetCommentById(?)", [commentId])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })

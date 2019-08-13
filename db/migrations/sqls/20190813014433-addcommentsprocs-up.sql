@@ -2,20 +2,21 @@ DROP PROCEDURE IF EXISTS CreateComment;
 
 CREATE PROCEDURE CreateComment(
     IN commentId VARCHAR(15),
+    IN userId VARCHAR(15),
     IN userName VARCHAR(255),
     IN reportId VARCHAR(15),
     IN comment VARCHAR(255)
 )
 BEGIN
-    INSERT INTO comments (id, userName, report_id, body)
-    VALUES (commentId, userName, reportId, comment);
+    INSERT INTO comments (id, user_id, userName, report_id, body)
+    VALUES (commentId, userId, userName, reportId, comment);
 END;
 
 DROP PROCEDURE IF EXISTS GetComments;
 
 CREATE PROCEDURE GetComments()
 BEGIN
-    SELECT *
+    SELECT user_id, userName, report_id, body
     FROM comments;
 END;
 
@@ -25,7 +26,7 @@ CREATE PROCEDURE GetCommentsByReportId(
     IN reportId VARCHAR(15)
 )
 BEGIN
-    SELECT *
+    SELECT user_id, userName, report_id, body
     FROM comments
     WHERE report_id = reportId;
 END;
@@ -36,18 +37,18 @@ CREATE PROCEDURE GetCommentsByUserId(
     IN userName VARCHAR(255)
 )
 BEGIN
-    SELECT *
+    SELECT user_id, userName, report_id, body
     FROM comments
     WHERE userName = userName;
 END;
 
-DROP PROCEDURE IF EXISTS GetCommentsById;
+DROP PROCEDURE IF EXISTS GetCommentById;
 
-CREATE PROCEDURE GetCommentsById(
+CREATE PROCEDURE GetCommentById(
     IN commentId VARCHAR(15)
 )
 BEGIN
-    SELECT *
+    SELECT user_id, userName, report_id, body
     FROM comments
     WHERE id = commentId;
 END;

@@ -2,7 +2,7 @@ DROP PROCEDURE IF EXISTS GetAllReports;
 
 CREATE PROCEDURE GetAllReports()
 BEGIN
-    SELECT *
+    SELECT id, type, position
     FROM reports;
 END;
 
@@ -10,7 +10,7 @@ DROP PROCEDURE IF EXISTS GetReportById;
 
 CREATE PROCEDURE GetReportById(IN reportId VARCHAR(15))
 BEGIN
-    SELECT *
+    SELECT id, type, position
     FROM reports
     WHERE id = reportId;
 END;
@@ -52,11 +52,23 @@ BEGIN
     WHERE report_id = reportId and `user_id` = userId;
 END;
 
+DROP PROCEDURE IF EXISTS GetUserVotePair;
+
+CREATE PROCEDURE GetUserVotePair(
+    IN reportId VARCHAR(15),
+    IN userId VARCHAR(15)
+)
+BEGIN
+    SELECT report_id, user_id
+    FROM upvotes
+    WHERE report_id = reportId and `user_id` = userId;
+END;
+
 DROP PROCEDURE IF EXISTS GetReportsByType;
 
 CREATE PROCEDURE GetReportsByType(IN reportType INT(11))
 BEGIN
-    SELECT *
+    SELECT id, type, position
     FROM reports
     WHERE `type` = reportType;
 END;
@@ -71,7 +83,7 @@ CREATE PROCEDURE GetReportsByBorder(
 )
 BEGIN
     SET @g = CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))");
-    SELECT *
+    SELECT id, type, position
     FROM reports
     WHERE ST_Contains(ST_GeomFromText(@g), position);
 END;
@@ -87,7 +99,7 @@ CREATE PROCEDURE GetReportsByTypeBorder(
 )
 BEGIN
     SET @g = CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))");
-    SELECT *
+    SELECT id, type, position
     FROM reports
     WHERE `type` = reportType and ST_Contains(ST_GeomFromText(@g), position);
 END;
