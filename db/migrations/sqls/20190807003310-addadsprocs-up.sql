@@ -10,13 +10,14 @@ DROP PROCEDURE IF EXISTS CreateAd;
 
 CREATE PROCEDURE CreateAd(
     IN adId VARCHAR(15),
+    IN photoPath VARCHAR(255),
     IN adLongitude VARCHAR(255),
     IN adLatitude VARCHAR(255)
 )
 BEGIN
     SET @g = CONCAT("POINT(",adLongitude," ",adLatitude,")");
-    INSERT INTO advertisements (id, position)
-    VALUES (adId, ST_GeomFromText(@g));
+    INSERT INTO advertisements (id, photo_path, position)
+    VALUES (adId, photoPath, ST_GeomFromText(@g));
 END;
 
 DROP PROCEDURE IF EXISTS GetAdById;

@@ -23,6 +23,7 @@ const Handler = {
     redis
       .hgetall(`ad:${req.params.id}`)
       .then(result => {
+        console.log(result);
         if (!result)
           return res.status(400).json({ msg: "This ad does not exist!" });
         return res.json({ ad: result });
@@ -82,6 +83,7 @@ const Handler = {
         // Creating ad here
         var newAd = {
           id: shortid.generate(),
+          photoPath: req.file.path,
           latitude: req.body.latitude.toString(),
           longitude: req.body.longitude.toString()
         };
