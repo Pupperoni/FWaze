@@ -32,12 +32,25 @@ const Handler = {
   // Get comments by report id (list down all comments on a report)
   getCommentsByReportId(req, res, next) {
     queryHandler
-      .getCommentsByReportId(req.params.id)
+      .getCommentsByReportId(req.params.id, req.query.page)
       .then(results => {
         console.log(results);
         if (results.length == 0)
           return res.json({ msg: "No comment found.", data: [] });
         return res.json({ data: results });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Get comments by report id (list down all comments on a report)
+  countCommentsByReportId(req, res, next) {
+    queryHandler
+      .countCommentsByReportId(req.params.id)
+      .then(results => {
+        console.log(results);
+        return res.json({ data: results["COUNT(*)"] });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -73,7 +86,15 @@ const Handler = {
     queryHandler
       .createComment(newComment)
       .then(result => {
-        return res.json({ msg: "Success!", comment: result });
+        queryHandler
+          .countCommentsByReportId(req.body.reportId)
+          .then(result2 => {
+            return res.json({
+              msg: "Success!",
+              comment: newComment,
+              count: result2["COUNT(*)"]
+            });
+          });
       })
       .catch(e => {
         return res.status(500).json({ err: e });

@@ -35,11 +35,22 @@ const Handler = {
       });
   },
 
-  getCommentsByReportId(reportId) {
+  getCommentsByReportId(reportId, pageNum) {
     return knex
-      .raw("CALL GetCommentsByReportId(?)", [reportId])
+      .raw("CALL GetCommentsByReportId(?,?)", [reportId, 5 * pageNum])
       .then(row => {
         return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
+  countCommentsByReportId(reportId) {
+    return knex
+      .raw("CALL CountCommentsByReportId(?)", [reportId])
+      .then(row => {
+        return Promise.resolve(row[0][0][0]);
       })
       .catch(e => {
         throw e;

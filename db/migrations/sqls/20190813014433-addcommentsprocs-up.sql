@@ -23,10 +23,24 @@ END;
 DROP PROCEDURE IF EXISTS GetCommentsByReportId;
 
 CREATE PROCEDURE GetCommentsByReportId(
-    IN reportId VARCHAR(15)
+    IN reportId VARCHAR(15),
+    IN pageNum INT
 )
 BEGIN
     SELECT report_id, user_id, userName, body
+    FROM comments
+    WHERE report_id = reportId
+    ORDER BY created_at DESC
+    LIMIT pageNum, 5;
+END;
+
+DROP PROCEDURE IF EXISTS CountCommentsByReportId;
+
+CREATE PROCEDURE CountCommentsByReportId(
+    IN reportId VARCHAR(15)
+)
+BEGIN
+    SELECT COUNT(*)
     FROM comments
     WHERE report_id = reportId;
 END;
