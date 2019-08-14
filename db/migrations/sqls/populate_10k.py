@@ -11,16 +11,16 @@ maxLen = 15
 minLen = 7
 
 # Declare boundaries in coords
-maxCoorLon = 127
-minCoorLon = 114
-maxCoorLat = 23
-minCoorLat = 6
+maxCoorLon = 165.4
+minCoorLon = 165.1
+maxCoorLat = -14.6
+minCoorLat = -14.7
 
 # Open/create file in write mode
-f = open('20190813001955-populateDB-up.sql','w+')
+f = open('script10k.sql','w+')
 
-# Create 10,000 SQL Insert inside bounds with random values
-for i in range(10000):
+# Create 50,000 Reports inside bounds with random values
+for i in range(100):
     # Generate random string as ID
     id = randomStringwithDigitsAndSymbols(random.randint(minLen, maxLen))
 
@@ -34,14 +34,9 @@ for i in range(10000):
     # Write SQL statement to file
     f.write("CALL CreateReport('{id}',{type},'{lon}','{lat}');\n".format(id=id, type=rType, lon=lon, lat=lat))
 
-# Change boundaries in coords
-maxCoorLon = 100
-minCoorLon = 70
-maxCoorLat = 46
-minCoorLat = 29
 
-# Create 10,000 SQL Insert outside bounds with random values
-for i in range(10000):
+# Create 50,000 Ads inside bounds with random values
+for i in range(100):
     # Generate random string as ID
     id = randomStringwithDigitsAndSymbols(random.randint(minLen, maxLen))
 
@@ -49,10 +44,7 @@ for i in range(10000):
     lat = str(random.uniform(minCoorLat, maxCoorLat))
     lon = str(random.uniform(minCoorLon, maxCoorLon))
 
-    # Generate random type
-    rType = str(random.randint(0,8))
-
     # Write SQL statement to file
-    f.write("CALL CreateReport('{id}',{type},'{lon}','{lat}');\n".format(id=id, type=rType, lon=lon, lat=lat))
+    f.write("CALL CreateAd('{id}','{lon}','{lat}');\n".format(id=id, lon=lon, lat=lat))
 
 f.close()

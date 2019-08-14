@@ -42,6 +42,7 @@ const Handler = {
     queryHandler
       .getAdsByBorder(left, right, bottom, top)
       .then(results => {
+        // console.log(results);
         return res.json({ ads: results });
       })
       .catch(e => {
@@ -49,7 +50,7 @@ const Handler = {
       });
   },
 
-  // Get profile picture of a user
+  // Get profile picture of an ad
   getImage(req, res, next) {
     var options = {
       root: "/usr/src/app/"
@@ -83,7 +84,6 @@ const Handler = {
         // Creating ad here
         var newAd = {
           id: shortid.generate(),
-          photoPath: req.file.path,
           latitude: req.body.latitude.toString(),
           longitude: req.body.longitude.toString()
         };

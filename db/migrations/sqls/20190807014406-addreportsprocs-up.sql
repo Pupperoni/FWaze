@@ -86,6 +86,7 @@ BEGIN
     SELECT id, type, position
     FROM reports
     WHERE ST_Contains(ST_GeomFromText(@g), position);
+    -- SHOW INDEX FROM reports;
 END;
 
 DROP PROCEDURE IF EXISTS GetReportsByTypeBorder;

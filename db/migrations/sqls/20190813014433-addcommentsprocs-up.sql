@@ -26,7 +26,7 @@ CREATE PROCEDURE GetCommentsByReportId(
     IN reportId VARCHAR(15)
 )
 BEGIN
-    SELECT user_id, userName, report_id, body
+    SELECT report_id, user_id, userName, body
     FROM comments
     WHERE report_id = reportId;
 END;

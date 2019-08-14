@@ -37,7 +37,7 @@ const Handler = {
       .then(result => {
         if (!result)
           return res.status(400).json({ msg: "This report does not exist!" });
-
+        console.log(req.params.id);
         // count number of votes in a report
         redis.scard(`report:${req.params.id}:upvoters`).then(count => {
           result.votes = count;
@@ -72,6 +72,7 @@ const Handler = {
     queryHandler
       .getReportsByBorder(left, right, bottom, top)
       .then(results => {
+        // console.log(results);
         return res.json({ reports: results });
       })
       .catch(e => {
@@ -163,6 +164,24 @@ const Handler = {
       });
   },
 
+  // Get profile picture of a report
+  getImage(req, res, next) {
+    var options = {
+      root: "/usr/src/app/"
+    };
+    redis
+      .hgetall(`report:${req.params.id}`)
+      .then(ad => {
+        if (ad) {
+          if (ad.photoPath) return res.sendFile(ad.photoPath, options);
+          else return res.json({ msg: "No file found" });
+        } else return res.status(400).json({ msg: "Ad does not exist" });
+      })
+      .catch(e => {
+        return res.status(500).json({ msg: "Error occurred", err: e });
+      });
+  },
+
   // Add a new report
   createReport(req, res, next) {
     redis.hgetall(`user:${req.body.userId}`).then(user => {
@@ -179,21 +198,41 @@ const Handler = {
         return res.status(400).json({ msg: `Invalid type.` });
 
       // Add to redis
-      redis.hmset(
-        `report:${newReport.id}`,
-        `id`,
-        newReport.id,
-        `userId`,
-        user.id,
-        `userName`,
-        user.name,
-        `longitude`,
-        newReport.longitude,
-        `latitude`,
-        newReport.latitude,
-        `type`,
-        newReport.type
-      );
+      if (req.file) {
+        redis.hmset(
+          `report:${newReport.id}`,
+          `id`,
+          newReport.id,
+          `userId`,
+          user.id,
+          `userName`,
+          user.name,
+          `longitude`,
+          newReport.longitude,
+          `latitude`,
+          newReport.latitude,
+          `type`,
+          newReport.type,
+          "photoPath",
+          req.file.path
+        );
+      } else {
+        redis.hmset(
+          `report:${newReport.id}`,
+          `id`,
+          newReport.id,
+          `userId`,
+          user.id,
+          `userName`,
+          user.name,
+          `longitude`,
+          newReport.longitude,
+          `latitude`,
+          newReport.latitude,
+          `type`,
+          newReport.type
+        );
+      }
 
       // Add to MySQL
       queryHandler

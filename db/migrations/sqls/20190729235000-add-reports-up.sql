@@ -4,6 +4,7 @@ CREATE TABLE `reports` (
   `type` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `position` point DEFAULT NULL,
+  `photo_path` varchar(255) DEFAULT NULL,
+  `position` geometry NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;

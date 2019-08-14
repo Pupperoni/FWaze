@@ -34,8 +34,9 @@ const Handler = {
     queryHandler
       .getCommentsByReportId(req.params.id)
       .then(results => {
+        console.log(results);
         if (results.length == 0)
-          return res.status(400).json({ msg: "No comment found." });
+          return res.json({ msg: "No comment found.", data: [] });
         return res.json({ data: results });
       })
       .catch(e => {
