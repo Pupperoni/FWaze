@@ -51,6 +51,39 @@ const Handler = {
       });
   },
 
+  // Add a route to favorites
+  createFaveRoute(routeData) {
+    return knex
+      .raw("CALL CreateFaveRoute(?,?,?,?,?,?,?,?)", [
+        routeData.id,
+        routeData.sourceLatitude,
+        routeData.sourceLongitude,
+        routeData.destinationLatitude,
+        routeData.destinationLongitude,
+        routeData.sourceString,
+        routeData.destinationString,
+        routeData.userId
+      ])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
+  // Get all faved routes
+  getFaveRoutes(userId) {
+    return knex
+      .raw("CALL GetRoutesByUserId(?)", [userId])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
   // Insert new user to 'users'
   createUser(user) {
     // return knex('users').insert(user)

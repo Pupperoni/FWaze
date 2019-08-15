@@ -115,6 +115,47 @@ const Handler = {
       });
   },
 
+  // Add a new fave route
+  createFaveRoute(req, res, next) {
+    var routeData = {
+      id: shortid.generate(),
+      sourceLatitude: req.body.sourceLatitude,
+      sourceLongitude: req.body.sourceLongitude,
+      destinationLatitude: req.body.destinationLatitude,
+      destinationLongitude: req.body.destinationLongitude,
+      sourceString: req.body.sourceString,
+      destinationString: req.body.destinationString,
+      userId: req.body.userId
+    };
+
+    queryHandler
+      .createFaveRoute(routeData)
+      .then(result => {
+        console.log(result);
+        return res.json({ data: result });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Add a new fave route
+  getFaveRoutes(req, res, next) {
+    redis.hgetall(`user:${req.params.id}`).then(user => {
+      if (!user) return res.status(400).json({ msg: "User does not exist" });
+      queryHandler
+        .getFaveRoutes(req.params.id)
+        .then(results => {
+          console.log(results);
+          return res.json({ routes: results });
+        })
+        .catch(e => {
+          console.log(e);
+          return res.status(500).json({ err: e });
+        });
+    });
+  },
+
   // Add a new user
   createUser(req, res, next) {
     var newMember = {
@@ -273,30 +314,6 @@ const Handler = {
             return res.status(500).json({ err: e });
           });
       });
-      // queryHandler
-      //   .getUserByName(name)
-      //   .then(result => {
-      //     if (!result) {
-      //       return res.status(400).json({ msg: "Login failed" });
-      //     }
-      //     bcrypt.compare(password, result.password).then(isMatch => {
-      //       if (isMatch) {
-      //         return res.json({
-      //           msg: "Login success",
-      //           user: {
-      //             id: result.id,
-      //             name: result.name,
-      //             email: result.email,
-      //             role: result.role,
-      //             home: result.home,
-      //             work: result.work
-      //           }
-      //         });
-      //       } else {
-      //         return res.status(400).json({ msg: "Login failed" });
-      //       }
-      //     });
-      //   })
     } else {
       return res.status(400).json({ msg: "Login failed" });
     }

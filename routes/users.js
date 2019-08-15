@@ -30,6 +30,12 @@ router.put("/home", userHandler.addHomeAddress);
 // Save work address
 router.put("/work", userHandler.addWorkAddress);
 
+// Get fave routes
+router.get("/faves/:id", userHandler.getFaveRoutes);
+
+// Add fave route
+router.post("/faves/new", userHandler.createFaveRoute);
+
 // Get image of user
 router.get("/:id/image", userHandler.getImage);
 
