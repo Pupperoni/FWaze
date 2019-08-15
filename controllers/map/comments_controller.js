@@ -44,6 +44,20 @@ const Handler = {
   },
 
   // Get comments by report id (list down all comments on a report)
+  getCommentsByReportIdExplain(req, res, next) {
+    queryHandler
+      .getCommentsByReportIdExplain(req.params.id, req.query.page)
+      .then(results => {
+        if (results.length == 0)
+          return res.json({ msg: "No comment found.", data: [] });
+        return res.json({ data: results });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Get comments by report id (list down all comments on a report)
   countCommentsByReportId(req, res, next) {
     queryHandler
       .countCommentsByReportId(req.params.id)

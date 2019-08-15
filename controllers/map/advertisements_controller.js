@@ -50,6 +50,23 @@ const Handler = {
       });
   },
 
+  // Get all ads enclosed in an area (tright = northeast)
+  getAdsByRangeExplain(req, res, next) {
+    var right = req.query.tright.split(",")[1];
+    var left = req.query.bleft.split(",")[1];
+    var top = req.query.tright.split(",")[0];
+    var bottom = req.query.bleft.split(",")[0];
+    queryHandler
+      .getAdsByBorderExplain(left, right, bottom, top)
+      .then(results => {
+        // console.log(results);
+        return res.json({ ads: results });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
   // Get profile picture of an ad
   getImage(req, res, next) {
     var options = {

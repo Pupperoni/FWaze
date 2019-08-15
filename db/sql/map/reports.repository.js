@@ -94,9 +94,31 @@ const Handler = {
       });
   },
 
+  getReportsByBorderExplain(xl, xu, yl, yu) {
+    return knex
+      .raw("CALL EGetReportsByBorder(?,?,?,?)", [xl, xu, yl, yu])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
   getReportsByTypeBorder(type, xl, xu, yl, yu) {
     return knex
       .raw("CALL GetReportsByTypeBorder(?,?,?,?,?)", [type, xl, xu, yl, yu])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
+  getReportsByTypeBorderExplain(type, xl, xu, yl, yu) {
+    return knex
+      .raw("CALL EGetReportsByTypeBorder(?,?,?,?,?)", [type, xl, xu, yl, yu])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })

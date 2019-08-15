@@ -46,6 +46,17 @@ const Handler = {
       });
   },
 
+  getCommentsByReportIdExplain(reportId, pageNum) {
+    return knex
+      .raw("CALL EGetCommentsByReportId(?,?)", [reportId, 5 * pageNum])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
   countCommentsByReportId(reportId) {
     return knex
       .raw("CALL CountCommentsByReportId(?)", [reportId])

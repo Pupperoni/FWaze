@@ -34,6 +34,20 @@ BEGIN
     LIMIT pageNum, 5;
 END;
 
+DROP PROCEDURE IF EXISTS EGetCommentsByReportId;
+
+CREATE PROCEDURE EGetCommentsByReportId(
+    IN reportId VARCHAR(15),
+    IN pageNum INT
+)
+BEGIN
+    EXPLAIN SELECT report_id, user_id, userName, body
+    FROM comments
+    WHERE report_id = reportId
+    ORDER BY created_at DESC
+    LIMIT pageNum, 5;
+END;
+
 DROP PROCEDURE IF EXISTS CountCommentsByReportId;
 
 CREATE PROCEDURE CountCommentsByReportId(

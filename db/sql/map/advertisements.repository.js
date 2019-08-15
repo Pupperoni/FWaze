@@ -47,6 +47,17 @@ const Handler = {
       .catch(e => {
         throw e;
       });
+  },
+
+  getAdsByBorderExplain(xl, xu, yl, yu) {
+    return knex
+      .raw("CALL EGetAdsByBorder(?,?,?,?)", [xl, xu, yl, yu])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
   }
 };
 

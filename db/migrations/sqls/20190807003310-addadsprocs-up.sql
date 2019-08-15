@@ -41,3 +41,18 @@ BEGIN
     FROM advertisements
     WHERE ST_Contains(ST_GeomFromText(@g), position);
 END;
+
+DROP PROCEDURE IF EXISTS EGetAdsByBorder;
+
+CREATE PROCEDURE EGetAdsByBorder(
+    IN xl VARCHAR(255),
+    IN xu VARCHAR(255),
+    IN yl VARCHAR(255),
+    IN yu VARCHAR(255)
+)
+BEGIN
+    SET @g = CONCAT("POLYGON((",xl," ",yl,", ",xu," ",yl,", ",xu," ",yu,", ",xl," ",yu,", ",xl," ",yl,"))");
+    EXPLAIN SELECT id, position
+    FROM advertisements
+    WHERE ST_Contains(ST_GeomFromText(@g), position);
+END;

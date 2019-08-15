@@ -7,3 +7,4 @@ CREATE SPATIAL INDEX idx_advertisements_position ON advertisements (position);
 
 -- Creating Index on comments
 CREATE INDEX idx_comments_report_id_timestamp ON comments (report_id, created_at);
+

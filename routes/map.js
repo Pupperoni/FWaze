@@ -38,6 +38,9 @@ router.get("/", (req, res, next) => {
 // Get ads by range
 router.get("/ads/range", adHandler.getAdsByRange);
 
+// Get ads by range
+router.get("/ads/explain/range", adHandler.getAdsByRangeExplain);
+
 // Get all ads
 router.get("/ads", adHandler.getAllAds);
 
@@ -64,14 +67,23 @@ router.get("/reports/:reportId/votes", reportHandler.getVoteCount);
 // Get user and vote pair (if exists)
 router.get("/reports/:reportId/voted/:userId", reportHandler.getUserVotePair);
 
-// Get reports by border range (?tleft=50,150&bright=120,100)
+// Get reports by border range (?tright=50,150&bleft=120,100)
 router.get("/reports/range", reportHandler.getReportsByRange);
+
+// Get reports by border range (?tright=50,150&bleft=120,100)
+router.get("/reports/explain/range", reportHandler.getReportsByRangeExplain);
 
 // Get report by report id
 router.get("/reports/:id", reportHandler.getReportById);
 
 // Get reports by type and range
 router.get("/reports/type/:type/range", reportHandler.getReportsByTypeRange);
+
+// Get reports by type and range
+router.get(
+  "/reports/type/:type/explain/range",
+  reportHandler.getReportsByTypeRangeExplain
+);
 
 // Get reports by type
 router.get("/reports/type/:type", reportHandler.getReportsByType);
@@ -99,6 +111,12 @@ router.get("/comments/:id", commentHandler.getCommentById);
 
 // Get comments by report id
 router.get("/comments/report/:id", commentHandler.getCommentsByReportId);
+
+// Get comments by report id
+router.get(
+  "/comments/report/:id/explain",
+  commentHandler.getCommentsByReportIdExplain
+);
 
 // Get comments by report id
 router.get(

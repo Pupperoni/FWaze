@@ -78,6 +78,22 @@ const Handler = {
       });
   },
 
+  // Get all reports enclosed in an area
+  getReportsByRangeExplain(req, res, next) {
+    var right = req.query.tright.split(",")[1];
+    var left = req.query.bleft.split(",")[1];
+    var top = req.query.tright.split(",")[0];
+    var bottom = req.query.bleft.split(",")[0];
+    queryHandler
+      .getReportsByBorderExplain(left, right, bottom, top)
+      .then(results => {
+        return res.json({ reports: results });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
   // Get all reports enclosed in an area of a specific type
   getReportsByTypeRange(req, res, next) {
     var right = req.query.tright.split(",")[1];
@@ -86,6 +102,28 @@ const Handler = {
     var bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getReportsByTypeBorder(
+        reportTypes[req.params.type],
+        left,
+        right,
+        bottom,
+        top
+      )
+      .then(results => {
+        return res.json({ reports: results });
+      })
+      .catch(e => {
+        return res.status(500).json({ err: e });
+      });
+  },
+
+  // Get all reports enclosed in an area of a specific type
+  getReportsByTypeRangeExplain(req, res, next) {
+    var right = req.query.tright.split(",")[1];
+    var left = req.query.bleft.split(",")[1];
+    var top = req.query.tright.split(",")[0];
+    var bottom = req.query.bleft.split(",")[0];
+    queryHandler
+      .getReportsByTypeBorderExplain(
         reportTypes[req.params.type],
         left,
         right,
@@ -138,14 +176,6 @@ const Handler = {
     redis.scard(`report:${req.params.id}:upvoters`).then(count => {
       return res.json({ result: count });
     });
-    // queryHandler
-    //   .getVoteCount(req.params.reportId)
-    //   .then(results => {
-    //     return res.json({ votes: results["COUNT(*)"] });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
   },
 
   // Get user and vote report pair
