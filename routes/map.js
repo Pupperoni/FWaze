@@ -6,7 +6,7 @@ const adHandler = require("../controllers/map/advertisements_controller");
 const reportHandler = require("../controllers/map/reports_controller");
 const commentHandler = require("../controllers/map/comments_controller");
 
-const storage = multer.diskStorage({
+const adstorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/ads/");
   },
@@ -15,7 +15,18 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const adUpload = multer({ storage: adstorage });
+
+const reportstorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/reports/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.body.userId + "-" + Date.now() + ".png");
+  }
+});
+
+const reportUpload = multer({ storage: reportstorage });
 
 // Display map
 router.get("/", (req, res, next) => {
@@ -37,7 +48,7 @@ router.get("/ads/:id", adHandler.getAdById);
 router.get("/ads/:id/image", adHandler.getImage);
 
 // Add new advertisement
-router.post("/ads/new", upload.single("photo"), adHandler.createAd);
+router.post("/ads/new", adUpload.single("photo"), adHandler.createAd);
 
 /* REPORTS */
 
@@ -65,8 +76,15 @@ router.get("/reports/type/:type/range", reportHandler.getReportsByTypeRange);
 // Get reports by type
 router.get("/reports/type/:type", reportHandler.getReportsByType);
 
+// Get report image
+router.get("/reports/:id/image", reportHandler.getImage);
+
 // Add new report
-router.post("/reports/new", reportHandler.createReport);
+router.post(
+  "/reports/new",
+  reportUpload.single("photo"),
+  reportHandler.createReport
+);
 
 // Get all reports
 router.get("/reports", reportHandler.getAllReports);
@@ -81,6 +99,12 @@ router.get("/comments/:id", commentHandler.getCommentById);
 
 // Get comments by report id
 router.get("/comments/report/:id", commentHandler.getCommentsByReportId);
+
+// Get comments by report id
+router.get(
+  "/comments/report/:id/count",
+  commentHandler.countCommentsByReportId
+);
 
 // Get comments by user id
 router.get("/comments/user/:id", commentHandler.getCommentsByUserId);

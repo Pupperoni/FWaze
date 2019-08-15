@@ -34,7 +34,6 @@ const Handler = {
     queryHandler
       .getCommentsByReportId(req.params.id, req.query.page)
       .then(results => {
-        console.log(results);
         if (results.length == 0)
           return res.json({ msg: "No comment found.", data: [] });
         return res.json({ data: results });
@@ -49,7 +48,6 @@ const Handler = {
     queryHandler
       .countCommentsByReportId(req.params.id)
       .then(results => {
-        console.log(results);
         return res.json({ data: results["COUNT(*)"] });
       })
       .catch(e => {
@@ -80,8 +78,6 @@ const Handler = {
       reportId: req.body.reportId,
       body: req.body.body
     };
-
-    console.log(newComment);
 
     queryHandler
       .createComment(newComment)

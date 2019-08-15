@@ -37,7 +37,6 @@ const Handler = {
       .then(result => {
         if (!result)
           return res.status(400).json({ msg: "This report does not exist!" });
-        console.log(req.params.id);
         // count number of votes in a report
         redis.scard(`report:${req.params.id}:upvoters`).then(count => {
           result.votes = count;
@@ -72,7 +71,6 @@ const Handler = {
     queryHandler
       .getReportsByBorder(left, right, bottom, top)
       .then(results => {
-        // console.log(results);
         return res.json({ reports: results });
       })
       .catch(e => {
@@ -95,8 +93,6 @@ const Handler = {
         top
       )
       .then(results => {
-        if (results.length == 0)
-          return res.status(400).json({ msg: "No reports found." });
         return res.json({ reports: results });
       })
       .catch(e => {
