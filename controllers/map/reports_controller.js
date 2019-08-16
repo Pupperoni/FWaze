@@ -40,6 +40,7 @@ const Handler = {
         // count number of votes in a report
         redis.scard(`report:${req.params.id}:upvoters`).then(count => {
           result.votes = count;
+          console.log(result);
           return res.json({ report: result });
         });
       })
@@ -217,8 +218,10 @@ const Handler = {
         id: shortid.generate(),
         type: req.body.type,
         latitude: req.body.latitude,
-        longitude: req.body.longitude
+        longitude: req.body.longitude,
+        location: req.body.address
       };
+      console.log(newReport);
 
       if (newReport.type < 0 || newReport.type > 8)
         return res.status(400).json({ msg: `Invalid type.` });
@@ -237,6 +240,8 @@ const Handler = {
           newReport.longitude,
           `latitude`,
           newReport.latitude,
+          `location`,
+          newReport.location,
           `type`,
           newReport.type,
           "photoPath",
@@ -255,6 +260,8 @@ const Handler = {
           newReport.longitude,
           `latitude`,
           newReport.latitude,
+          `location`,
+          newReport.location,
           `type`,
           newReport.type
         );

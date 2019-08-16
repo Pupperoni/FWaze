@@ -131,8 +131,7 @@ const Handler = {
     queryHandler
       .createFaveRoute(routeData)
       .then(result => {
-        console.log(result);
-        return res.json({ data: result });
+        return res.json({ msg: "Success" });
       })
       .catch(e => {
         return res.status(500).json({ err: e });
@@ -146,11 +145,9 @@ const Handler = {
       queryHandler
         .getFaveRoutes(req.params.id)
         .then(results => {
-          console.log(results);
           return res.json({ routes: results });
         })
         .catch(e => {
-          console.log(e);
           return res.status(500).json({ err: e });
         });
     });
@@ -290,7 +287,6 @@ const Handler = {
                   if (home) result.home = home;
                   // Then get work address
                   redis.hgetall(`user:${userId}:work`).then(work => {
-                    console.log(work);
                     if (work) result.work = work;
                     return res.json({
                       msg: "Login success",

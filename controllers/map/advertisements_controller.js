@@ -23,7 +23,6 @@ const Handler = {
     redis
       .hgetall(`ad:${req.params.id}`)
       .then(result => {
-        console.log(result);
         if (!result)
           return res.status(400).json({ msg: "This ad does not exist!" });
         return res.json({ ad: result });
@@ -93,7 +92,7 @@ const Handler = {
       .then(user => {
         if (!user)
           return res.status(400).json({ msg: "This user does not exist!" });
-        if (user.role != 1)
+        if (user.role === 0)
           return res
             .status(400)
             .json({ msg: "Sorry. Only advertisers can post advertisements" });
@@ -102,7 +101,8 @@ const Handler = {
         var newAd = {
           id: shortid.generate(),
           latitude: req.body.latitude.toString(),
-          longitude: req.body.longitude.toString()
+          longitude: req.body.longitude.toString(),
+          location: req.body.address
         };
 
         // Add to redis
@@ -121,6 +121,8 @@ const Handler = {
             newAd.longitude,
             "latitude",
             newAd.latitude,
+            "location",
+            newAd.location,
             "photoPath",
             req.file.path
           );
@@ -138,7 +140,9 @@ const Handler = {
             "longitude",
             newAd.longitude,
             "latitude",
-            newAd.latitude
+            newAd.latitude,
+            "location",
+            newAd.location
           );
         }
 
