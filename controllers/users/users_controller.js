@@ -1,10 +1,15 @@
 const queryHandler = require("../../db/sql/users/users.repository");
+const commandHandler = require("../../cqrs/commands/users/users.command.handler");
 
 var bcrypt = require("bcryptjs");
 var shortid = require("shortid");
 
 var Redis = require("ioredis");
 var redis = new Redis(process.env.REDIS_URL);
+
+//
+// Query responsibility
+//
 
 const Handler = {
   // Get all user info
@@ -65,79 +70,6 @@ const Handler = {
       });
   },
 
-  // Set user's home address
-  addHomeAddress(req, res, next) {
-    if (!req.body.submit) {
-      return res.json({ data: "Request cancelled" });
-    }
-    redis.hmset(
-      `user:${req.body.id}:home`,
-      `latitude`,
-      req.body.latitude,
-      `longitude`,
-      req.body.longitude,
-      `address`,
-      req.body.address
-    );
-
-    queryHandler
-      .setHomeAd(req.body.id, req.body.address)
-      .then(result => {
-        return res.json({ data: result });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
-  },
-
-  // Set user's work address
-  addWorkAddress(req, res, next) {
-    if (!req.body.submit) {
-      return res.json({ data: "Request cancelled" });
-    }
-    redis.hmset(
-      `user:${req.body.id}:work`,
-      `latitude`,
-      req.body.latitude,
-      `longitude`,
-      req.body.longitude,
-      `address`,
-      req.body.address
-    );
-
-    queryHandler
-      .setWorkAd(req.body.id, req.body.address)
-      .then(result => {
-        return res.json({ data: result });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
-  },
-
-  // Add a new fave route
-  createFaveRoute(req, res, next) {
-    var routeData = {
-      id: shortid.generate(),
-      sourceLatitude: req.body.sourceLatitude,
-      sourceLongitude: req.body.sourceLongitude,
-      destinationLatitude: req.body.destinationLatitude,
-      destinationLongitude: req.body.destinationLongitude,
-      sourceString: req.body.sourceString,
-      destinationString: req.body.destinationString,
-      userId: req.body.userId
-    };
-
-    queryHandler
-      .createFaveRoute(routeData)
-      .then(result => {
-        return res.json({ msg: "Success" });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
-  },
-
   // Add a new fave route
   getFaveRoutes(req, res, next) {
     redis.hgetall(`user:${req.params.id}`).then(user => {
@@ -151,122 +83,6 @@ const Handler = {
           return res.status(500).json({ err: e });
         });
     });
-  },
-
-  // Add a new user
-  createUser(req, res, next) {
-    var newMember = {
-      id: shortid.generate(),
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      role: req.body.role
-    };
-
-    // Hash password
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(newMember.password, salt, (err, hash) => {
-        if (err) throw err;
-        newMember.password = hash;
-
-        // Save to redis as hash
-        redis
-          .hmset(
-            `user:${newMember.id}`,
-            `id`,
-            newMember.id,
-            `name`,
-            newMember.name,
-            `email`,
-            newMember.email,
-            `password`,
-            newMember.password,
-            `role`,
-            newMember.role
-          )
-          .then(() => {
-            redis
-              .hmset(
-                `user:${newMember.id}:home`,
-                `latitude`,
-                "",
-                `longitude`,
-                "",
-                `address`,
-                ""
-              )
-              .then(() => {
-                redis.hmset(
-                  `user:${newMember.id}:work`,
-                  `latitude`,
-                  "",
-                  `longitude`,
-                  "",
-                  `address`,
-                  ""
-                );
-              });
-          });
-
-        // To access a user by his name, we store his id somewhere
-        redis.set(`user:name:${newMember.name}`, newMember.id);
-
-        // Save user to MySQL DB
-        queryHandler
-          .createUser(newMember)
-          .then(result => {
-            return res.json({ msg: "Success", data: newMember });
-          })
-          .catch(e => {
-            return res.status(500).json({ err: e });
-          });
-      });
-    });
-  },
-
-  // Edit user details
-  updateUser(req, res, next) {
-    var memberData = {
-      id: req.body.id,
-      name: req.body.name,
-      email: req.body.email,
-      role: req.body.role
-    };
-
-    // Update redis data
-    if (req.file) {
-      redis.hmset(
-        `user:${memberData.id}`,
-        "name",
-        memberData.name,
-        "email",
-        memberData.email,
-        "role",
-        memberData.role,
-        "avatarPath",
-        `${req.file.path}`
-      );
-    } else {
-      redis.hmset(
-        `user:${memberData.id}`,
-        "name",
-        memberData.name,
-        "email",
-        memberData.email,
-        "role",
-        memberData.role
-      );
-    }
-
-    // Update MySQL data
-    queryHandler
-      .updateUser(memberData)
-      .then(result => {
-        return res.json({ msg: "Success", data: memberData });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
   },
 
   // Log in a user
@@ -313,6 +129,140 @@ const Handler = {
     } else {
       return res.status(400).json({ msg: "Login failed" });
     }
+  },
+
+  //
+  // Commands responsibility section
+  //
+
+  // Add a new user
+  createUser(req, res, next) {
+    commandHandler.userCreated(req.body).then(result => {
+      console.log(result);
+      if (result) return res.json({ msg: "Success", data: result });
+      else return res.status(400).json({ msg: "Failed" });
+    });
+  },
+
+  // Edit user details
+  updateUser(req, res, next) {
+    commandHandler.userUpdated(req.body);
+    // var memberData = {
+    //   id: req.body.id,
+    //   name: req.body.name,
+    //   email: req.body.email,
+    //   role: req.body.role
+    // };
+
+    // // Update redis data
+    // if (req.file) {
+    //   redis.hmset(
+    //     `user:${memberData.id}`,
+    //     "name",
+    //     memberData.name,
+    //     "email",
+    //     memberData.email,
+    //     "role",
+    //     memberData.role,
+    //     "avatarPath",
+    //     `${req.file.path}`
+    //   );
+    // } else {
+    //   redis.hmset(
+    //     `user:${memberData.id}`,
+    //     "name",
+    //     memberData.name,
+    //     "email",
+    //     memberData.email,
+    //     "role",
+    //     memberData.role
+    //   );
+    // }
+
+    // // Update MySQL data
+    // queryHandler
+    //   .updateUser(memberData)
+    //   .then(result => {
+    //     return res.json({ msg: "Success", data: memberData });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
+  },
+
+  // Set user's home address
+  addHomeAddress(req, res, next) {
+    if (!req.body.submit) return res.json({ data: "Request cancelled" });
+
+    commandHandler.homeAddressUpdated(req, res, next);
+    // redis.hmset(
+    //   `user:${req.body.id}:home`,
+    //   `latitude`,
+    //   req.body.latitude,
+    //   `longitude`,
+    //   req.body.longitude,
+    //   `address`,
+    //   req.body.address
+    // );
+
+    // queryHandler
+    //   .setHomeAd(req.body.id, req.body.address)
+    //   .then(result => {
+    //     return res.json({ data: result });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
+  },
+
+  // Set user's work address
+  addWorkAddress(req, res, next) {
+    if (!req.body.submit) return res.json({ data: "Request cancelled" });
+
+    commandHandler.workAddressUpdated(req, res, next);
+    // redis.hmset(
+    //   `user:${req.body.id}:work`,
+    //   `latitude`,
+    //   req.body.latitude,
+    //   `longitude`,
+    //   req.body.longitude,
+    //   `address`,
+    //   req.body.address
+    // );
+
+    // queryHandler
+    //   .setWorkAd(req.body.id, req.body.address)
+    //   .then(result => {
+    //     return res.json({ data: result });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
+  },
+
+  // Add a new fave route
+  createFaveRoute(req, res, next) {
+    commandHandler.faveRouteCreated(req, res, next);
+
+    // var routeData = {
+    //   id: shortid.generate(),
+    //   sourceLatitude: req.body.sourceLatitude,
+    //   sourceLongitude: req.body.sourceLongitude,
+    //   destinationLatitude: req.body.destinationLatitude,
+    //   destinationLongitude: req.body.destinationLongitude,
+    //   sourceString: req.body.sourceString,
+    //   destinationString: req.body.destinationString,
+    //   userId: req.body.userId
+    // };
+
+    // queryHandler
+    //   .createFaveRoute(routeData)
+    //   .then(result => {
+    //     return res.json({ msg: "Success" });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
   }
 };
 

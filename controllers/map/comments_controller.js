@@ -1,8 +1,12 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
-
+const commandHandler = require("../../cqrs/commands/map/comments.command.handler");
 var shortid = require("shortid");
 
 const Handler = {
+  //
+  //  Query responsibility
+  //
+
   // Get all comments
   getAllComments(req, res, next) {
     queryHandler
@@ -83,32 +87,37 @@ const Handler = {
       });
   },
 
+  //
+  //  Commands responsibility section
+  //
+
   // Add a comment
   createComment(req, res, next) {
-    var newComment = {
-      id: shortid.generate(),
-      userId: req.body.userId,
-      userName: req.body.userName,
-      reportId: req.body.reportId,
-      body: req.body.body
-    };
+    commandHandler.commentCreated(req, res, next);
+    // var newComment = {
+    //   id: shortid.generate(),
+    //   userId: req.body.userId,
+    //   userName: req.body.userName,
+    //   reportId: req.body.reportId,
+    //   body: req.body.body
+    // };
 
-    queryHandler
-      .createComment(newComment)
-      .then(result => {
-        queryHandler
-          .countCommentsByReportId(req.body.reportId)
-          .then(result2 => {
-            return res.json({
-              msg: "Success!",
-              comment: newComment,
-              count: result2["COUNT(*)"]
-            });
-          });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
+    // queryHandler
+    //   .createComment(newComment)
+    //   .then(result => {
+    //     queryHandler
+    //       .countCommentsByReportId(req.body.reportId)
+    //       .then(result2 => {
+    //         return res.json({
+    //           msg: "Success!",
+    //           comment: newComment,
+    //           count: result2["COUNT(*)"]
+    //         });
+    //       });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
   }
 };
 

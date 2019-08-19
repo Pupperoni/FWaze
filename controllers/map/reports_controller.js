@@ -1,10 +1,11 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
 const userHandler = require("../../db/sql/users/users.repository");
-
+const commandHandler = require("../../cqrs/commands/map/reports.command.handler");
 var shortid = require("shortid");
 
 var Redis = require("ioredis");
 var redis = new Redis(process.env.REDIS_URL);
+
 const reportTypes = {
   traffic_jam: 0,
   heavy_traffic_jam: 1,
@@ -18,6 +19,10 @@ const reportTypes = {
 };
 
 const Handler = {
+  //
+  // Query responsibility
+  //
+
   // Get all reports
   getAllReports(req, res, next) {
     queryHandler
@@ -139,38 +144,6 @@ const Handler = {
       });
   },
 
-  // Add vote instance
-  addVote(req, res, next) {
-    // Add to redis
-    redis.sadd(`user:${req.body.userId}:upvoting`, req.body.reportId);
-    redis.sadd(`report:${req.body.reportId}:upvoters`, req.body.userId);
-
-    // Add to mySQL
-    queryHandler
-      .addVote(req.body.reportId, req.body.userId)
-      .then(results => {
-        return res.json({ msg: "Success" });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
-  },
-
-  // Remove vote instance
-  deleteVote(req, res, next) {
-    redis.srem(`user:${req.body.userId}:upvoting`, req.body.reportId);
-    redis.srem(`report:${req.body.reportId}:upvoters`, req.body.userId);
-
-    queryHandler
-      .removeVote(req.body.reportId, req.body.userId)
-      .then(results => {
-        return res.json({ msg: "Success" });
-      })
-      .catch(e => {
-        return res.status(500).json({ err: e });
-      });
-  },
-
   // Get vote count
   getVoteCount(req, res, next) {
     // count number of votes in a report
@@ -209,74 +182,111 @@ const Handler = {
       });
   },
 
+  //
+  //  Command responsibility section
+  //
+
   // Add a new report
   createReport(req, res, next) {
-    redis.hgetall(`user:${req.body.userId}`).then(user => {
-      // Check if user exists
-      if (!user) return res.status(400).json({ msg: `User does not exist!` });
-      var newReport = {
-        id: shortid.generate(),
-        type: req.body.type,
-        latitude: req.body.latitude,
-        longitude: req.body.longitude,
-        location: req.body.address
-      };
-      console.log(newReport);
+    commandHandler.reportCreated(req, res, next);
+    // redis.hgetall(`user:${req.body.userId}`).then(user => {
+    //   // Check if user exists
+    //   if (!user) return res.status(400).json({ msg: `User does not exist!` });
+    //   var newReport = {
+    //     id: shortid.generate(),
+    //     type: req.body.type,
+    //     latitude: req.body.latitude,
+    //     longitude: req.body.longitude,
+    //     location: req.body.address
+    //   };
+    //   console.log(newReport);
 
-      if (newReport.type < 0 || newReport.type > 8)
-        return res.status(400).json({ msg: `Invalid type.` });
+    //   if (newReport.type < 0 || newReport.type > 8)
+    //     return res.status(400).json({ msg: `Invalid type.` });
 
-      // Add to redis
-      if (req.file) {
-        redis.hmset(
-          `report:${newReport.id}`,
-          `id`,
-          newReport.id,
-          `userId`,
-          user.id,
-          `userName`,
-          user.name,
-          `longitude`,
-          newReport.longitude,
-          `latitude`,
-          newReport.latitude,
-          `location`,
-          newReport.location,
-          `type`,
-          newReport.type,
-          "photoPath",
-          req.file.path
-        );
-      } else {
-        redis.hmset(
-          `report:${newReport.id}`,
-          `id`,
-          newReport.id,
-          `userId`,
-          user.id,
-          `userName`,
-          user.name,
-          `longitude`,
-          newReport.longitude,
-          `latitude`,
-          newReport.latitude,
-          `location`,
-          newReport.location,
-          `type`,
-          newReport.type
-        );
-      }
+    //   // Add to redis
+    //   if (req.file) {
+    //     redis.hmset(
+    //       `report:${newReport.id}`,
+    //       `id`,
+    //       newReport.id,
+    //       `userId`,
+    //       user.id,
+    //       `userName`,
+    //       user.name,
+    //       `longitude`,
+    //       newReport.longitude,
+    //       `latitude`,
+    //       newReport.latitude,
+    //       `location`,
+    //       newReport.location,
+    //       `type`,
+    //       newReport.type,
+    //       "photoPath",
+    //       req.file.path
+    //     );
+    //   } else {
+    //     redis.hmset(
+    //       `report:${newReport.id}`,
+    //       `id`,
+    //       newReport.id,
+    //       `userId`,
+    //       user.id,
+    //       `userName`,
+    //       user.name,
+    //       `longitude`,
+    //       newReport.longitude,
+    //       `latitude`,
+    //       newReport.latitude,
+    //       `location`,
+    //       newReport.location,
+    //       `type`,
+    //       newReport.type
+    //     );
+    //   }
 
-      // Add to MySQL
-      queryHandler
-        .createReport(newReport)
-        .then(result => {
-          return res.json({ msg: "Success", data: newReport });
-        })
-        .catch(e => {
-          return res.status(500).json({ err: e });
-        });
-    });
+    //   // Add to MySQL
+    //   queryHandler
+    //     .createReport(newReport)
+    //     .then(result => {
+    //       return res.json({ msg: "Success", data: newReport });
+    //     })
+    //     .catch(e => {
+    //       return res.status(500).json({ err: e });
+    //     });
+    // });
+  },
+  // Add vote instance
+  addVote(req, res, next) {
+    commandHandler.voteCreated(req, res, next);
+    // // Add to redis
+    // redis.sadd(`user:${req.body.userId}:upvoting`, req.body.reportId);
+    // redis.sadd(`report:${req.body.reportId}:upvoters`, req.body.userId);
+    // // Add to mySQL
+    // queryHandler
+    //   .addVote(req.body.reportId, req.body.userId)
+    //   .then(results => {
+    //     return res.json({ msg: "Success" });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
+  },
+
+  // Remove vote instance
+  deleteVote(req, res, next) {
+    commandHandler.voteDeleted(req, res, next);
+    // redis.srem(`user:${req.body.userId}:upvoting`, req.body.reportId);
+    // redis.srem(`report:${req.body.reportId}:upvoters`, req.body.userId);
+
+    // queryHandler
+    //   .removeVote(req.body.reportId, req.body.userId)
+    //   .then(results => {
+    //     return res.json({ msg: "Success" });
+    //   })
+    //   .catch(e => {
+    //     return res.status(500).json({ err: e });
+    //   });
   }
 };
 
