@@ -2,7 +2,7 @@ const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
 module.exports = {
-  createUser(event) {
+  saveEvent(event) {
     // Get last offset from event store
     redis.zrange("events", 0, -1, "WITHSCORES").then(result => {
       var offset;

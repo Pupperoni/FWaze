@@ -138,7 +138,6 @@ const Handler = {
   // Add a new user
   createUser(req, res, next) {
     commandHandler.userCreated(req.body).then(result => {
-      console.log(result);
       if (result) return res.json({ msg: "Success", data: result });
       else return res.status(400).json({ msg: "Failed" });
     });

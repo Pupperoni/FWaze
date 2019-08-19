@@ -8,7 +8,6 @@ const redis = new Redis(process.env.REDIS_URL);
 
 emitter.on("userCreated", function(data) {
   console.log("event received: user created");
-  console.log(data);
   redis
     .hmset(
       `user:${data.id}`,

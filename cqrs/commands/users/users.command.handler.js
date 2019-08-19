@@ -38,7 +38,7 @@ const Handler = {
         eventHandler.emit("userCreated", event.payload);
 
         // call write repo to save to event store
-        writeRepo.createUser(event);
+        writeRepo.saveEvent(event);
       });
     });
 
