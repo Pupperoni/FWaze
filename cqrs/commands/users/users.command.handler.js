@@ -11,36 +11,39 @@ const Handler = {
     var valid = true;
     if (data.password !== data.confirm_password) valid = false;
 
-    // generate unique id
-    var id = shortid.generate();
-    data.id = id;
+    // continue if all tests pass
+    if (valid) {
+      // generate unique id
+      var id = shortid.generate();
+      data.id = id;
 
-    // Hash password
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(data.password, salt, (err, hash) => {
-        if (err) throw err;
-        // replace plaintext password to hash
-        data.password = hash;
+      // Hash password
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(data.password, salt, (err, hash) => {
+          if (err) throw err;
+          // replace plaintext password to hash
+          data.password = hash;
 
-        // Create event instance
-        var event = {
-          id: shortid.generate(),
-          eventName: "USER CREATED",
-          payload: {
-            id: data.id,
-            name: data.name,
-            email: data.email,
-            password: data.password,
-            role: data.role
-          }
-        };
-        // emit the event and save to read repo
-        eventHandler.emit("userCreated", event.payload);
+          // Create event instance
+          var event = {
+            id: shortid.generate(),
+            eventName: "USER CREATED",
+            payload: {
+              id: data.id,
+              name: data.name,
+              email: data.email,
+              password: data.password,
+              role: data.role
+            }
+          };
+          // emit the event and save to read repo
+          eventHandler.emit("userCreated", event.payload);
 
-        // call write repo to save to event store
-        writeRepo.saveEvent(event);
+          // call write repo to save to event store
+          writeRepo.saveEvent(event);
+        });
       });
-    });
+    }
 
     // after validation, return the response
     if (valid) return Promise.resolve(data);
