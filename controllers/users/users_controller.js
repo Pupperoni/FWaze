@@ -137,46 +137,71 @@ const Handler = {
 
   // Add a new user
   createUser(req, res, next) {
-    commandHandler.userCreated(req.body).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .userCreated(req.body)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   },
 
   // Edit user details
   updateUser(req, res, next) {
-    commandHandler.userUpdated(req.body, req.file).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .userUpdated(req.body, req.file)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   },
 
   // Set user's home address
   addHomeAddress(req, res, next) {
     if (!req.body.submit) return res.json({ data: "Request cancelled" });
 
-    commandHandler.homeAddressUpdated(req.body).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .homeAddressUpdated(req.body)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   },
 
   // Set user's work address
   addWorkAddress(req, res, next) {
     if (!req.body.submit) return res.json({ data: "Request cancelled" });
 
-    commandHandler.workAddressUpdated(req.body).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .workAddressUpdated(req.body)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   },
 
   // Add a new fave route
   createFaveRoute(req, res, next) {
-    commandHandler.faveRouteCreated(req.body).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .faveRouteCreated(req.body)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   }
 };
 

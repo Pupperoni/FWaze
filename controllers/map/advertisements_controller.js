@@ -94,10 +94,15 @@ const Handler = {
 
   // Add an ad (only for users with role >= 1)
   createAd(req, res, next) {
-    commandHandler.adCreated(req.body, req.file).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .adCreated(req.body, req.file)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   }
 };
 

@@ -93,34 +93,15 @@ const Handler = {
 
   // Add a comment
   createComment(req, res, next) {
-    commandHandler.commentCreated(req.body).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
-    // var newComment = {
-    //   id: shortid.generate(),
-    //   userId: req.body.userId,
-    //   userName: req.body.userName,
-    //   reportId: req.body.reportId,
-    //   body: req.body.body
-    // };
-
-    // queryHandler
-    //   .createComment(newComment)
-    //   .then(result => {
-    //     queryHandler
-    //       .countCommentsByReportId(req.body.reportId)
-    //       .then(result2 => {
-    //         return res.json({
-    //           msg: "Success!",
-    //           comment: newComment,
-    //           count: result2["COUNT(*)"]
-    //         });
-    //       });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
+    commandHandler
+      .commentCreated(req.body)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   }
 };
 

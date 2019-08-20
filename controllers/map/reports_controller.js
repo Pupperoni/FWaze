@@ -188,25 +188,40 @@ const Handler = {
 
   // Add a new report
   createReport(req, res, next) {
-    commandHandler.reportCreated(req.body, req.file).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .reportCreated(req.body, req.file)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   },
   // Add vote instance
   addVote(req, res, next) {
-    commandHandler.voteCreated(req.body).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .voteCreated(req.body)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   },
 
   // Remove vote instance
   deleteVote(req, res, next) {
-    commandHandler.voteDeleted(req.body).then(result => {
-      if (result) return res.json({ msg: "Success", data: result });
-      else return res.status(400).json({ msg: "Failed" });
-    });
+    commandHandler
+      .voteDeleted(req.body)
+      .then(result => {
+        if (result) return res.json({ msg: "Success", data: result });
+        else return res.status(400).json({ msg: "Failed" });
+      })
+      .catch(e => {
+        return res.status(400).json({ msg: "Failed", err: e });
+      });
   }
 };
 
