@@ -1,12 +1,9 @@
-const Redis = require("ioredis");
-
-const bcrypt = require("bcryptjs");
 const shortid = require("shortid");
-
-const redis = new Redis(process.env.REDIS_URL);
 const eventHandler = require("../../eventListeners/map/reports.event.handler");
 const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
-const writeRepo = require("../../writeRepositories/map/reports.write.repository");
+const writeRepo = require("../../writeRepositories/write.repository");
+const constants = require("../../../constants");
+
 const Handler = {
   // create a report
   reportCreated(data, file) {
@@ -27,8 +24,10 @@ const Handler = {
 
         // Create event instance
         var event = {
-          id: shortid.generate(),
-          eventName: "REPORT CREATED",
+          eventId: shortid.generate(),
+          eventName: constants.REPORT_CREATED,
+          aggregateName: constants.REPORT_AGGREGATE_NAME,
+          aggregateID: data.id,
           payload: {
             id: data.id,
             userId: user.id,
@@ -43,7 +42,7 @@ const Handler = {
         if (file) event.payload.photoPath = file.path;
 
         // emit the event and save to read repo
-        eventHandler.emit("reportCreated", event.payload);
+        eventHandler.emit(constants.REPORT_CREATED, event.payload);
 
         // call write repo to save to event store
         writeRepo.saveEvent(event);
@@ -64,8 +63,10 @@ const Handler = {
     if (valid) {
       // Create event instance
       var event = {
-        id: shortid.generate(),
-        eventName: "REPORT VOTE_CREATED",
+        eventId: shortid.generate(),
+        eventName: constants.REPORT_VOTE_CREATED,
+        aggregateName: constants.REPORT_AGGREGATE_NAME,
+        aggregateID: data.reportId,
         payload: {
           id: data.reportId,
           userId: data.userId
@@ -73,7 +74,7 @@ const Handler = {
       };
 
       // emit the event after all data is good
-      eventHandler.emit("voteCreated", event.payload);
+      eventHandler.emit(constants.REPORT_VOTE_CREATED, event.payload);
 
       // save the create event to eventstore
       writeRepo.saveEvent(event);
@@ -92,8 +93,10 @@ const Handler = {
     if (valid) {
       // Create event instance
       var event = {
-        id: shortid.generate(),
-        eventName: "REPORT VOTE_DELETED",
+        eventId: shortid.generate(),
+        eventName: constants.REPORT_VOTE_DELETED,
+        aggregateName: constants.REPORT_AGGREGATE_NAME,
+        aggregateID: data.reportId,
         payload: {
           id: data.reportId,
           userId: data.userId
@@ -101,7 +104,7 @@ const Handler = {
       };
 
       // emit the event after all data is good
-      eventHandler.emit("voteDeleted", event.payload);
+      eventHandler.emit(constants.REPORT_VOTE_DELETED, event.payload);
 
       // save the create event to eventstore
       writeRepo.saveEvent(event);

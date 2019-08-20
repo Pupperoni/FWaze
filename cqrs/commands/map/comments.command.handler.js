@@ -1,16 +1,15 @@
-const Redis = require("ioredis");
-
-const bcrypt = require("bcryptjs");
 const shortid = require("shortid");
-
-const redis = new Redis(process.env.REDIS_URL);
 const eventHandler = require("../../eventListeners/map/comments.event.handler");
-const writeRepo = require("../../writeRepositories/map/comments.write.repository");
+const writeRepo = require("../../writeRepositories/write.repository");
+const constants = require("../../../constants");
+
 const Handler = {
   // create a report
   commentCreated(data) {
     // validate data sent here
     var valid = true;
+
+    // check if report and user exists
 
     // if all tests pass, do important stuff
     if (valid) {
@@ -20,7 +19,9 @@ const Handler = {
       // Create event instance
       var event = {
         id: shortid.generate(),
-        eventName: "COMMENT CREATED",
+        eventName: constants.COMMENT_CREATED,
+        aggregateName: constants.COMMENT_AGGREGATE_NAME,
+        aggregateID: data.id,
         payload: {
           id: data.id,
           userId: data.userId,
@@ -31,7 +32,7 @@ const Handler = {
       };
 
       // emit the event after all data is good
-      eventHandler.emit("commentCreated", event.payload);
+      eventHandler.emit(constants.COMMENT_CREATED, event.payload);
 
       // save the create event to eventstore
       writeRepo.saveEvent(event);

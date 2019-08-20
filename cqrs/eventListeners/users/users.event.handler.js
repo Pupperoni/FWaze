@@ -5,8 +5,9 @@ const emitter = new MyEmitter();
 
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
+const constants = require("../../../constants");
 
-emitter.on("userCreated", function(data) {
+emitter.on(constants.USER_CREATED, function(data) {
   console.log("event received: user created");
   redis
     .hmset(
@@ -51,7 +52,7 @@ emitter.on("userCreated", function(data) {
   queryHandler.createUser(data);
 });
 
-emitter.on("userUpdated", function(data) {
+emitter.on(constants.USER_UPDATED, function(data) {
   console.log("event received: user updated");
   console.log(data);
   // Update redis data
@@ -83,7 +84,7 @@ emitter.on("userUpdated", function(data) {
   queryHandler.updateUser(data);
 });
 
-emitter.on("homeAddressUpdated", function(data) {
+emitter.on(constants.USER_HOME_UPDATED, function(data) {
   console.log("event received: home address updated");
   redis.hmset(
     `user:${data.id}:home`,
@@ -98,7 +99,7 @@ emitter.on("homeAddressUpdated", function(data) {
   queryHandler.setHomeAd(data.id, data.address);
 });
 
-emitter.on("workAddressUpdated", function(data) {
+emitter.on(constants.USER_WORK_UPDATED, function(data) {
   console.log("event received: work address updated");
   redis.hmset(
     `user:${data.id}:work`,
@@ -113,7 +114,7 @@ emitter.on("workAddressUpdated", function(data) {
   queryHandler.setWorkAd(data.id, data.address);
 });
 
-emitter.on("faveRouteCreated", function(data) {
+emitter.on(constants.USER_ROUTE_CREATED, function(data) {
   console.log("event received: fave route created");
 
   queryHandler.createFaveRoute(data);

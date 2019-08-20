@@ -2,10 +2,10 @@ const EventEmitter = require("events");
 const queryHandler = require("../../../db/sql/map/comments.repository");
 class MyEmitter extends EventEmitter {}
 const emitter = new MyEmitter();
+const constants = require("../../../constants");
 
-emitter.on("commentCreated", function(data) {
+emitter.on(constants.COMMENT_CREATED, function(data) {
   console.log("event received: comment created");
-  console.log(data);
   queryHandler.createComment(data);
 });
 

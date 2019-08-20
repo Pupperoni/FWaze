@@ -5,9 +5,11 @@ const emitter = new MyEmitter();
 
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
+const constants = require("../../../constants");
 
-emitter.on("reportCreated", function(data) {
+emitter.on(constants.REPORT_CREATED, function(data) {
   console.log("event received: report created");
+
   // Add to redis
   if (data.photoPath) {
     redis.hmset(
@@ -27,7 +29,7 @@ emitter.on("reportCreated", function(data) {
       `type`,
       data.type,
       "photoPath",
-      req.file.path
+      data.photoPath
     );
   } else {
     redis.hmset(
@@ -48,12 +50,11 @@ emitter.on("reportCreated", function(data) {
       data.type
     );
   }
-
   // Add to MySQL
   queryHandler.createReport(data);
 });
 
-emitter.on("voteCreated", function(data) {
+emitter.on(constants.REPORT_VOTE_CREATED, function(data) {
   console.log("event received: vote created");
   // Add to redis
   redis.sadd(`user:${data.userId}:upvoting`, data.id);
@@ -62,7 +63,7 @@ emitter.on("voteCreated", function(data) {
   queryHandler.addVote(data.id, data.userId);
 });
 
-emitter.on("voteDeleted", function(data) {
+emitter.on(constants.REPORT_VOTE_DELETED, function(data) {
   console.log("event received: vote deleted");
   // Remove from redis
   redis.srem(`user:${data.userId}:upvoting`, data.id);
