@@ -15,6 +15,8 @@ const Handler = {
 
     // get role of user and check if advertiser
     return userAggregate.getCurrentState(data.userId).then(user => {
+      // user does not exist
+      if (!user) valid = false;
       // user is regular (not valid)
       if (user.role === 0) valid = false;
 

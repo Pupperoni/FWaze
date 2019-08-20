@@ -25,9 +25,9 @@ module.exports = {
         );
 
         // sanity checker
-        // redis
-        //   .zrange(`event:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
-        //   .then(console.log);
+        redis
+          .zrange(`event:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
+          .then(console.log);
       });
   }
 };

@@ -5,55 +5,113 @@ const shortid = require("shortid");
 
 const redis = new Redis(process.env.REDIS_URL);
 const eventHandler = require("../../eventListeners/map/reports.event.handler");
-
+const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
+const writeRepo = require("../../writeRepositories/map/reports.write.repository");
 const Handler = {
   // create a report
-  reportCreated(req, res, next) {
+  reportCreated(data, file) {
     // validate data sent here
     var valid = true;
 
-    // after validating, return response
-    if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+    // get role of user and check if advertiser
+    return userAggregate.getCurrentState(data.userId).then(user => {
+      // user does not exist
+      if (!user) valid = false;
+      // invalid report type
+      if (data.type < 0 || data.type > 8) valid = false;
 
-    // emit the event after all data is good
-    eventHandler.emit("reportCreated", req.body);
+      // continue if all tests pass
+      if (valid) {
+        // generate unique id
+        data.id = shortid.generate();
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+        // Create event instance
+        var event = {
+          id: shortid.generate(),
+          eventName: "REPORT CREATED",
+          payload: {
+            id: data.id,
+            userId: user.id,
+            userName: user.name,
+            type: data.type,
+            latitude: data.latitude.toString(),
+            longitude: data.longitude.toString(),
+            location: data.address
+          }
+        };
+        // check if file is uploaded
+        if (file) event.payload.photoPath = file.path;
+
+        // emit the event and save to read repo
+        eventHandler.emit("reportCreated", event.payload);
+
+        // call write repo to save to event store
+        writeRepo.saveEvent(event);
+
+        // after validation, return the response
+        return Promise.resolve(data);
+      }
+      // validation failed
+      return Promise.reject("Invalid data received");
+    });
   },
 
-  voteCreated(req, res, next) {
+  voteCreated(data) {
     // validate data sent here
     var valid = true;
 
-    // after validating, return response
+    // continue if data is valid
     if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+      // Create event instance
+      var event = {
+        id: shortid.generate(),
+        eventName: "REPORT VOTE_CREATED",
+        payload: {
+          id: data.reportId,
+          userId: data.userId
+        }
+      };
 
-    // emit the event after all data is good
-    eventHandler.emit("voteCreated", req.body);
+      // emit the event after all data is good
+      eventHandler.emit("voteCreated", event.payload);
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+      // save the create event to eventstore
+      writeRepo.saveEvent(event);
+
+      // after validation, return the response
+      return Promise.resolve(data);
+    }
+    // validation failed
+    return Promise.reject("Invalid data received");
   },
 
-  voteDeleted(req, res, next) {
+  voteDeleted(data) {
     // validate data sent here
     var valid = true;
 
-    // after validating, return response
     if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+      // Create event instance
+      var event = {
+        id: shortid.generate(),
+        eventName: "REPORT VOTE_DELETED",
+        payload: {
+          id: data.reportId,
+          userId: data.userId
+        }
+      };
 
-    // emit the event after all data is good
-    eventHandler.emit("voteDeleted", req.body);
+      // emit the event after all data is good
+      eventHandler.emit("voteDeleted", event.payload);
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+      // save the create event to eventstore
+      writeRepo.saveEvent(event);
+
+      // return response
+      return Promise.resolve(data);
+    }
+
+    // validation failed
+    return Promise.reject("Invalid data received");
   }
 };
 
