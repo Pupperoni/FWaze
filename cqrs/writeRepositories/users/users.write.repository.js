@@ -10,12 +10,12 @@ module.exports = {
 
     // Get last offset from event store
     redis
-      .zrange(`event:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
+      .zrevrange(`event:${aggregateName}:${aggregateID}`, 0, 0, "WITHSCORES")
       .then(result => {
         var offset;
         // if empty list, start at 0
         if (result.length == 0) offset = 0;
-        else offset = parseInt(result[result.length - 1]) + 1; // incr 1 last el
+        else offset = parseInt(result[1]) + 1; // incr 1 last el
 
         // save to eventstore
         redis.zadd(
