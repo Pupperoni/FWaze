@@ -93,7 +93,10 @@ const Handler = {
 
   // Add a comment
   createComment(req, res, next) {
-    commandHandler.commentCreated(req, res, next);
+    commandHandler.commentCreated(req.body).then(result => {
+      if (result) return res.json({ msg: "Success", data: result });
+      else return res.status(400).json({ msg: "Failed" });
+    });
     // var newComment = {
     //   id: shortid.generate(),
     //   userId: req.body.userId,
