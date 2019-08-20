@@ -94,82 +94,10 @@ const Handler = {
 
   // Add an ad (only for users with role >= 1)
   createAd(req, res, next) {
-    commandHandler.adCreated(req, res, next);
-    // Check user role (must be advertiser)
-    // redis
-    //   .hgetall(`user:${req.body.userId}`)
-    //   .then(user => {
-    //     if (!user)
-    //       return res.status(400).json({ msg: "This user does not exist!" });
-    //     if (user.role === 0)
-    //       return res
-    //         .status(400)
-    //         .json({ msg: "Sorry. Only advertisers can post advertisements" });
-
-    //     // Creating ad here
-    //     var newAd = {
-    //       id: shortid.generate(),
-    //       latitude: req.body.latitude.toString(),
-    //       longitude: req.body.longitude.toString(),
-    //       location: req.body.address
-    //     };
-
-    //     // Add to redis
-    //     if (req.file) {
-    //       redis.hmset(
-    //         `ad:${newAd.id}`,
-    //         "id",
-    //         newAd.id,
-    //         "caption",
-    //         req.body.caption,
-    //         "userId",
-    //         user.id,
-    //         "userName",
-    //         user.name,
-    //         "longitude",
-    //         newAd.longitude,
-    //         "latitude",
-    //         newAd.latitude,
-    //         "location",
-    //         newAd.location,
-    //         "photoPath",
-    //         req.file.path
-    //       );
-    //     } else {
-    //       redis.hmset(
-    //         `ad:${newAd.id}`,
-    //         "id",
-    //         newAd.id,
-    //         "caption",
-    //         req.body.caption,
-    //         "userId",
-    //         user.id,
-    //         "userName",
-    //         user.name,
-    //         "longitude",
-    //         newAd.longitude,
-    //         "latitude",
-    //         newAd.latitude,
-    //         "location",
-    //         newAd.location
-    //       );
-    //     }
-
-    //     // Add to MySQL
-    //     queryHandler
-    //       .createAd(newAd)
-    //       .then(result => {
-    //         return res.json({ msg: "Success!", data: newAd });
-    //       })
-    //       .catch(e => {
-    //         return res.status(400).json({
-    //           msg: "Something went wrong. Check your info and try again."
-    //         });
-    //       });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
+    commandHandler.adCreated(req.body, req.file).then(result => {
+      if (result) return res.json({ msg: "Success", data: result });
+      else return res.status(400).json({ msg: "Failed" });
+    });
   }
 };
 

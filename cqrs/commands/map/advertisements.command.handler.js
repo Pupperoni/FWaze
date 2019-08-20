@@ -5,23 +5,56 @@ const shortid = require("shortid");
 
 const redis = new Redis(process.env.REDIS_URL);
 const eventHandler = require("../../eventListeners/map/advertisements.event.handler");
-
+const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
+const writeRepo = require("../../writeRepositories/map/advertisements.write.repository");
 const Handler = {
   // create a report
-  adCreated(req, res, next) {
+  adCreated(data, file) {
     // validate data sent here
     var valid = true;
 
-    // after validating, return response
-    if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+    // get role of user and check if advertiser
+    var result = Promise.resolve(
+      userAggregate.getCurrentState(data.userId).then(user => {
+        // user is regular (not valid)
+        if (user.role === 0) valid = false;
 
-    // emit the event after all data is good
-    eventHandler.emit("adCreated", req.body);
+        // continue if all tests pass
+        if (valid) {
+          // generate unique id
+          data.id = shortid.generate();
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+          // Create event instance
+          var event = {
+            id: shortid.generate(),
+            eventName: "AD CREATED",
+            payload: {
+              id: data.id,
+              userId: user.id,
+              userName: user.name,
+              caption: data.caption,
+              latitude: data.latitude.toString(),
+              longitude: data.longitude.toString(),
+              location: data.address
+            }
+          };
+          // check if file is uploaded
+          if (file) event.payload.photoPath = file.path;
+
+          // emit the event and save to read repo
+          eventHandler.emit("adCreated", event.payload);
+
+          // call write repo to save to event store
+          writeRepo.saveEvent(event);
+
+          // after validation, return the response
+          return Promise.resolve(data);
+        }
+        // validation failed
+        return Promise.reject("Invalid data received");
+      })
+    );
+    return result;
   }
 };
 
