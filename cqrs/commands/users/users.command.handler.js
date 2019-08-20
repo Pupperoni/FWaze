@@ -3,7 +3,7 @@ const shortid = require("shortid");
 
 const eventHandler = require("../../eventListeners/users/users.event.handler");
 const writeRepo = require("../../writeRepositories/users/users.write.repository");
-// creates events
+
 const Handler = {
   // Add a new user
   userCreated(data) {
@@ -14,8 +14,7 @@ const Handler = {
     // continue if all tests pass
     if (valid) {
       // generate unique id
-      var id = shortid.generate();
-      data.id = id;
+      data.id = shortid.generate();
 
       // Hash password
       bcrypt.genSalt(10, (err, salt) => {
@@ -43,27 +42,47 @@ const Handler = {
           writeRepo.saveEvent(event);
         });
       });
+
+      // after validation, return the response
+      return Promise.resolve(data);
     }
 
-    // after validation, return the response
-    if (valid) return Promise.resolve(data);
-    else return Promise.reject("Invalid data received");
+    // validation failed
+    return Promise.reject("Invalid data received");
   },
 
-  userUpdated(req, res, next) {
+  userUpdated(data, file) {
     // validate data sent here
     var valid = true;
 
     // after validating, return response
     if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+      // Create event instance
+      var event = {
+        id: shortid.generate(),
+        eventName: "USER UPDATED",
+        payload: {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          role: data.role
+        }
+      };
+      // check if file was uploaded
+      if (file) event.payload.avatarPath = file.path;
 
-    // emit the event after all data is good
-    eventHandler.emit("userUpdated", req.body);
+      // emit the event after all data is good
+      eventHandler.emit("userUpdated", event.payload);
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+      // call write repo to save to event store
+      writeRepo.saveEvent(event);
+
+      // return response
+      return Promise.resolve(data);
+    }
+
+    // validation failed
+    return Promise.reject("Invalid data received");
   },
 
   homeAddressUpdated(req, res, next) {

@@ -145,48 +145,10 @@ const Handler = {
 
   // Edit user details
   updateUser(req, res, next) {
-    commandHandler.userUpdated(req.body);
-    // var memberData = {
-    //   id: req.body.id,
-    //   name: req.body.name,
-    //   email: req.body.email,
-    //   role: req.body.role
-    // };
-
-    // // Update redis data
-    // if (req.file) {
-    //   redis.hmset(
-    //     `user:${memberData.id}`,
-    //     "name",
-    //     memberData.name,
-    //     "email",
-    //     memberData.email,
-    //     "role",
-    //     memberData.role,
-    //     "avatarPath",
-    //     `${req.file.path}`
-    //   );
-    // } else {
-    //   redis.hmset(
-    //     `user:${memberData.id}`,
-    //     "name",
-    //     memberData.name,
-    //     "email",
-    //     memberData.email,
-    //     "role",
-    //     memberData.role
-    //   );
-    // }
-
-    // // Update MySQL data
-    // queryHandler
-    //   .updateUser(memberData)
-    //   .then(result => {
-    //     return res.json({ msg: "Success", data: memberData });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
+    commandHandler.userUpdated(req.body, req.file).then(result => {
+      if (result) return res.json({ msg: "Success", data: result });
+      else return res.status(400).json({ msg: "Failed" });
+    });
   },
 
   // Set user's home address

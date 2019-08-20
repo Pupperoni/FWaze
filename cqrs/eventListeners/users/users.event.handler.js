@@ -54,6 +54,33 @@ emitter.on("userCreated", function(data) {
 emitter.on("userUpdated", function(data) {
   console.log("event received: user updated");
   console.log(data);
+  // Update redis data
+  if (data.avatarPath) {
+    redis.hmset(
+      `user:${data.id}`,
+      "name",
+      data.name,
+      "email",
+      data.email,
+      "role",
+      data.role,
+      "avatarPath",
+      data.avatarPath
+    );
+  } else {
+    redis.hmset(
+      `user:${data.id}`,
+      "name",
+      data.name,
+      "email",
+      data.email,
+      "role",
+      data.role
+    );
+  }
+
+  // Update MySQL data
+  queryHandler.updateUser(data);
 });
 
 emitter.on("homeAddressUpdated", function(data) {
