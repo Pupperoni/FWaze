@@ -14,47 +14,44 @@ const Handler = {
     var valid = true;
 
     // get role of user and check if advertiser
-    var result = Promise.resolve(
-      userAggregate.getCurrentState(data.userId).then(user => {
-        // user is regular (not valid)
-        if (user.role === 0) valid = false;
+    return userAggregate.getCurrentState(data.userId).then(user => {
+      // user is regular (not valid)
+      if (user.role === 0) valid = false;
 
-        // continue if all tests pass
-        if (valid) {
-          // generate unique id
-          data.id = shortid.generate();
+      // continue if all tests pass
+      if (valid) {
+        // generate unique id
+        data.id = shortid.generate();
 
-          // Create event instance
-          var event = {
-            id: shortid.generate(),
-            eventName: "AD CREATED",
-            payload: {
-              id: data.id,
-              userId: user.id,
-              userName: user.name,
-              caption: data.caption,
-              latitude: data.latitude.toString(),
-              longitude: data.longitude.toString(),
-              location: data.address
-            }
-          };
-          // check if file is uploaded
-          if (file) event.payload.photoPath = file.path;
+        // Create event instance
+        var event = {
+          id: shortid.generate(),
+          eventName: "AD CREATED",
+          payload: {
+            id: data.id,
+            userId: user.id,
+            userName: user.name,
+            caption: data.caption,
+            latitude: data.latitude.toString(),
+            longitude: data.longitude.toString(),
+            location: data.address
+          }
+        };
+        // check if file is uploaded
+        if (file) event.payload.photoPath = file.path;
 
-          // emit the event and save to read repo
-          eventHandler.emit("adCreated", event.payload);
+        // emit the event and save to read repo
+        eventHandler.emit("adCreated", event.payload);
 
-          // call write repo to save to event store
-          writeRepo.saveEvent(event);
+        // call write repo to save to event store
+        writeRepo.saveEvent(event);
 
-          // after validation, return the response
-          return Promise.resolve(data);
-        }
-        // validation failed
-        return Promise.reject("Invalid data received");
-      })
-    );
-    return result;
+        // after validation, return the response
+        return Promise.resolve(data);
+      }
+      // validation failed
+      return Promise.reject("Invalid data received");
+    });
   }
 };
 
