@@ -155,75 +155,28 @@ const Handler = {
   addHomeAddress(req, res, next) {
     if (!req.body.submit) return res.json({ data: "Request cancelled" });
 
-    commandHandler.homeAddressUpdated(req, res, next);
-    // redis.hmset(
-    //   `user:${req.body.id}:home`,
-    //   `latitude`,
-    //   req.body.latitude,
-    //   `longitude`,
-    //   req.body.longitude,
-    //   `address`,
-    //   req.body.address
-    // );
-
-    // queryHandler
-    //   .setHomeAd(req.body.id, req.body.address)
-    //   .then(result => {
-    //     return res.json({ data: result });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
+    commandHandler.homeAddressUpdated(req.body).then(result => {
+      if (result) return res.json({ msg: "Success", data: result });
+      else return res.status(400).json({ msg: "Failed" });
+    });
   },
 
   // Set user's work address
   addWorkAddress(req, res, next) {
     if (!req.body.submit) return res.json({ data: "Request cancelled" });
 
-    commandHandler.workAddressUpdated(req, res, next);
-    // redis.hmset(
-    //   `user:${req.body.id}:work`,
-    //   `latitude`,
-    //   req.body.latitude,
-    //   `longitude`,
-    //   req.body.longitude,
-    //   `address`,
-    //   req.body.address
-    // );
-
-    // queryHandler
-    //   .setWorkAd(req.body.id, req.body.address)
-    //   .then(result => {
-    //     return res.json({ data: result });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
+    commandHandler.workAddressUpdated(req.body).then(result => {
+      if (result) return res.json({ msg: "Success", data: result });
+      else return res.status(400).json({ msg: "Failed" });
+    });
   },
 
   // Add a new fave route
   createFaveRoute(req, res, next) {
-    commandHandler.faveRouteCreated(req, res, next);
-
-    // var routeData = {
-    //   id: shortid.generate(),
-    //   sourceLatitude: req.body.sourceLatitude,
-    //   sourceLongitude: req.body.sourceLongitude,
-    //   destinationLatitude: req.body.destinationLatitude,
-    //   destinationLongitude: req.body.destinationLongitude,
-    //   sourceString: req.body.sourceString,
-    //   destinationString: req.body.destinationString,
-    //   userId: req.body.userId
-    // };
-
-    // queryHandler
-    //   .createFaveRoute(routeData)
-    //   .then(result => {
-    //     return res.json({ msg: "Success" });
-    //   })
-    //   .catch(e => {
-    //     return res.status(500).json({ err: e });
-    //   });
+    commandHandler.faveRouteCreated(req.body).then(result => {
+      if (result) return res.json({ msg: "Success", data: result });
+      else return res.status(400).json({ msg: "Failed" });
+    });
   }
 };
 

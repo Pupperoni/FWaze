@@ -85,12 +85,38 @@ emitter.on("userUpdated", function(data) {
 
 emitter.on("homeAddressUpdated", function(data) {
   console.log("event received: home address updated");
-  console.log(data);
+  redis.hmset(
+    `user:${data.id}:home`,
+    `latitude`,
+    data.latitude,
+    `longitude`,
+    data.longitude,
+    `address`,
+    data.address
+  );
+
+  queryHandler.setHomeAd(data.id, data.address);
 });
 
 emitter.on("workAddressUpdated", function(data) {
   console.log("event received: work address updated");
-  console.log(data);
+  redis.hmset(
+    `user:${data.id}:work`,
+    `latitude`,
+    data.latitude,
+    `longitude`,
+    data.longitude,
+    `address`,
+    data.address
+  );
+
+  queryHandler.setWorkAd(data.id, data.address);
+});
+
+emitter.on("faveRouteCreated", function(data) {
+  console.log("event received: fave route created");
+
+  queryHandler.createFaveRoute(data);
 });
 
 module.exports = emitter;

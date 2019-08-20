@@ -85,52 +85,99 @@ const Handler = {
     return Promise.reject("Invalid data received");
   },
 
-  homeAddressUpdated(req, res, next) {
+  homeAddressUpdated(data) {
     // validate data sent here
     var valid = true;
 
-    // after validating, return response
+    // after validating, do important stuff
     if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+      // Create event instance
+      var event = {
+        id: shortid.generate(),
+        eventName: "USER HOME_UPDATED",
+        payload: {
+          id: data.id,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          address: data.address
+        }
+      };
+      // emit the event after all data is good
+      eventHandler.emit("homeAddressUpdated", event.payload);
 
-    // emit the event after all data is good
-    eventHandler.emit("homeAddressUpdated", req.body);
+      // save the create event to eventstore
+      writeRepo.saveEvent(event);
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+      // return response
+      return Promise.resolve(data);
+    }
+
+    // validation failed
+    return Promise.reject("Invalid data received");
   },
 
-  workAddressUpdated(req, res, next) {
+  workAddressUpdated(data) {
     // validate data sent here
     var valid = true;
 
     // after validating, return response
     if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+      // Create event instance
+      var event = {
+        id: shortid.generate(),
+        eventName: "USER WORK_UPDATED",
+        payload: {
+          id: data.id,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          address: data.address
+        }
+      };
 
-    // emit the event after all data is good
-    eventHandler.emit("homeAddressUpdated", req.body);
+      // emit the event after all data is good
+      eventHandler.emit("workAddressUpdated", event.payload);
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+      // save the create event to eventstore
+      writeRepo.saveEvent(event);
+
+      // return response
+      return Promise.resolve(data);
+    }
+    return Promise.reject("Invalid data received");
   },
 
-  faveRouteCreated(req, res, next) {
+  faveRouteCreated(data) {
     // validate data sent here
     var valid = true;
 
     // after validating, return response
     if (valid) {
-      res.json({ msg: "Success" });
-    } else res.status(400).json({ msg: "Failed" });
+      // Create event instance
+      var event = {
+        id: shortid.generate(),
+        eventName: "USER ROUTE_CREATED",
+        payload: {
+          id: data.userId,
+          routeId: shortid.generate(),
+          sourceLatitude: data.sourceLatitude,
+          sourceLongitude: data.sourceLongitude,
+          destinationLatitude: data.destinationLatitude,
+          destinationLongitude: data.destinationLongitude,
+          sourceString: data.sourceString,
+          destinationString: data.destinationString
+        }
+      };
 
-    // emit the event after all data is good
-    eventHandler.emit("faveRouteUpdated", req.body);
+      // emit the event after all data is good
+      eventHandler.emit("faveRouteCreated", event.payload);
 
-    // save the create event to eventstore
-    // redis.zadd("events", 1, req);
+      // save the create event to eventstore
+      writeRepo.saveEvent(event);
+
+      // return response
+      return Promise.resolve(data);
+    }
+    return Promise.reject("Invalid data received");
   }
 };
 

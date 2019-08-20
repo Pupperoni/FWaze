@@ -23,6 +23,11 @@ module.exports = {
           offset,
           JSON.stringify(event)
         );
+
+        // sanity checker
+        redis
+          .zrange(`event:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
+          .then(console.log);
       });
   }
 };

@@ -55,14 +55,14 @@ const Handler = {
   createFaveRoute(routeData) {
     return knex
       .raw("CALL CreateFaveRoute(?,?,?,?,?,?,?,?)", [
-        routeData.id,
+        routeData.routeId,
         routeData.sourceLatitude,
         routeData.sourceLongitude,
         routeData.destinationLatitude,
         routeData.destinationLongitude,
         routeData.sourceString,
         routeData.destinationString,
-        routeData.userId
+        routeData.id
       ])
       .then(row => {
         return Promise.resolve(row[0][0]);
