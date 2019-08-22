@@ -1,6 +1,6 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
 const commandHandler = require("../../cqrs/commands/map/comments.command.handler");
-
+const constants = require("../../constants");
 const Handler = {
   //
   //  Query responsibility
@@ -24,7 +24,7 @@ const Handler = {
       .getCommentById(req.params.id)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: "This comment does not exist!" });
+          return res.status(400).json({ msg: constants.COMMENT_NOT_EXISTS });
         return res.json({ data: result });
       })
       .catch(e => {
@@ -38,7 +38,7 @@ const Handler = {
       .getCommentsByReportId(req.params.id, req.query.page)
       .then(results => {
         if (results.length == 0)
-          return res.json({ msg: "No comment found.", data: [] });
+          return res.json({ msg: constants.COMMENTS_NOT_FOUND, data: [] });
         return res.json({ data: results });
       })
       .catch(e => {
@@ -52,7 +52,7 @@ const Handler = {
       .getCommentsByReportIdExplain(req.params.id, req.query.page)
       .then(results => {
         if (results.length == 0)
-          return res.json({ msg: "No comment found.", data: [] });
+          return res.json({ msg: constants.COMMENTS_NOT_FOUND, data: [] });
         return res.json({ data: results });
       })
       .catch(e => {
@@ -78,7 +78,7 @@ const Handler = {
       .getCommentsByUserId(req.params.id)
       .then(results => {
         if (results.length == 0)
-          return res.status(400).json({ msg: "No comment found." });
+          return res.status(400).json({ msg: constants.COMMENTS_NOT_FOUND });
         return res.json({ data: results });
       })
       .catch(e => {
@@ -95,11 +95,10 @@ const Handler = {
     commandHandler
       .commentCreated(req.body)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   }
 };

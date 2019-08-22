@@ -9,15 +9,20 @@ const Handler = {
   reportCreated(data, file) {
     // validate data sent here
     let valid = true;
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     // get role of user and check if advertiser
     return userAggregate.getCurrentState(data.userId).then(user => {
       // user does not exist
       if (!user) {
         valid = false;
+        reason = constants.USER_NOT_EXISTS;
       }
       // invalid report type
-      if (data.type < 0 || data.type > 8) valid = false;
+      if (data.type < 0 || data.type > 8) {
+        valid = false;
+        reason = constants.INVALID_REPORT_TYPE;
+      }
 
       // continue if all tests pass
       if (valid) {
@@ -53,13 +58,14 @@ const Handler = {
         return Promise.resolve(data);
       }
       // validation failed
-      return Promise.reject("Invalid data received");
+      return Promise.reject(reason);
     });
   },
 
   voteCreated(data) {
     // validate data sent here
     let valid = true;
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     // continue if data is valid
     if (valid) {
@@ -85,12 +91,13 @@ const Handler = {
       return Promise.resolve(data);
     }
     // validation failed
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reason);
   },
 
   voteDeleted(data) {
     // validate data sent here
     let valid = true;
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     if (valid) {
       // Create event instance
@@ -116,7 +123,7 @@ const Handler = {
     }
 
     // validation failed
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reson);
   }
 };
 

@@ -11,10 +11,10 @@ const Handler = {
   userCreated(data) {
     // validate data sent here
     let valid = true;
-    let reason = "Invalid data received";
+    let reason = constants.DEFAULT_INVALID_DATA;
     if (data.password !== data.confirm_password) {
       valid = false;
-      reason = "Passwords don't match";
+      reason = constants.PASSWORDS_NOT_MATCH;
     }
 
     // continue if all tests pass
@@ -62,6 +62,7 @@ const Handler = {
   userUpdated(data, file) {
     // validate data sent here
     let valid = true;
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     // after validating, return response
     if (valid) {
@@ -92,12 +93,13 @@ const Handler = {
     }
 
     // validation failed
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reason);
   },
 
   homeAddressUpdated(data) {
     // validate data sent here
     let valid = true;
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     // after validating, do important stuff
     if (valid) {
@@ -125,12 +127,13 @@ const Handler = {
     }
 
     // validation failed
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reason);
   },
 
   workAddressUpdated(data) {
     // validate data sent here
     let valid = true;
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     // after validating, return response
     if (valid) {
@@ -157,14 +160,13 @@ const Handler = {
       // return response
       return Promise.resolve(data);
     }
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reason);
   },
 
   faveRouteCreated(data) {
     // validate data sent here
     let valid = true;
-
-    console.log(data);
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     // after validating, return response
     if (valid) {
@@ -195,7 +197,7 @@ const Handler = {
       // return response
       return Promise.resolve(data);
     }
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reason);
   }
 };
 

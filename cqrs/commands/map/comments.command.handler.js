@@ -8,6 +8,7 @@ const Handler = {
   commentCreated(data) {
     // validate data sent here
     let valid = true;
+    let reason = constants.DEFAULT_INVALID_DATA;
 
     // check if report and user exists
 
@@ -43,7 +44,7 @@ const Handler = {
     }
 
     // validation failed
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reason);
   }
 };
 

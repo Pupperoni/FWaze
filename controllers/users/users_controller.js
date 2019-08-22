@@ -1,6 +1,6 @@
 const queryHandler = require("../../db/sql/users/users.repository");
 const commandHandler = require("../../cqrs/commands/users/users.command.handler");
-
+const constants = require("../../constants");
 let bcrypt = require("bcryptjs");
 
 let Redis = require("ioredis");
@@ -17,7 +17,7 @@ const Handler = {
       .getAllUsers()
       .then(results => {
         if (results.length == 0)
-          return res.status(400).json({ msg: "No users found" });
+          return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
         return res.json({ users: results });
       })
       .catch(e => {
@@ -32,7 +32,7 @@ const Handler = {
       .hgetall(`user:${req.params.id}`)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: "This user does not exist!" });
+          return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
         // Convert string role to int
         result.role = parseInt(result.role);
 
@@ -61,18 +61,21 @@ const Handler = {
       .then(user => {
         if (user) {
           if (user.avatarPath) return res.sendFile(user.avatarPath, options);
-          else return res.json({ msg: "No file found" });
-        } else return res.status(400).json({ msg: "User does not exist" });
+          else return res.json({ msg: constants.FILE_NOT_FOUND });
+        } else return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
       })
       .catch(e => {
-        return res.status(500).json({ msg: "Error occurred", err: e });
+        return res
+          .status(500)
+          .json({ msg: constants.DEFAULT_SERVER_ERROR, err: e });
       });
   },
 
   // Add a new fave route
   getFaveRoutes(req, res, next) {
     redis.hgetall(`user:${req.params.id}`).then(user => {
-      if (!user) return res.status(400).json({ msg: "User does not exist" });
+      if (!user)
+        return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
       queryHandler
         .getFaveRoutes(req.params.id)
         .then(results => {
@@ -94,11 +97,11 @@ const Handler = {
     if (name && password && name !== "" && password !== "") {
       // fields must not be empty
       redis
-        .get(`user:name:${req.body.name}`) // check if user exists
+        .get(`user:name:${name}`) // check if user exists
         .then(userId => {
-          if (!userId) return Promise.reject("Login failed");
+          if (!userId) return Promise.reject(constants.DEFAULT_LOGIN_FAILURE);
           id = userId;
-          return redis.hgetall(`user:${userId}`);
+          return redis.hgetall(`user:${id}`);
         })
         .then(result => {
           user = result;
@@ -108,7 +111,7 @@ const Handler = {
           if (isMatch) {
             // Get home address haha
             return redis.hgetall(`user:${id}:home`); // get home details
-          } else return Promise.reject("Login failed");
+          } else return Promise.reject(constants.DEFAULT_LOGIN_FAILURE);
         })
         .then(home => {
           if (home) user.home = home;
@@ -118,7 +121,7 @@ const Handler = {
         .then(work => {
           if (work) user.work = work;
           return res.json({
-            msg: "Login success",
+            msg: constants.LOGIN_SUCCESS,
             user: user
           });
         })
@@ -126,7 +129,8 @@ const Handler = {
           console.log(e);
           return res.status(400).json({ msg: e });
         });
-    } else return res.status(400).json({ msg: "Login failed" });
+    } else
+      return res.status(400).json({ msg: constants.DEFAULT_LOGIN_FAILURE });
   },
 
   //
@@ -139,25 +143,23 @@ const Handler = {
     queryHandler
       .getUserByName(req.body.name) // checks name
       .then(user => {
-        if (user.length > 0) return Promise.reject("Username already taken");
+        if (user.length > 0) return Promise.reject(constants.USERNAME_TAKEN);
         else
           return Promise.resolve(queryHandler.getUserByEmail(req.body.email)); // checks email
       })
       .then(user => {
-        if (user.length > 0) return Promise.reject("Email already registered");
+        if (user.length > 0) return Promise.reject(constants.EMAIL_TAKEN);
         else return Promise.resolve(true);
       })
+      .then(() => {
+        // all good
+        commandHandler.userCreated(req.body);
+      })
       .then(result => {
-        if (result) {
-          // all good
-          commandHandler.userCreated(req.body).then(result => {
-            if (result) return res.json({ msg: "Success", data: result });
-            else return res.status(400).json({ msg: "Failed" });
-          });
-        }
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   },
 
@@ -166,11 +168,10 @@ const Handler = {
     commandHandler
       .userUpdated(req.body, req.file)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   },
 
@@ -181,11 +182,10 @@ const Handler = {
     commandHandler
       .homeAddressUpdated(req.body)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   },
 
@@ -196,11 +196,10 @@ const Handler = {
     commandHandler
       .workAddressUpdated(req.body)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   },
 
@@ -209,11 +208,10 @@ const Handler = {
     commandHandler
       .faveRouteCreated(req.body)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   }
 };

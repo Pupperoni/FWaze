@@ -1,6 +1,6 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
 const commandHandler = require("../../cqrs/commands/map/reports.command.handler");
-
+const constants = require("../../constants");
 let Redis = require("ioredis");
 let redis = new Redis(process.env.REDIS_URL);
 
@@ -39,7 +39,7 @@ const Handler = {
       .hgetall(`report:${req.params.id}`)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: "This report does not exist!" });
+          return res.status(400).json({ msg: constants.REPORT_NOT_EXISTS });
         // count number of votes in a report
         redis.scard(`report:${req.params.id}:upvoters`).then(count => {
           result.votes = count;
@@ -58,7 +58,7 @@ const Handler = {
       .getReportsByType(reportTypes[req.params.type])
       .then(results => {
         if (results.length == 0)
-          return res.status(400).json({ msg: "No reports of this type." });
+          return res.status(400).json({ msg: constants.REPORT_TYPE_EMPTY });
         return res.json({ reports: results });
       })
       .catch(e => {
@@ -172,11 +172,14 @@ const Handler = {
       .then(ad => {
         if (ad) {
           if (ad.photoPath) return res.sendFile(ad.photoPath, options);
-          else return res.json({ msg: "No file found" });
-        } else return res.status(400).json({ msg: "Ad does not exist" });
+          else return res.json({ msg: constants.FILE_NOT_FOUND });
+        } else
+          return res.status(400).json({ msg: constants.REPORT_NOT_EXISTS });
       })
       .catch(e => {
-        return res.status(500).json({ msg: "Error occurred", err: e });
+        return res
+          .status(500)
+          .json({ msg: constants.DEFAULT_SERVER_ERROR, err: e });
       });
   },
 
@@ -189,11 +192,10 @@ const Handler = {
     commandHandler
       .reportCreated(req.body, req.file)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   },
   // Add vote instance
@@ -201,11 +203,10 @@ const Handler = {
     commandHandler
       .voteCreated(req.body)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   },
 
@@ -214,11 +215,10 @@ const Handler = {
     commandHandler
       .voteDeleted(req.body)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   }
 };

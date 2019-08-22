@@ -1,6 +1,6 @@
 const queryHandler = require("../../db/sql/map/advertisements.repository");
 const commandHandler = require("../../cqrs/commands/map/advertisements.command.handler");
-
+const constants = require("../../constants");
 let Redis = require("ioredis");
 let redis = new Redis(process.env.REDIS_URL);
 const Handler = {
@@ -26,7 +26,7 @@ const Handler = {
       .hgetall(`ad:${req.params.id}`)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: "This ad does not exist!" });
+          return res.status(400).json({ msg: constants.AD_NOT_EXISTS });
         return res.json({ ad: result });
       })
       .catch(e => {
@@ -78,11 +78,13 @@ const Handler = {
       .then(ad => {
         if (ad) {
           if (ad.photoPath) return res.sendFile(ad.photoPath, options);
-          else return res.json({ msg: "No file found" });
-        } else return res.status(400).json({ msg: "Ad does not exist" });
+          else return res.json({ msg: constants.FILE_NOT_FOUND });
+        } else return res.status(400).json({ msg: constants.AD_NOT_EXISTS });
       })
       .catch(e => {
-        return res.status(500).json({ msg: "Error occurred", err: e });
+        return res
+          .status(500)
+          .json({ msg: constants.DEFAULT_SERVER_ERROR, err: e });
       });
   },
 
@@ -95,11 +97,11 @@ const Handler = {
     commandHandler
       .adCreated(req.body, req.file)
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        if (result)
+          return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
-        return res.status(400).json({ msg: "Failed", err: e });
+        return res.status(400).json({ err: e });
       });
   }
 };
