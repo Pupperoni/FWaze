@@ -1,5 +1,7 @@
 const shortid = require("shortid");
 const eventHandler = require("../../eventListeners/map/comments.event.handler");
+const reportAggregate = require("../../aggregateHelpers/map/reports.aggregate");
+const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
 const writeRepo = require("../../writeRepositories/write.repository");
 const constants = require("../../../constants");
 
@@ -11,40 +13,58 @@ const Handler = {
     let reason = constants.DEFAULT_INVALID_DATA;
 
     // check if report and user exists
-
-    // if all tests pass, do important stuff
-    if (valid) {
-      // generate id
-      data.id = shortid.generate();
-
-      // Create event instance
-      let event = {
-        id: shortid.generate(),
-        eventName: constants.COMMENT_CREATED,
-        aggregateName: constants.COMMENT_AGGREGATE_NAME,
-        aggregateID: data.id,
-        payload: {
-          id: data.id,
-          userId: data.userId,
-          userName: data.userName,
-          reportId: data.reportId,
-          body: data.body,
-          timestamp: data.timestamp
+    return reportAggregate
+      .getCurrentState(data.reportId) // check if report exists
+      .then(report => {
+        if (!report) {
+          // report does not exist
+          valid = false;
+          reason = constants.REPORT_NOT_EXISTS;
+          return Promise.reject(reason);
+        } else return userAggregate.getCurrentState(data.userId); // check if user exists
+      })
+      .then(user => {
+        if (!user) {
+          valid = false;
+          reason = constants.USER_NOT_EXISTS;
+          return Promise.reject(reason);
         }
-      };
 
-      // emit the event after all data is good
-      eventHandler.emit(constants.COMMENT_CREATED, event.payload);
+        // if all tests pass, do important stuff
+        if (valid) {
+          // generate id
+          data.id = shortid.generate();
 
-      // save the create event to eventstore
-      writeRepo.saveEvent(event);
+          // Create event instance
+          let event = {
+            id: shortid.generate(),
+            eventName: constants.COMMENT_CREATED,
+            aggregateName: constants.COMMENT_AGGREGATE_NAME,
+            aggregateID: data.id,
+            payload: {
+              id: data.id,
+              userId: data.userId,
+              userName: data.userName,
+              reportId: data.reportId,
+              body: data.body,
+              timestamp: data.timestamp
+            }
+          };
 
-      // return response
-      return Promise.resolve(data);
-    }
+          // emit the event after all data is good
+          eventHandler.emit(constants.COMMENT_CREATED, event.payload);
 
-    // validation failed
-    return Promise.reject(reason);
+          // save the create event to eventstore
+          writeRepo.saveEvent(event);
+
+          // return response
+          return Promise.resolve(data);
+        }
+      })
+      .catch(e => {
+        // validation failed
+        return Promise.reject(e);
+      });
   }
 };
 
