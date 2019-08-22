@@ -33,7 +33,6 @@ module.exports = {
       .then(() => {
         // save snapshot after 50 offsets
         if ((offset + 1) % 50 === 0) {
-          console.log("snapshot time");
           if (aggregateName === constants.USER_AGGREGATE_NAME) {
             return userAggregate.getCurrentState(aggregateID);
           } else if (aggregateName === constants.REPORT_AGGREGATE_NAME) {
@@ -42,7 +41,6 @@ module.exports = {
         }
       })
       .then(aggregate => {
-        console.log(offset);
         if (aggregate) {
           // save currentstate with offset
           redis.hset(

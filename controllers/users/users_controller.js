@@ -126,7 +126,6 @@ const Handler = {
           });
         })
         .catch(e => {
-          console.log(e);
           return res.status(400).json({ msg: e });
         });
     } else
