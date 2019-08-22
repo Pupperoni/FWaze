@@ -34,15 +34,17 @@ module.exports = {
         // save snapshot after 50 offsets
         if ((offset + 1) % 50 === 0) {
           // could separate these into multiple files for cleaner code i guess
-          if (aggregateName === constants.USER_AGGREGATE_NAME) {
-            return userAggregate.getCurrentState(aggregateID);
-          } else if (aggregateName === constants.REPORT_AGGREGATE_NAME) {
-            return reportAggregate.getCurrentState(aggregateID);
+          switch (aggregateName) {
+            case constants.USER_AGGREGATE_NAME:
+              return userAggregate.getCurrentState(aggregateID);
+            case aggregateName === constants.REPORT_AGGREGATE_NAME:
+              return reportAggregate.getCurrentState(aggregateID);
           }
         }
       })
       .then(aggregate => {
         if (aggregate) {
+          console.log(`Snapshot updated: ${offset}`);
           // save currentstate with offset
           redis.hset(
             `snapshot:${aggregateName}:${aggregateID}`,

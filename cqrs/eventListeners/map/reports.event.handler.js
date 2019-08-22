@@ -50,6 +50,10 @@ emitter.on(constants.REPORT_CREATED, function(data) {
       data.type
     );
   }
+
+  // Link users and reports
+  redis.sadd(`reports:${data.userId}`, data.id);
+
   // Add to MySQL
   queryHandler.createReport(data);
 });

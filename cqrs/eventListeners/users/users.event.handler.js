@@ -54,30 +54,45 @@ emitter.on(constants.USER_CREATED, function(data) {
 
 emitter.on(constants.USER_UPDATED, function(data) {
   console.log("event received: user updated");
-  // Update redis data
-  if (data.avatarPath) {
-    redis.hmset(
-      `user:${data.id}`,
-      "name",
-      data.name,
-      "email",
-      data.email,
-      "role",
-      data.role,
-      "avatarPath",
-      data.avatarPath
-    );
-  } else {
-    redis.hmset(
-      `user:${data.id}`,
-      "name",
-      data.name,
-      "email",
-      data.email,
-      "role",
-      data.role
-    );
-  }
+
+  redis
+    .del(`user:name:${data.name}`) // delete old name checker
+    .then(() => {
+      // Update redis data
+      if (data.avatarPath) {
+        redis.hmset(
+          `user:${data.id}`,
+          "name",
+          data.name,
+          "email",
+          data.email,
+          "role",
+          data.role,
+          "avatarPath",
+          data.avatarPath
+        );
+      } else {
+        redis.hmset(
+          `user:${data.id}`,
+          "name",
+          data.name,
+          "email",
+          data.email,
+          "role",
+          data.role
+        );
+      }
+    })
+    .then(() => {
+      // Update reports
+      redis.smembers(`reports:${data.id}`).then(reportIds => {
+        reportIds.forEach(id => {
+          redis.hset(`report:${id}`, `userName`, data.name);
+        });
+      });
+      // Update name checker
+      redis.set(`user:name:${data.name}`, data.id);
+    });
 
   // Update MySQL data
   queryHandler.updateUser(data);
