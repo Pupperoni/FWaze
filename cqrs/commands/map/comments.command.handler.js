@@ -13,23 +13,15 @@ const Handler = {
     let reason = constants.DEFAULT_INVALID_DATA;
 
     // check if report and user exists
-    return reportAggregate
-      .getCurrentState(data.reportId) // check if report exists
-      .then(report => {
-        if (!report) {
-          // report does not exist
-          valid = false;
-          reason = constants.REPORT_NOT_EXISTS;
-          return Promise.reject(reason);
-        } else return userAggregate.getCurrentState(data.userId); // check if user exists
-      })
-      .then(user => {
-        if (!user) {
-          valid = false;
-          reason = constants.USER_NOT_EXISTS;
-          return Promise.reject(reason);
-        }
-
+    let reportCheck = reportAggregate.getCurrentState(data.reportId); // check if report exists
+    let userCheck = userAggregate.getCurrentState(data.userId); // check if user exists
+    return Promise.all([reportCheck, userCheck])
+      .then(results => {
+        results.forEach(aggregate => {
+          if (!aggregate) {
+            valid = false;
+          }
+        });
         // if all tests pass, do important stuff
         if (valid) {
           // generate id
@@ -60,6 +52,9 @@ const Handler = {
           // return response
           return Promise.resolve(data);
         }
+
+        // validation failed
+        return Promise.reject(reason);
       })
       .catch(e => {
         // validation failed
