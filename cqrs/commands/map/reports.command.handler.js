@@ -123,7 +123,7 @@ const Handler = {
     }
 
     // validation failed
-    return Promise.reject(reson);
+    return Promise.reject(reason);
   }
 };
 
