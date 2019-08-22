@@ -1,6 +1,5 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
 const commandHandler = require("../../cqrs/commands/map/comments.command.handler");
-var shortid = require("shortid");
 
 const Handler = {
   //

@@ -15,6 +15,24 @@ BEGIN
     WHERE id = userId;
 END;
 
+DROP PROCEDURE IF EXISTS GetUserByName;
+
+CREATE PROCEDURE GetUserByName(IN userName VARCHAR(15))
+BEGIN
+    SELECT id, name, email, role, home, work
+    FROM users
+    WHERE name = userName;
+END;
+
+DROP PROCEDURE IF EXISTS GetUserByEmail;
+
+CREATE PROCEDURE GetUserByEmail(IN userEmail VARCHAR(15))
+BEGIN
+    SELECT id, name, email, role, home, work
+    FROM users
+    WHERE email = userEmail;
+END;
+
 DROP PROCEDURE IF EXISTS CreateUser;
 
 CREATE PROCEDURE CreateUser(

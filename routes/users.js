@@ -1,8 +1,8 @@
-var express = require("express");
+const express = require("express");
 const multer = require("multer");
 
-var router = express.Router();
-var userHandler = require("../controllers/users/users_controller");
+let router = express.Router();
+let userHandler = require("../controllers/users/users_controller");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

@@ -1,4 +1,4 @@
-var knex = require("../../knex");
+let knex = require("../../knex");
 
 const Handler = {
   // Fetch all user names and emails
@@ -8,6 +8,30 @@ const Handler = {
       .then(row => {
         // for some reason, the sql query is also sent as the 2nd element
         // so we return only the first
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
+  // Fetch users using name
+  getUserByName(name) {
+    return knex
+      .raw("CALL GetUserByName(?)", [name])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
+  // Fetch users using email
+  getUserByEmail(email) {
+    return knex
+      .raw("CALL GetUserByEmail(?)", [email])
+      .then(row => {
         return Promise.resolve(row[0][0]);
       })
       .catch(e => {

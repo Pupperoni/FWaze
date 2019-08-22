@@ -1,14 +1,15 @@
-var knex = require("../../knex");
+let knex = require("../../knex");
 
 const Handler = {
   createComment(commentData) {
     return knex
-      .raw("CALL CreateComment(?,?,?,?,?)", [
+      .raw("CALL CreateComment(?,?,?,?,?,?)", [
         commentData.id,
         commentData.userId,
         commentData.userName,
         commentData.reportId,
-        commentData.body
+        commentData.body,
+        commentData.timestamp
       ])
       .then(row => {
         return Promise.resolve(row[0][0]);

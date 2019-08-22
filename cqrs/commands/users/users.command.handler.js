@@ -10,27 +10,12 @@ const Handler = {
   // Add a new user
   userCreated(data) {
     // validate data sent here
-    var valid = true;
-    if (data.password !== data.confirm_password) valid = false;
-
-    // check if user name and email exists
-    // var nameCheck = userAggregate
-    //   .getCurrentState(data.name, "name")
-    //   .then(user => {
-    //     console.log(user);
-    //     // user exists with this name
-    //     if (user.name == data.name) return Promise.resolve(false);
-    //     else return Promise.resolve(true);
-    //   });
-
-    // var emailCheck = userAggregate
-    //   .getCurrentState(data.email, "email")
-    //   .then(user => {
-    //     console.log(user);
-    //     // user exists with this name
-    //     if (user) return Promise.resolve(false);
-    //     else return Promise.resolve(true);
-    //   });
+    let valid = true;
+    let reason = "Invalid data received";
+    if (data.password !== data.confirm_password) {
+      valid = false;
+      reason = "Passwords don't match";
+    }
 
     // continue if all tests pass
     if (valid) {
@@ -45,7 +30,7 @@ const Handler = {
           data.password = hash;
 
           // Create event instance
-          var event = {
+          let event = {
             eventId: shortid.generate(),
             eventName: constants.USER_CREATED,
             aggregateName: constants.USER_AGGREGATE_NAME,
@@ -63,20 +48,6 @@ const Handler = {
 
           // call write repo to save to event store
           writeRepo.saveEvent(event);
-
-          // writeRepo.saveEvent({
-          //   eventId: shortid.generate(),
-          //   eventName: "USER CREATED",
-          //   aggregateName: "USERNAME",
-          //   aggregateID: data.name,
-          //   payload: {
-          //     id: data.id,
-          //     name: data.name,
-          //     email: data.email,
-          //     password: data.password,
-          //     role: data.role
-          //   }
-          // });
         });
       });
 
@@ -85,17 +56,17 @@ const Handler = {
     }
 
     // validation failed
-    return Promise.reject("Invalid data received");
+    return Promise.reject(reason);
   },
 
   userUpdated(data, file) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
 
     // after validating, return response
     if (valid) {
       // Create event instance
-      var event = {
+      let event = {
         eventId: shortid.generate(),
         eventName: constants.USER_UPDATED,
         aggregateName: constants.USER_AGGREGATE_NAME,
@@ -126,12 +97,12 @@ const Handler = {
 
   homeAddressUpdated(data) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
 
     // after validating, do important stuff
     if (valid) {
       // Create event instance
-      var event = {
+      let event = {
         eventId: shortid.generate(),
         eventName: constants.USER_HOME_UPDATED,
         aggregateName: constants.USER_AGGREGATE_NAME,
@@ -159,12 +130,12 @@ const Handler = {
 
   workAddressUpdated(data) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
 
     // after validating, return response
     if (valid) {
       // Create event instance
-      var event = {
+      let event = {
         eventId: shortid.generate(),
         eventName: constants.USER_WORK_UPDATED,
         aggregateName: constants.USER_AGGREGATE_NAME,
@@ -191,16 +162,18 @@ const Handler = {
 
   faveRouteCreated(data) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
+
+    console.log(data);
 
     // after validating, return response
     if (valid) {
       // Create event instance
-      var event = {
+      let event = {
         eventId: shortid.generate(),
         eventName: constants.USER_ROUTE_CREATED,
         aggregateName: constants.USER_AGGREGATE_NAME,
-        aggregateID: data.id,
+        aggregateID: data.userId,
         payload: {
           id: data.userId,
           routeId: shortid.generate(),

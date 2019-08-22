@@ -5,11 +5,12 @@ CREATE PROCEDURE CreateComment(
     IN userId VARCHAR(15),
     IN userName VARCHAR(255),
     IN reportId VARCHAR(15),
-    IN comment VARCHAR(255)
+    IN comment VARCHAR(255),
+    IN timenow TIMESTAMP
 )
 BEGIN
-    INSERT INTO comments (id, user_id, userName, report_id, body)
-    VALUES (commentId, userId, userName, reportId, comment);
+    INSERT INTO comments (id, user_id, userName, report_id, body, created_at)
+    VALUES (commentId, userId, userName, reportId, comment, timenow);
 END;
 
 DROP PROCEDURE IF EXISTS GetComments;
@@ -27,7 +28,7 @@ CREATE PROCEDURE GetCommentsByReportId(
     IN pageNum INT
 )
 BEGIN
-    SELECT report_id, user_id, userName, body
+    SELECT report_id, user_id, userName, body, created_at
     FROM comments
     WHERE report_id = reportId
     ORDER BY created_at DESC

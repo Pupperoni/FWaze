@@ -7,7 +7,7 @@ const Handler = {
   // create a report
   commentCreated(data) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
 
     // check if report and user exists
 
@@ -17,7 +17,7 @@ const Handler = {
       data.id = shortid.generate();
 
       // Create event instance
-      var event = {
+      let event = {
         id: shortid.generate(),
         eventName: constants.COMMENT_CREATED,
         aggregateName: constants.COMMENT_AGGREGATE_NAME,
@@ -27,7 +27,8 @@ const Handler = {
           userId: data.userId,
           userName: data.userName,
           reportId: data.reportId,
-          body: data.body
+          body: data.body,
+          timestamp: data.timestamp
         }
       };
 

@@ -12,32 +12,12 @@ module.exports = {
         .then(history => {
           // user has no history yet
           if (history.length === 0) return null;
-
-          // build the details of the user
-          var user = {
-            id: identifier,
-            name: undefined,
-            email: undefined,
-            password: undefined,
-            role: undefined,
-            home: {
-              latitude: undefined,
-              longitude: undefined,
-              address: undefined
-            },
-            work: {
-              latitude: undefined,
-              longitude: undefined,
-              address: undefined
-            },
-            faveRoutes: [],
-            avatarPath: undefined
-          };
+          let user = {};
 
           // Recount history
           history.forEach(event => {
-            var event = JSON.parse(event);
-            var payload = event.payload;
+            event = JSON.parse(event);
+            let payload = event.payload;
 
             if (event.eventName === constants.USER_CREATED) {
               user.id = payload.id;
@@ -48,24 +28,40 @@ module.exports = {
             } else if (event.eventName === constants.USER_UPDATED) {
               user.name = payload.name;
               user.email = payload.email;
-              user.password = payload.password;
               user.role = payload.role;
-              user.avatarPath = payload.avatarPath;
+              if (payload.avatarPath) user.avatarPath = payload.avatarPath;
             } else if (event.eventName === constants.USER_HOME_UPDATED) {
+              if (!user.home) {
+                user.home = {
+                  latitude: undefined,
+                  longitude: undefined,
+                  address: undefined
+                };
+              }
               user.home.latitude = payload.latitude;
               user.home.longitude = payload.longitude;
               user.home.address = payload.address;
             } else if (event.eventName === constants.USER_WORK_UPDATED) {
+              if (!user.work) {
+                user.work = {
+                  latitude: undefined,
+                  longitude: undefined,
+                  address: undefined
+                };
+              }
               user.work.latitude = payload.latitude;
               user.work.longitude = payload.longitude;
               user.work.address = payload.address;
             } else if (event.eventName === constants.USER_ROUTE_CREATED) {
+              if (!user.faveRoutes) {
+                user.faveRoutes = [];
+              }
               user.faveRoutes.push(payload);
             }
           });
 
-          // user was not found in history
-          if (user.name === undefined) return null;
+          // user does not exist if it was not created
+          if (!user.id) return null;
 
           // current state of user
           return user;

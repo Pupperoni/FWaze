@@ -54,7 +54,6 @@ emitter.on(constants.USER_CREATED, function(data) {
 
 emitter.on(constants.USER_UPDATED, function(data) {
   console.log("event received: user updated");
-  console.log(data);
   // Update redis data
   if (data.avatarPath) {
     redis.hmset(

@@ -1,4 +1,4 @@
-var knex = require("../../knex");
+let knex = require("../../knex");
 
 const Handler = {
   createReport(reportData) {

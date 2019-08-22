@@ -8,12 +8,14 @@ const Handler = {
   // create a report
   reportCreated(data, file) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
 
     // get role of user and check if advertiser
     return userAggregate.getCurrentState(data.userId).then(user => {
       // user does not exist
-      if (!user) valid = false;
+      if (!user) {
+        valid = false;
+      }
       // invalid report type
       if (data.type < 0 || data.type > 8) valid = false;
 
@@ -23,7 +25,7 @@ const Handler = {
         data.id = shortid.generate();
 
         // Create event instance
-        var event = {
+        let event = {
           eventId: shortid.generate(),
           eventName: constants.REPORT_CREATED,
           aggregateName: constants.REPORT_AGGREGATE_NAME,
@@ -57,12 +59,12 @@ const Handler = {
 
   voteCreated(data) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
 
     // continue if data is valid
     if (valid) {
       // Create event instance
-      var event = {
+      let event = {
         eventId: shortid.generate(),
         eventName: constants.REPORT_VOTE_CREATED,
         aggregateName: constants.REPORT_AGGREGATE_NAME,
@@ -88,11 +90,11 @@ const Handler = {
 
   voteDeleted(data) {
     // validate data sent here
-    var valid = true;
+    let valid = true;
 
     if (valid) {
       // Create event instance
-      var event = {
+      let event = {
         eventId: shortid.generate(),
         eventName: constants.REPORT_VOTE_DELETED,
         aggregateName: constants.REPORT_AGGREGATE_NAME,

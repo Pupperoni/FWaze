@@ -1,11 +1,10 @@
 const queryHandler = require("../../db/sql/users/users.repository");
 const commandHandler = require("../../cqrs/commands/users/users.command.handler");
 
-var bcrypt = require("bcryptjs");
-var shortid = require("shortid");
+let bcrypt = require("bcryptjs");
 
-var Redis = require("ioredis");
-var redis = new Redis(process.env.REDIS_URL);
+let Redis = require("ioredis");
+let redis = new Redis(process.env.REDIS_URL);
 
 //
 // Query responsibility
@@ -54,7 +53,7 @@ const Handler = {
 
   // Get profile picture of a user
   getImage(req, res, next) {
-    var options = {
+    let options = {
       root: "/usr/src/app/"
     };
     redis
@@ -87,8 +86,8 @@ const Handler = {
 
   // Log in a user
   loginUser(req, res, next) {
-    var name = req.body.name;
-    var password = req.body.password;
+    let name = req.body.name;
+    let password = req.body.password;
 
     if (name && password && name !== "" && password !== "") {
       redis.get(`user:name:${req.body.name}`).then(userId => {
@@ -137,11 +136,26 @@ const Handler = {
 
   // Add a new user
   createUser(req, res, next) {
-    commandHandler
-      .userCreated(req.body)
+    // validate user details
+    queryHandler
+      .getUserByName(req.body.name) // checks name
+      .then(user => {
+        if (user.length > 0) return Promise.reject("Username already taken");
+        else
+          return Promise.resolve(queryHandler.getUserByEmail(req.body.email)); // checks email
+      })
+      .then(user => {
+        if (user.length > 0) return Promise.reject("Email already registered");
+        else return Promise.resolve(true);
+      })
       .then(result => {
-        if (result) return res.json({ msg: "Success", data: result });
-        else return res.status(400).json({ msg: "Failed" });
+        if (result) {
+          // all good
+          commandHandler.userCreated(req.body).then(result => {
+            if (result) return res.json({ msg: "Success", data: result });
+            else return res.status(400).json({ msg: "Failed" });
+          });
+        }
       })
       .catch(e => {
         return res.status(400).json({ msg: "Failed", err: e });

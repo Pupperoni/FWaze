@@ -1,10 +1,8 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
-const userHandler = require("../../db/sql/users/users.repository");
 const commandHandler = require("../../cqrs/commands/map/reports.command.handler");
-var shortid = require("shortid");
 
-var Redis = require("ioredis");
-var redis = new Redis(process.env.REDIS_URL);
+let Redis = require("ioredis");
+let redis = new Redis(process.env.REDIS_URL);
 
 const reportTypes = {
   traffic_jam: 0,
@@ -70,10 +68,10 @@ const Handler = {
 
   // Get all reports enclosed in an area
   getReportsByRange(req, res, next) {
-    var right = req.query.tright.split(",")[1];
-    var left = req.query.bleft.split(",")[1];
-    var top = req.query.tright.split(",")[0];
-    var bottom = req.query.bleft.split(",")[0];
+    let right = req.query.tright.split(",")[1];
+    let left = req.query.bleft.split(",")[1];
+    let top = req.query.tright.split(",")[0];
+    let bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getReportsByBorder(left, right, bottom, top)
       .then(results => {
@@ -86,10 +84,10 @@ const Handler = {
 
   // Get all reports enclosed in an area
   getReportsByRangeExplain(req, res, next) {
-    var right = req.query.tright.split(",")[1];
-    var left = req.query.bleft.split(",")[1];
-    var top = req.query.tright.split(",")[0];
-    var bottom = req.query.bleft.split(",")[0];
+    let right = req.query.tright.split(",")[1];
+    let left = req.query.bleft.split(",")[1];
+    let top = req.query.tright.split(",")[0];
+    let bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getReportsByBorderExplain(left, right, bottom, top)
       .then(results => {
@@ -102,10 +100,10 @@ const Handler = {
 
   // Get all reports enclosed in an area of a specific type
   getReportsByTypeRange(req, res, next) {
-    var right = req.query.tright.split(",")[1];
-    var left = req.query.bleft.split(",")[1];
-    var top = req.query.tright.split(",")[0];
-    var bottom = req.query.bleft.split(",")[0];
+    let right = req.query.tright.split(",")[1];
+    let left = req.query.bleft.split(",")[1];
+    let top = req.query.tright.split(",")[0];
+    let bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getReportsByTypeBorder(
         reportTypes[req.params.type],
@@ -124,10 +122,10 @@ const Handler = {
 
   // Get all reports enclosed in an area of a specific type
   getReportsByTypeRangeExplain(req, res, next) {
-    var right = req.query.tright.split(",")[1];
-    var left = req.query.bleft.split(",")[1];
-    var top = req.query.tright.split(",")[0];
-    var bottom = req.query.bleft.split(",")[0];
+    let right = req.query.tright.split(",")[1];
+    let left = req.query.bleft.split(",")[1];
+    let top = req.query.tright.split(",")[0];
+    let bottom = req.query.bleft.split(",")[0];
     queryHandler
       .getReportsByTypeBorderExplain(
         reportTypes[req.params.type],
@@ -166,7 +164,7 @@ const Handler = {
 
   // Get profile picture of a report
   getImage(req, res, next) {
-    var options = {
+    let options = {
       root: "/usr/src/app/"
     };
     redis
