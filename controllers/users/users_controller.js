@@ -88,46 +88,45 @@ const Handler = {
   loginUser(req, res, next) {
     let name = req.body.name;
     let password = req.body.password;
+    let id = null;
+    let user = {};
 
     if (name && password && name !== "" && password !== "") {
-      redis.get(`user:name:${req.body.name}`).then(userId => {
-        if (!userId) return res.status(400).json({ msg: "Login failed" });
-        redis
-          .hgetall(`user:${userId}`)
-          .then(result => {
-            bcrypt.compare(password, result.password).then(isMatch => {
-              if (isMatch) {
-                // Get home address haha
-                redis.hgetall(`user:${userId}:home`).then(home => {
-                  if (home) result.home = home;
-                  // Then get work address
-                  redis.hgetall(`user:${userId}:work`).then(work => {
-                    if (work) result.work = work;
-                    return res.json({
-                      msg: "Login success",
-                      user: {
-                        id: result.id,
-                        name: result.name,
-                        email: result.email,
-                        role: result.role,
-                        home: result.home,
-                        work: result.work
-                      }
-                    });
-                  });
-                });
-              } else {
-                return res.status(400).json({ msg: "Login failed" });
-              }
-            });
-          })
-          .catch(e => {
-            return res.status(500).json({ err: e });
+      // fields must not be empty
+      redis
+        .get(`user:name:${req.body.name}`) // check if user exists
+        .then(userId => {
+          if (!userId) return Promise.reject("Login failed");
+          id = userId;
+          return redis.hgetall(`user:${userId}`);
+        })
+        .then(result => {
+          user = result;
+          return bcrypt.compare(password, result.password); // check if password is correct
+        })
+        .then(isMatch => {
+          if (isMatch) {
+            // Get home address haha
+            return redis.hgetall(`user:${id}:home`); // get home details
+          } else return Promise.reject("Login failed");
+        })
+        .then(home => {
+          if (home) user.home = home;
+          // Then get work address
+          return redis.hgetall(`user:${id}:work`); // and work details
+        })
+        .then(work => {
+          if (work) user.work = work;
+          return res.json({
+            msg: "Login success",
+            user: user
           });
-      });
-    } else {
-      return res.status(400).json({ msg: "Login failed" });
-    }
+        })
+        .catch(e => {
+          console.log(e);
+          return res.status(400).json({ msg: e });
+        });
+    } else return res.status(400).json({ msg: "Login failed" });
   },
 
   //
