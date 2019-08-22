@@ -33,6 +33,7 @@ module.exports = {
       .then(() => {
         // save snapshot after 50 offsets
         if ((offset + 1) % 50 === 0) {
+          // could separate these into multiple files for cleaner code i guess
           if (aggregateName === constants.USER_AGGREGATE_NAME) {
             return userAggregate.getCurrentState(aggregateID);
           } else if (aggregateName === constants.REPORT_AGGREGATE_NAME) {

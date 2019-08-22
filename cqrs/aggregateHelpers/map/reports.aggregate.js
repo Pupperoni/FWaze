@@ -24,9 +24,6 @@ module.exports = {
           );
         })
         .then(history => {
-          // report has no history yet
-          if (history.length === 0) return null;
-
           // Recount history
           history.forEach(event => {
             event = JSON.parse(event);
@@ -44,6 +41,7 @@ module.exports = {
                 // report = payload
                 break;
               case constants.REPORT_VOTE_CREATED:
+                if (!report.votes) report.votes = 0;
                 report.votes++;
                 if (!report.voters) report.voters = [];
                 report.voters.push(payload.userId);
