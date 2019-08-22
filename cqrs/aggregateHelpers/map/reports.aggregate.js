@@ -5,14 +5,27 @@ const constants = require("../../../constants");
 module.exports = {
   getCurrentState(id) {
     // get history of events of report id (TO DO: Get from last snapshot)
-
+    let report = {};
+    let lastOffset = 0;
     return Promise.resolve(
+      // check if snapshot exists
       redis
-        .zrange(`events:${constants.REPORT_AGGREGATE_NAME}:${id}`, 0, -1)
+        .hgetall(`snapshot:${constants.REPORT_AGGREGATE_NAME}:${id}`)
+        .then(snapshot => {
+          // snapshot exists - start here
+          if (snapshot.offset && snapshot.currentState) {
+            report = JSON.parse(snapshot.currentState);
+            lastOffset = snapshot.offset + 1;
+          }
+          return redis.zrange(
+            `events:${constants.REPORT_AGGREGATE_NAME}:${id}`,
+            lastOffset,
+            -1
+          );
+        })
         .then(history => {
           // report has no history yet
           if (history.length === 0) return null;
-          let report = {};
 
           // Recount history
           history.forEach(event => {

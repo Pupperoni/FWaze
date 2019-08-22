@@ -43,7 +43,6 @@ const Handler = {
         // count number of votes in a report
         redis.scard(`report:${req.params.id}:upvoters`).then(count => {
           result.votes = count;
-          console.log(result);
           return res.json({ report: result });
         });
       })

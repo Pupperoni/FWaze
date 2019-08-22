@@ -6,14 +6,25 @@ module.exports = {
   getCurrentState(id) {
     // get history of events of user id (TO DO: Get from last snapshot)
 
+    let user = {};
+    let lastOffset = 0;
     return Promise.resolve(
+      // check if snapshot exists
       redis
-        .zrange(`events:${constants.USER_AGGREGATE_NAME}:${id}`, 0, -1)
+        .hgetall(`snapshot:${constants.USER_AGGREGATE_NAME}:${id}`)
+        .then(snapshot => {
+          // snapshot exists - start here
+          if (snapshot.offset && snapshot.currentState) {
+            user = JSON.parse(snapshot.currentState);
+            lastOffset = parseInt(snapshot.offset) + 1;
+          }
+          return redis.zrange(
+            `events:${constants.USER_AGGREGATE_NAME}:${id}`,
+            lastOffset,
+            -1
+          );
+        })
         .then(history => {
-          // user has no history yet
-          if (history.length === 0) return null;
-          let user = {};
-
           // Recount history
           history.forEach(event => {
             event = JSON.parse(event);
