@@ -50,6 +50,8 @@ emitter.on(constants.AD_CREATED, function(data) {
     );
   }
 
+  redis.sadd(`ads:${data.userId}`, data.id);
+
   // Add to MySQL
   queryHandler.createAd(data);
 });

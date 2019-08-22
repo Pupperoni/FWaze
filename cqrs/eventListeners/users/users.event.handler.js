@@ -90,6 +90,12 @@ emitter.on(constants.USER_UPDATED, function(data) {
           redis.hset(`report:${id}`, `userName`, data.name);
         });
       });
+      // Update ads
+      redis.smembers(`ads:${data.id}`).then(reportIds => {
+        reportIds.forEach(id => {
+          redis.hset(`ad:${id}`, `userName`, data.name);
+        });
+      });
       // Update name checker
       redis.set(`user:name:${data.name}`, data.id);
     });
