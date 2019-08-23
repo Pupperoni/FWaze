@@ -7,7 +7,7 @@ const writeRepo = require("../../writeRepositories/write.repository");
 const constants = require("../../../constants");
 
 function validateEmail(email) {
-  var re = /\S+@\S+/;
+  let re = /\S+@\S+/;
   return re.test(email);
 }
 
