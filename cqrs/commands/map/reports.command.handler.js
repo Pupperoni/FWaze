@@ -1,6 +1,7 @@
 const shortid = require("shortid");
 const eventHandler = require("../../eventListeners/map/reports.event.handler");
 const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
+const reportAggregate = require("../../aggregateHelpers/map/reports.aggregate");
 const writeRepo = require("../../writeRepositories/write.repository");
 const constants = require("../../../constants");
 
@@ -67,31 +68,43 @@ const Handler = {
     let valid = true;
     let reason = constants.DEFAULT_INVALID_DATA;
 
-    // continue if data is valid
-    if (valid) {
-      // Create event instance
-      let event = {
-        eventId: shortid.generate(),
-        eventName: constants.REPORT_VOTE_CREATED,
-        aggregateName: constants.REPORT_AGGREGATE_NAME,
-        aggregateID: data.reportId,
-        payload: {
-          id: data.reportId,
-          userId: data.userId
+    // check if report and user exists
+    let reportCheck = reportAggregate.getCurrentState(data.reportId); // check if report exists
+    let userCheck = userAggregate.getCurrentState(data.userId); // check if user exists
+    return Promise.all([reportCheck, userCheck]).then(results => {
+      results.forEach(aggregate => {
+        if (!aggregate) {
+          valid = false;
         }
-      };
+      });
 
-      // emit the event after all data is good
-      eventHandler.emit(constants.REPORT_VOTE_CREATED, event.payload);
+      // continue if data is valid
+      if (valid) {
+        // Create event instance
+        let event = {
+          eventId: shortid.generate(),
+          eventName: constants.REPORT_VOTE_CREATED,
+          aggregateName: constants.REPORT_AGGREGATE_NAME,
+          aggregateID: data.reportId,
+          payload: {
+            id: data.reportId,
+            userId: data.userId
+          }
+        };
 
-      // save the create event to eventstore
-      writeRepo.saveEvent(event);
+        // emit the event after all data is good
+        eventHandler.emit(constants.REPORT_VOTE_CREATED, event.payload);
 
-      // after validation, return the response
-      return Promise.resolve(data);
-    }
-    // validation failed
-    return Promise.reject(reason);
+        // save the create event to eventstore
+        writeRepo.saveEvent(event);
+
+        // after validation, return the response
+        return Promise.resolve(data);
+      }
+
+      // validation failed
+      return Promise.reject(reason);
+    });
   },
 
   voteDeleted(data) {
@@ -99,31 +112,42 @@ const Handler = {
     let valid = true;
     let reason = constants.DEFAULT_INVALID_DATA;
 
-    if (valid) {
-      // Create event instance
-      let event = {
-        eventId: shortid.generate(),
-        eventName: constants.REPORT_VOTE_DELETED,
-        aggregateName: constants.REPORT_AGGREGATE_NAME,
-        aggregateID: data.reportId,
-        payload: {
-          id: data.reportId,
-          userId: data.userId
+    // check if report and user exists
+    let reportCheck = reportAggregate.getCurrentState(data.reportId); // check if report exists
+    let userCheck = userAggregate.getCurrentState(data.userId); // check if user exists
+    return Promise.all([reportCheck, userCheck]).then(results => {
+      results.forEach(aggregate => {
+        if (!aggregate) {
+          valid = false;
         }
-      };
+      });
 
-      // emit the event after all data is good
-      eventHandler.emit(constants.REPORT_VOTE_DELETED, event.payload);
+      if (valid) {
+        // Create event instance
+        let event = {
+          eventId: shortid.generate(),
+          eventName: constants.REPORT_VOTE_DELETED,
+          aggregateName: constants.REPORT_AGGREGATE_NAME,
+          aggregateID: data.reportId,
+          payload: {
+            id: data.reportId,
+            userId: data.userId
+          }
+        };
 
-      // save the create event to eventstore
-      writeRepo.saveEvent(event);
+        // emit the event after all data is good
+        eventHandler.emit(constants.REPORT_VOTE_DELETED, event.payload);
 
-      // return response
-      return Promise.resolve(data);
-    }
+        // save the create event to eventstore
+        writeRepo.saveEvent(event);
 
-    // validation failed
-    return Promise.reject(reason);
+        // return response
+        return Promise.resolve(data);
+      }
+
+      // validation failed
+      return Promise.reject(reason);
+    });
   }
 };
 

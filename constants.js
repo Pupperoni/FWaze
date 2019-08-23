@@ -33,6 +33,7 @@ module.exports = {
   PASSWORDS_NOT_MATCH: "Passwords do not match",
   USERNAME_TAKEN: "Username already taken",
   EMAIL_TAKEN: "Email address already registered",
+  EMAIL_INVALID_FORMAT: "Format is not a valid email address",
   USER_NOT_PERMITTED: "You don't have the right permissions",
   REPORT_NOT_EXISTS: "This report does not exist",
   INVALID_REPORT_TYPE: "Invalid report type",
