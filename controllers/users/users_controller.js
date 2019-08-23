@@ -164,8 +164,23 @@ const Handler = {
 
   // Edit user details
   updateUser(req, res, next) {
-    commandHandler
-      .userUpdated(req.body, req.file)
+    // validate user details
+    queryHandler
+      .getUserByName(req.body.name) // checks name
+      .then(user => {
+        if (user.length > 0 && user[0].id !== req.body.id)
+          return Promise.reject(constants.USERNAME_TAKEN);
+        else
+          return Promise.resolve(queryHandler.getUserByEmail(req.body.email)); // checks email
+      })
+      .then(user => {
+        if (user.length > 0 && user[0].id !== req.body.id)
+          return Promise.reject(constants.EMAIL_TAKEN);
+        else return Promise.resolve(true);
+      })
+      .then(() => {
+        commandHandler.userUpdated(req.body, req.file);
+      })
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
