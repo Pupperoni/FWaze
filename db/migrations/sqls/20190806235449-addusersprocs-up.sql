@@ -17,7 +17,7 @@ END;
 
 DROP PROCEDURE IF EXISTS GetUserByName;
 
-CREATE PROCEDURE GetUserByName(IN userName VARCHAR(15))
+CREATE PROCEDURE GetUserByName(IN userName VARCHAR(255))
 BEGIN
     SELECT id, name, email, role, home, work
     FROM users
@@ -26,7 +26,7 @@ END;
 
 DROP PROCEDURE IF EXISTS GetUserByEmail;
 
-CREATE PROCEDURE GetUserByEmail(IN userEmail VARCHAR(15))
+CREATE PROCEDURE GetUserByEmail(IN userEmail VARCHAR(255))
 BEGIN
     SELECT id, name, email, role, home, work
     FROM users
