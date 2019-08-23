@@ -26,9 +26,9 @@ module.exports = {
         );
 
         // sanity checker
-        // redis
-        //   .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
-        //   .then(console.log);
+        redis
+          .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
+          .then(console.log);
       })
       .then(() => {
         // save snapshot after 50 offsets
