@@ -4,7 +4,7 @@ const constants = require("../../../constants");
 
 module.exports = {
   getCurrentState(id) {
-    // get history of events of user id (TO DO: Get from last snapshot)
+    // get history of events of user id
 
     let user = {};
     let lastOffset = 0;

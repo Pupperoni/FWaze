@@ -4,7 +4,7 @@ const constants = require("../../../constants");
 
 module.exports = {
   getCurrentState(id) {
-    // get history of events of report id (TO DO: Get from last snapshot)
+    // get history of events of report id
     let report = {};
     let lastOffset = 0;
     return Promise.resolve(

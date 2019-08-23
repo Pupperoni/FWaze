@@ -6,15 +6,26 @@ const eventHandler = require("../../eventListeners/users/users.event.handler");
 const writeRepo = require("../../writeRepositories/write.repository");
 const constants = require("../../../constants");
 
+function validateEmail(email) {
+  var re = /\S+@\S+/;
+  return re.test(email);
+}
+
 const Handler = {
   // Add a new user
   userCreated(data) {
     // validate data sent here
     let valid = true;
     let reason = constants.DEFAULT_INVALID_DATA;
+    // passwords match?
     if (data.password !== data.confirm_password) {
       valid = false;
       reason = constants.PASSWORDS_NOT_MATCH;
+    }
+    // email valid?
+    if (!validateEmail(data.email)) {
+      valid = false;
+      reason = constants.EMAIL_INVALID_FORMAT;
     }
 
     // continue if all tests pass
@@ -63,6 +74,11 @@ const Handler = {
     // validate data sent here
     let valid = true;
     let reason = constants.DEFAULT_INVALID_DATA;
+    // email valid?
+    if (!validateEmail(data.email)) {
+      valid = false;
+      reason = constants.EMAIL_INVALID_FORMAT;
+    }
 
     // after validating, return response
     if (valid) {
