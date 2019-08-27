@@ -266,10 +266,9 @@ const Handler = {
       destinationLongitude: req.body.destinationLongitude,
       sourceString: req.body.sourceString,
       destinationString: req.body.destinationString,
-      id: req.body.id
+      id: req.body.userId
     };
-    commandHandler
-      .faveRouteCreated(payload)
+    CommonCommandHandler.sendCommand(payload, constants.USER_ROUTE_CREATED)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })

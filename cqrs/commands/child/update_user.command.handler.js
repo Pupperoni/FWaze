@@ -7,7 +7,7 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-function UserUpdatedCommandHandler(payload) {}
+function UserUpdatedCommandHandler() {}
 
 UserUpdatedCommandHandler.prototype = Object.create(
   BaseCommandHandler.prototype
