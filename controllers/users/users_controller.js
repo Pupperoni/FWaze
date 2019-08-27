@@ -172,6 +172,8 @@ const Handler = {
 
   // Edit user details
   updateUser(req, res, next) {
+    console.log(req.body);
+
     // validate user details
     queryHandler
       .getUserByName(req.body.name) // checks name
@@ -194,6 +196,16 @@ const Handler = {
           name: req.body.name,
           email: req.body.email,
           role: req.body.role,
+          home: {
+            latitude: req.body.homeLatitude,
+            longitude: req.body.homeLongitude,
+            address: req.body.homeAddress
+          },
+          work: {
+            latitude: req.body.workLatitude,
+            longitude: req.body.workLongitude,
+            address: req.body.workAddress
+          },
           file: req.file
         };
         CommonCommandHandler.sendCommand(payload, constants.USER_UPDATED);

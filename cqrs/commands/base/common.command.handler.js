@@ -9,11 +9,15 @@ const CommonCommandHandler = {
         // run the functions
         return commandHandler.commandChain(payload);
       })
-      .then(event => {
-        // after the event, send to read and write models
-        this.sendEvent(event);
-        this.addEvent(event);
-        return event.payload;
+      .then(events => {
+        // after the events, send to read and write models
+        events.forEach(event => {
+          console.log(event);
+          this.sendEvent(event);
+          this.addEvent(event);
+        });
+
+        return events[0].payload;
       });
   },
 

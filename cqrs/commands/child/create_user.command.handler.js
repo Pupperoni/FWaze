@@ -53,7 +53,8 @@ UserCreatedCommandHandler.prototype.performCommand = function(payload) {
   payload.password = hash;
 
   // Create event instance
-  let event = {
+  let events = [];
+  events.push({
     eventId: shortid.generate(),
     eventName: constants.USER_CREATED,
     aggregateName: constants.USER_AGGREGATE_NAME,
@@ -65,9 +66,9 @@ UserCreatedCommandHandler.prototype.performCommand = function(payload) {
       role: payload.role,
       password: payload.password
     }
-  };
+  });
 
-  return Promise.resolve(event);
+  return Promise.resolve(events);
 };
 
 module.exports = UserCreatedCommandHandler;
