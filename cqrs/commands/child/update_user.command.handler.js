@@ -1,5 +1,4 @@
 const BaseCommandHandler = require("../base/base.command.handler");
-const bcrypt = require("bcryptjs");
 const shortid = require("shortid");
 const constants = require("../../../constants");
 
@@ -8,11 +7,7 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-function UserUpdatedCommandHandler(payload) {
-  BaseCommandHandler.call(this, payload);
-  this.aggregateName = constants.USER_AGGREGATE_NAME;
-  this.eventName = constants.USER_UPDATED;
-}
+function UserUpdatedCommandHandler(payload) {}
 
 UserUpdatedCommandHandler.prototype = Object.create(
   BaseCommandHandler.prototype
@@ -28,29 +23,35 @@ UserUpdatedCommandHandler.prototype.getCommands = function() {
   return [constants.USER_UPDATED];
 };
 
-UserUpdatedCommandHandler.prototype.validate = function() {
+UserUpdatedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;
-
+  let reasons = [];
   // email valid?
-  if (!validateEmail(this.payload.email)) {
+  if (!validateEmail(payload.email)) {
     valid = false;
-    this.reason = constants.EMAIL_INVALID_FORMAT;
+    reasons.push(constants.EMAIL_INVALID_FORMAT);
   }
-  return Promise.resolve(valid);
+  if (valid) return Promise.resolve(valid);
+  else return Promise.reject(reasons);
 };
 
-UserUpdatedCommandHandler.prototype.performCommand = function() {
+UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
   // Create event instance
   let event = {
     eventId: shortid.generate(),
-    eventName: this.eventName,
-    aggregateName: this.aggregateName,
-    aggregateID: this.payload.id,
-    payload: this.payload
+    eventName: constants.USER_UPDATED,
+    aggregateName: constants.USER_AGGREGATE_NAME,
+    aggregateID: payload.id,
+    payload: {
+      id: payload.id,
+      name: payload.name,
+      email: payload.email,
+      role: payload.role
+    }
   };
   // check if file was uploaded
-  if (this.payload.file) event.payload.avatarPath = this.payload.file.path;
+  if (payload.file) event.payload.avatarPath = payload.file.path;
 
   return Promise.resolve(event);
 };

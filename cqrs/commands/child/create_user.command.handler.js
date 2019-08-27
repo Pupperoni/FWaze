@@ -8,11 +8,7 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-function UserCreatedCommandHandler(payload) {
-  BaseCommandHandler.call(this, payload);
-  this.aggregateName = constants.USER_AGGREGATE_NAME;
-  this.eventName = constants.USER_CREATED;
-}
+function UserCreatedCommandHandler(payload) {}
 
 UserCreatedCommandHandler.prototype = Object.create(
   BaseCommandHandler.prototype
@@ -28,40 +24,47 @@ UserCreatedCommandHandler.prototype.getCommands = function() {
   return [constants.USER_CREATED];
 };
 
-UserCreatedCommandHandler.prototype.validate = function() {
+UserCreatedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;
-
+  let reasons = [];
   // passwords match?
-  if (this.payload.password !== this.payload.confirm_password) {
+  if (payload.password !== payload.confirmPassword) {
     valid = false;
-    this.reason = constants.PASSWORDS_NOT_MATCH;
+    reasons.push(constants.PASSWORDS_NOT_MATCH);
   }
 
   // email valid?
-  if (!validateEmail(this.payload.email)) {
+  if (!validateEmail(payload.email)) {
     valid = false;
-    this.reason = constants.EMAIL_INVALID_FORMAT;
+    reasons.push(constants.EMAIL_INVALID_FORMAT);
   }
-  return Promise.resolve(valid);
+
+  if (valid) return Promise.resolve(valid);
+  else return Promise.reject(reasons);
 };
 
-UserCreatedCommandHandler.prototype.performCommand = function() {
+UserCreatedCommandHandler.prototype.performCommand = function(payload) {
   // generate unique id
-  this.payload.id = shortid.generate();
-
+  payload.id = shortid.generate();
   // Hash password
   let salt = bcrypt.genSaltSync(10);
-  let hash = bcrypt.hashSync(this.payload.password, salt);
-  this.payload.password = hash;
+  let hash = bcrypt.hashSync(payload.password, salt);
+  payload.password = hash;
 
   // Create event instance
   let event = {
     eventId: shortid.generate(),
-    eventName: this.eventName,
-    aggregateName: this.aggregateName,
-    aggregateID: this.payload.id,
-    payload: this.payload
+    eventName: constants.USER_CREATED,
+    aggregateName: constants.USER_AGGREGATE_NAME,
+    aggregateID: payload.id,
+    payload: {
+      id: payload.id,
+      name: payload.name,
+      email: payload.email,
+      role: payload.role,
+      password: payload.password
+    }
   };
 
   return Promise.resolve(event);

@@ -1,27 +1,20 @@
 const constants = require("../../../constants");
 
-function BaseCommandHandler(payload) {
-  this.payload = payload;
-  this.reason = constants.DEFAULT_INVALID_DATA;
-}
+function BaseCommandHandler() {}
 
 BaseCommandHandler.prototype.getCommands = function() {
   return [];
 };
 
-BaseCommandHandler.prototype.validate = function() {
+BaseCommandHandler.prototype.validate = function(payload) {
   /* validate data here and resolve promise if valid */
-  return Promise.resolve(true);
+  if (payload) return Promise.resolve(true);
 };
 
-BaseCommandHandler.prototype.fail = function() {
-  /* run this if validate fails */
-};
-
-BaseCommandHandler.prototype.performCommand = function() {
+BaseCommandHandler.prototype.performCommand = function(payload) {
   /* run this if validate passes */
 
-  return Promise.resolve(null);
+  return Promise.resolve(payload);
 };
 
 BaseCommandHandler.prototype.getAggregate = function() {
@@ -29,20 +22,17 @@ BaseCommandHandler.prototype.getAggregate = function() {
   return Promise.resolve(null);
 };
 
-BaseCommandHandler.prototype.commandChain = function() {
+BaseCommandHandler.prototype.commandChain = function(payload) {
   /* main function */
 
-  return this.validate()
+  return this.validate(payload)
     .then(valid => {
       if (valid) {
-        return this.performCommand();
-      } else {
-        this.fail();
-        return Promise.reject(this.reason);
+        return this.performCommand(payload);
       }
     })
     .catch(e => {
-      return Promise.reject(this.reason);
+      return Promise.reject(e);
     });
 };
 

@@ -153,8 +153,14 @@ const Handler = {
       })
       .then(() => {
         // all good
-        // commandHandler.userCreated(req.body);
-        CommonCommandHandler.sendCommand(req.body, constants.USER_CREATED);
+        const payload = {
+          name: req.body.name,
+          email: req.body.email,
+          role: req.body.role,
+          password: req.body.password,
+          confirmPassword: req.body.confirmPassword
+        };
+        CommonCommandHandler.sendCommand(payload, constants.USER_CREATED);
       })
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
@@ -183,8 +189,14 @@ const Handler = {
       .then(() => {
         // commandHandler.userUpdated(req.body, req.file);
         // Add file to body
-        req.body.file = req.file;
-        CommonCommandHandler.sendCommand(req.body, constants.USER_UPDATED);
+        const payload = {
+          id: req.body.id,
+          name: req.body.name,
+          email: req.body.email,
+          role: req.body.role,
+          file: req.file
+        };
+        CommonCommandHandler.sendCommand(payload, constants.USER_UPDATED);
       })
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
@@ -197,9 +209,14 @@ const Handler = {
   // Set user's home address
   addHomeAddress(req, res, next) {
     if (!req.body.submit) return res.json({ data: "Request cancelled" });
-
+    const payload = {
+      id: req.body.id,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      address: req.body.address
+    };
     commandHandler
-      .homeAddressUpdated(req.body)
+      .homeAddressUpdated(payload)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
@@ -211,9 +228,14 @@ const Handler = {
   // Set user's work address
   addWorkAddress(req, res, next) {
     if (!req.body.submit) return res.json({ data: "Request cancelled" });
-
+    const payload = {
+      id: req.body.id,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      address: req.body.address
+    };
     commandHandler
-      .workAddressUpdated(req.body)
+      .workAddressUpdated(payload)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
@@ -224,8 +246,18 @@ const Handler = {
 
   // Add a new fave route
   createFaveRoute(req, res, next) {
+    const payload = {
+      routeId: req.body.routeId,
+      sourceLatitude: req.body.sourceLatitude,
+      sourceLongitude: req.body.sourceLongitude,
+      destinationLatitude: req.body.destinationLatitude,
+      destinationLongitude: req.body.destinationLongitude,
+      sourceString: req.body.sourceString,
+      destinationString: req.body.destinationString,
+      id: req.body.id
+    };
     commandHandler
-      .faveRouteCreated(req.body)
+      .faveRouteCreated(payload)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
