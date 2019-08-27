@@ -1,5 +1,6 @@
 const queryHandler = require("../../db/sql/users/users.repository");
-const commandHandler = require("../../cqrs/commands/users/users.command.handler");
+// const commandHandler = require("../../cqrs/commands/users/users.command.handler");
+const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
 let bcrypt = require("bcryptjs");
 
@@ -152,7 +153,8 @@ const Handler = {
       })
       .then(() => {
         // all good
-        commandHandler.userCreated(req.body);
+        // commandHandler.userCreated(req.body);
+        CommonCommandHandler.sendCommand(req.body, constants.USER_CREATED);
       })
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });

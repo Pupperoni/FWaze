@@ -43,7 +43,7 @@ const Handler = {
             type: data.type,
             latitude: data.latitude.toString(),
             longitude: data.longitude.toString(),
-            location: data.address
+            location: data.location
           }
         };
         // check if file is uploaded
