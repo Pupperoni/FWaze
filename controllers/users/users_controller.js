@@ -181,7 +181,10 @@ const Handler = {
         else return Promise.resolve(true);
       })
       .then(() => {
-        commandHandler.userUpdated(req.body, req.file);
+        // commandHandler.userUpdated(req.body, req.file);
+        // Add file to body
+        req.body.file = req.file;
+        CommonCommandHandler.sendCommand(req.body, constants.USER_UPDATED);
       })
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });

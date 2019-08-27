@@ -4,16 +4,19 @@ const writeRepo = require("../../writeRepositories/write.repository");
 const CommonCommandHandler = {
   sendCommand(payload, commandName) {
     // get appropriate command handler
-    this.getCommandHandler(payload, commandName)
-      .then(commandHandler => {
-        // run the functions
-        return commandHandler.commandChain();
-      })
-      .then(event => {
-        // after the event, send to read and write models
-        this.sendEvent(event);
-        this.addEvent(event);
-      });
+    return Promise.resolve(
+      this.getCommandHandler(payload, commandName)
+        .then(commandHandler => {
+          // run the functions
+          return commandHandler.commandChain();
+        })
+        .then(event => {
+          // after the event, send to read and write models
+          this.sendEvent(event);
+          this.addEvent(event);
+          return event.payload;
+        })
+    );
   },
 
   getCommandHandler(payload, commandName) {
