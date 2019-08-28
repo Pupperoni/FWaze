@@ -3,7 +3,7 @@ const redis = new Redis(process.env.REDIS_URL);
 const constants = require("../../constants");
 const userAggregate = require("../aggregateHelpers/users/users.aggregate");
 const reportAggregate = require("../aggregateHelpers/map/reports.aggregate");
-
+const applicationAggregate = require("../aggregateHelpers/users/applications.aggregate");
 module.exports = {
   saveEvent(event) {
     let aggregateName = event.aggregateName;
@@ -39,6 +39,8 @@ module.exports = {
               return userAggregate.getCurrentState(aggregateID);
             case constants.REPORT_AGGREGATE_NAME:
               return reportAggregate.getCurrentState(aggregateID);
+            case constants.APPLICATION_AGGREGATE_NAME:
+              return applicationAggregate.getCurrentState(aggregateID);
           }
         }
       })

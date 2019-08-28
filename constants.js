@@ -11,6 +11,10 @@ module.exports = {
   USER_WORK_UPDATED: "user_work_updated",
   USER_ROUTE_CREATED: "user_route_created",
 
+  // Application aggregate constants
+  APPLICATION_AGGREGATE_NAME: "applications",
+  APPLICATION_CREATED: "application_created",
+
   // Report aggregate constants
   REPORT_AGGREGATE_NAME: "reports",
   REPORT_CREATED: "report_created",
@@ -45,6 +49,8 @@ module.exports = {
   AD_NOT_EXISTS: "This ad does not exist",
   COMMENT_NOT_EXISTS: "This comment does not exist",
   COMMENTS_NOT_FOUND: "No comments found",
+  APPLICATION_NOT_EXISTS: "Application does not exist",
+  DUPLICATE_APPLICATION: "Application already being processed",
   FILE_NOT_FOUND: "File not found",
   COMMAND_NOT_EXISTS: "Command does not exist"
 };

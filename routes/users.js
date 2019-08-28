@@ -3,6 +3,7 @@ const multer = require("multer");
 
 let router = express.Router();
 let userHandler = require("../controllers/users/users_controller");
+let applicationHandler = require("../controllers/users/applications_controller");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -44,5 +45,13 @@ router.get("/:id", userHandler.getUserById);
 
 /* GET users listing. */
 router.get("/", userHandler.getAllUsers);
+
+/* Advertiser Applications */
+
+// Get application by user id
+router.get("/apply/:id", applicationHandler.getApplicationByUserId);
+
+// Add new application
+router.post("/apply/new", applicationHandler.createApplication);
 
 module.exports = router;

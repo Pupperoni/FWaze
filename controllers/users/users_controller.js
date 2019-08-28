@@ -1,10 +1,10 @@
 const queryHandler = require("../../db/sql/users/users.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
-let bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 
-let Redis = require("ioredis");
-let redis = new Redis(process.env.REDIS_URL);
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
 
 //
 // Query responsibility
@@ -138,13 +138,19 @@ const Handler = {
 
   // Add a new user
   createUser(req, res, next) {
+    const payload = {
+      name: req.body.name,
+      email: req.body.email,
+      role: req.body.role,
+      password: req.body.password,
+      confirmPassword: req.body.confirmPassword
+    };
     // validate user details
     queryHandler
-      .getUserByName(req.body.name) // checks name
+      .getUserByName(payload.name) // checks name
       .then(user => {
         if (user.length > 0) return Promise.reject(constants.USERNAME_TAKEN);
-        else
-          return Promise.resolve(queryHandler.getUserByEmail(req.body.email)); // checks email
+        else return Promise.resolve(queryHandler.getUserByEmail(payload.email)); // checks email
       })
       .then(user => {
         if (user.length > 0) return Promise.reject(constants.EMAIL_TAKEN);
@@ -152,13 +158,6 @@ const Handler = {
       })
       .then(() => {
         // all good
-        const payload = {
-          name: req.body.name,
-          email: req.body.email,
-          role: req.body.role,
-          password: req.body.password,
-          confirmPassword: req.body.confirmPassword
-        };
         CommonCommandHandler.sendCommand(payload, constants.USER_CREATED);
       })
       .then(result => {
@@ -171,42 +170,38 @@ const Handler = {
 
   // Edit user details
   updateUser(req, res, next) {
-    console.log(req.body);
-
+    const payload = {
+      id: req.body.id,
+      name: req.body.name,
+      email: req.body.email,
+      role: req.body.role,
+      home: {
+        latitude: req.body.homeLatitude,
+        longitude: req.body.homeLongitude,
+        address: req.body.homeAddress
+      },
+      work: {
+        latitude: req.body.workLatitude,
+        longitude: req.body.workLongitude,
+        address: req.body.workAddress
+      },
+      file: req.file
+    };
     // validate user details
     queryHandler
-      .getUserByName(req.body.name) // checks name
+      .getUserByName(payload.name) // checks name
       .then(user => {
-        if (user.length > 0 && user[0].id !== req.body.id)
+        if (user.length > 0 && user[0].id !== payload.id)
           return Promise.reject(constants.USERNAME_TAKEN);
-        else
-          return Promise.resolve(queryHandler.getUserByEmail(req.body.email)); // checks email
+        else return Promise.resolve(queryHandler.getUserByEmail(payload.email)); // checks email
       })
       .then(user => {
-        if (user.length > 0 && user[0].id !== req.body.id)
+        if (user.length > 0 && user[0].id !== payload.id)
           return Promise.reject(constants.EMAIL_TAKEN);
         else return Promise.resolve(true);
       })
       .then(() => {
         // commandHandler.userUpdated(req.body, req.file);
-        // Add file to body
-        const payload = {
-          id: req.body.id,
-          name: req.body.name,
-          email: req.body.email,
-          role: req.body.role,
-          home: {
-            latitude: req.body.homeLatitude,
-            longitude: req.body.homeLongitude,
-            address: req.body.homeAddress
-          },
-          work: {
-            latitude: req.body.workLatitude,
-            longitude: req.body.workLongitude,
-            address: req.body.workAddress
-          },
-          file: req.file
-        };
         CommonCommandHandler.sendCommand(payload, constants.USER_UPDATED);
       })
       .then(result => {

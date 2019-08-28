@@ -51,6 +51,9 @@ const CommonCommandHandler = {
       case constants.COMMENT_AGGREGATE_NAME:
         componentName = constants.MAP_COMPONENT;
         break;
+      case constants.APPLICATION_AGGREGATE_NAME:
+        componentName = constants.USER_COMPONENT;
+        break;
     }
     return componentName;
   },
@@ -60,7 +63,6 @@ const CommonCommandHandler = {
     const componentName = this.getComponent(event.aggregateName);
     // import the corresponding event handler
     const eventHandler = require(`../../eventListeners/${componentName}/${event.aggregateName}.event.handler`);
-
     eventHandler.emit(event.eventName, event.payload);
   },
 
