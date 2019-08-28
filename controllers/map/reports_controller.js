@@ -1,6 +1,7 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
 const commandHandler = require("../../cqrs/commands/map/reports.command.handler");
 const constants = require("../../constants");
+const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 let Redis = require("ioredis");
 let redis = new Redis(process.env.REDIS_URL);
 
@@ -188,8 +189,17 @@ const Handler = {
 
   // Add a new report
   createReport(req, res, next) {
-    commandHandler
-      .reportCreated(req.body, req.file)
+    const payload = {
+      userId: req.body.userId,
+      userName: req.body.userName,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      location: req.body.location,
+      type: req.body.type
+    };
+    // commandHandler
+    //   .reportCreated(req.body, req.file)
+    CommonCommandHandler.sendCommand(payload, constants.REPORT_CREATED)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
@@ -197,10 +207,16 @@ const Handler = {
         return res.status(400).json({ err: e });
       });
   },
+
   // Add vote instance
   addVote(req, res, next) {
-    commandHandler
-      .voteCreated(req.body)
+    const payload = {
+      id: req.body.reportId,
+      userId: req.body.userId
+    };
+    // commandHandler
+    //   .voteCreated(req.body)
+    CommonCommandHandler.sendCommand(payload, constants.REPORT_VOTE_CREATED)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
@@ -211,8 +227,13 @@ const Handler = {
 
   // Remove vote instance
   deleteVote(req, res, next) {
-    commandHandler
-      .voteDeleted(req.body)
+    const payload = {
+      id: req.body.reportId,
+      userId: req.body.userId
+    };
+    // commandHandler
+    //   .voteDeleted(req.body)
+    CommonCommandHandler.sendCommand(payload, constants.REPORT_VOTE_DELETED)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })

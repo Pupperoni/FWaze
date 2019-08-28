@@ -9,6 +9,7 @@ BaseCommandHandler.prototype.getCommands = function() {
 BaseCommandHandler.prototype.validate = function(payload) {
   /* validate data here and resolve promise if valid */
   if (payload) return Promise.resolve(true);
+  else return Promise.reject([constants.DEFAULT_INVALID_DATA]);
 };
 
 BaseCommandHandler.prototype.performCommand = function(payload) {
@@ -27,9 +28,7 @@ BaseCommandHandler.prototype.commandChain = function(payload) {
 
   return this.validate(payload)
     .then(valid => {
-      if (valid) {
-        return this.performCommand(payload);
-      }
+      return this.performCommand(payload);
     })
     .catch(e => {
       return Promise.reject(e);

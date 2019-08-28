@@ -29,11 +29,9 @@ const CommonCommandHandler = {
       const handler = require(`/usr/src/app/cqrs/commands/child/${files[fileIndex]}`);
       let commandHandler = new handler();
       let commands = commandHandler.getCommands();
-      for (let i = 0; i < commands.length; i++) {
-        if (commands[i] === commandName) {
-          return Promise.resolve(commandHandler);
-        }
-      }
+      // return command handler if command name found
+      if (commands.includes(commandName))
+        return Promise.resolve(commandHandler);
     }
     return Promise.reject(constants.COMMAND_NOT_EXISTS);
   },
@@ -58,7 +56,9 @@ const CommonCommandHandler = {
   },
 
   sendEvent(event) {
+    // get component name
     const componentName = this.getComponent(event.aggregateName);
+    // import the corresponding event handler
     const eventHandler = require(`../../eventListeners/${componentName}/${event.aggregateName}.event.handler`);
 
     eventHandler.emit(event.eventName, event.payload);

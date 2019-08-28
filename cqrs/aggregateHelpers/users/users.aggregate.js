@@ -26,11 +26,11 @@ module.exports = {
         })
         .then(history => {
           // Recount history
-          console.log(`Start at offset: ${lastOffset}`);
-          console.log("User:");
-          console.log(user);
-          console.log("History:");
-          console.log(history);
+          // console.log(`Start at offset: ${lastOffset}`);
+          // console.log("User:");
+          // console.log(user);
+          // console.log("History:");
+          // console.log(history);
           history.forEach(event => {
             event = JSON.parse(event);
             let payload = event.payload;

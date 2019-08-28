@@ -1,8 +1,8 @@
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 const constants = require("../../constants");
-let userAggregate = require("../aggregateHelpers/users/users.aggregate");
-let reportAggregate = require("../aggregateHelpers/map/reports.aggregate");
+const userAggregate = require("../aggregateHelpers/users/users.aggregate");
+const reportAggregate = require("../aggregateHelpers/map/reports.aggregate");
 
 module.exports = {
   saveEvent(event) {
@@ -26,9 +26,9 @@ module.exports = {
         );
 
         // sanity checker
-        redis
-          .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
-          .then(console.log);
+        // redis
+        //   .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
+        //   .then(console.log);
       })
       .then(() => {
         // save snapshot after 50 offsets
@@ -37,7 +37,7 @@ module.exports = {
           switch (aggregateName) {
             case constants.USER_AGGREGATE_NAME:
               return userAggregate.getCurrentState(aggregateID);
-            case aggregateName === constants.REPORT_AGGREGATE_NAME:
+            case constants.REPORT_AGGREGATE_NAME:
               return reportAggregate.getCurrentState(aggregateID);
           }
         }
