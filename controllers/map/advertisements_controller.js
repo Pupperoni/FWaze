@@ -1,5 +1,4 @@
 const queryHandler = require("../../db/sql/map/advertisements.repository");
-// const commandHandler = require("../../cqrs/commands/map/advertisements.command.handler");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
 let Redis = require("ioredis");

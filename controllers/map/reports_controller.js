@@ -1,5 +1,4 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
-const commandHandler = require("../../cqrs/commands/map/reports.command.handler");
 const constants = require("../../constants");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 let Redis = require("ioredis");
@@ -195,8 +194,10 @@ const Handler = {
       latitude: req.body.latitude,
       longitude: req.body.longitude,
       location: req.body.location,
-      type: req.body.type
+      type: req.body.type,
+      file: req.file
     };
+
     // commandHandler
     //   .reportCreated(req.body, req.file)
     CommonCommandHandler.sendCommand(payload, constants.REPORT_CREATED)

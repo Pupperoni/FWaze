@@ -1,5 +1,4 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
-// const commandHandler = require("../../cqrs/commands/map/comments.command.handler");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
 const Handler = {

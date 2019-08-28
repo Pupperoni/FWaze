@@ -47,6 +47,8 @@ ReportCreatedCommandHandler.prototype.performCommand = function(payload) {
   // generate unique id
   payload.id = shortid.generate();
 
+  console.log(payload);
+
   // Create event instance
   let events = [];
   events.push({
@@ -54,7 +56,15 @@ ReportCreatedCommandHandler.prototype.performCommand = function(payload) {
     eventName: constants.REPORT_CREATED,
     aggregateName: constants.REPORT_AGGREGATE_NAME,
     aggregateID: payload.id,
-    payload: payload
+    payload: {
+      id: payload.id,
+      userId: payload.userId,
+      userName: payload.userName,
+      latitude: payload.latitude,
+      longitude: payload.longitude,
+      location: payload.location,
+      type: payload.type
+    }
   });
 
   // check if file is uploaded

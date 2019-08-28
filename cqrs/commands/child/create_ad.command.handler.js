@@ -26,7 +26,6 @@ AdCreatedCommandHandler.prototype.validate = function(payload) {
   // get role of user and check if advertiser
   return Promise.resolve(
     aggregate.getCurrentState(payload.userId).then(user => {
-      console.log(user);
       // user does not exist
       if (!user) {
         valid = false;

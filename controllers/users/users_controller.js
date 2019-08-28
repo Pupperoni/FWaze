@@ -1,5 +1,4 @@
 const queryHandler = require("../../db/sql/users/users.repository");
-// const commandHandler = require("../../cqrs/commands/users/users.command.handler");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
 let bcrypt = require("bcryptjs");
