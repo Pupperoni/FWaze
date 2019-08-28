@@ -5,78 +5,82 @@ const constants = require("../../../constants");
 const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
 const applicationAggregate = require("../../aggregateHelpers/users/applications.aggregate");
 
-function ApplicationCreatedCommandHandler() {}
+function ApplicationRejectedCommandHandler() {}
 
-ApplicationCreatedCommandHandler.prototype = Object.create(
+ApplicationRejectedCommandHandler.prototype = Object.create(
   BaseCommandHandler.prototype
 );
 
 Object.defineProperty(
-  ApplicationCreatedCommandHandler.prototype,
+  ApplicationRejectedCommandHandler.prototype,
   "constructor",
   {
-    value: ApplicationCreatedCommandHandler,
+    value: ApplicationRejectedCommandHandler,
     enumerable: false, // so that it does not appear in 'for in' loop
     writable: true
   }
 );
 
-ApplicationCreatedCommandHandler.prototype.getCommands = function() {
-  return [constants.APPLICATION_CREATED];
+ApplicationRejectedCommandHandler.prototype.getCommands = function() {
+  return [constants.APPLICATION_REJECTED];
 };
 
-ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
+ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;
   let reasons = [];
 
-  // get role of user and check if regular
+  // get role of user that made the request (should be admin) and check if admin
   return Promise.resolve(
     userAggregate
-      .getCurrentState(payload.userId)
+      .getCurrentState(payload.adminId)
       .then(user => {
         // user does not exist
         if (!user) {
           valid = false;
           reasons.push(constants.USER_NOT_EXISTS);
         }
-        // user is not regular (not valid)
-        else if (user.role != 0) {
+        // should be admin
+        else if (user.role != 2) {
           valid = false;
           reasons.push(constants.USER_NOT_PERMITTED);
         }
         if (valid) {
+          // check if application exists
           return applicationAggregate.getCurrentState(payload.userId);
         } else return Promise.reject(reasons);
       })
       .then(application => {
-        // pending application exists
-        if (application) {
-          if (application.status && application.status === 0) {
-            valid = false;
-            reasons.push(constants.DUPLICATE_APPLICATION);
-          }
+        // application does not exist; cannot reject
+        if (!application) {
+          valid = false;
+          reasons.push(constants.APPLICATION_NOT_EXISTS);
         }
-
+        // application not pending
+        else if (application.status !== 0) {
+          valid = false;
+          reasons.push(constants.APPLICATION_NOT_EXISTS);
+        }
         if (valid) return Promise.resolve(valid);
         else return Promise.reject(reasons);
       })
   );
 };
 
-ApplicationCreatedCommandHandler.prototype.performCommand = function(payload) {
-  payload.id = shortid.generate();
+ApplicationRejectedCommandHandler.prototype.performCommand = function(payload) {
   // Create event instance
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.APPLICATION_CREATED,
+    eventName: constants.APPLICATION_REJECTED,
     aggregateName: constants.APPLICATION_AGGREGATE_NAME,
     aggregateID: payload.userId,
-    payload: payload
+    payload: {
+      userId: payload.userId
+    }
   });
 
   return Promise.resolve(events);
 };
 
-module.exports = ApplicationCreatedCommandHandler;
+module.exports = ApplicationRejectedCommandHandler;

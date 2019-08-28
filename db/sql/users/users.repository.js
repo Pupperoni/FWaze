@@ -112,12 +112,11 @@ const Handler = {
   createUser(user) {
     // return knex('users').insert(user)
     return knex
-      .raw("CALL CreateUser(?,?,?,?,?)", [
+      .raw("CALL CreateUser(?,?,?,?)", [
         user.id,
         user.name,
         user.email,
-        user.password,
-        user.role
+        user.password
       ])
       .then(row => {
         return Promise.resolve(row[0]);
@@ -130,12 +129,7 @@ const Handler = {
   // Update user details
   updateUser(user) {
     return knex
-      .raw("CALL UpdateUser(?,?,?,?)", [
-        user.name,
-        user.email,
-        user.role,
-        user.id
-      ])
+      .raw("CALL UpdateUser(?,?,?)", [user.name, user.email, user.id])
       .then(row => {
         return Promise.resolve(row[0]);
       })

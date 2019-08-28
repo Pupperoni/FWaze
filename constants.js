@@ -14,6 +14,8 @@ module.exports = {
   // Application aggregate constants
   APPLICATION_AGGREGATE_NAME: "applications",
   APPLICATION_CREATED: "application_created",
+  APPLICATION_APPROVED: "application_approved",
+  APPLICATION_REJECTED: "application_rejected",
 
   // Report aggregate constants
   REPORT_AGGREGATE_NAME: "reports",

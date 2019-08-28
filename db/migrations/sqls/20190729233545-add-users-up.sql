@@ -4,10 +4,7 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL UNIQUE,
   `email` varchar(255) NOT NULL UNIQUE,
   `password` varchar(255) NOT NULL,
-  `role` int(11) NOT NULL,
   `home` varchar(255) NOT NULL DEFAULT '',
   `work` varchar(255) NOT NULL DEFAULT '',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;

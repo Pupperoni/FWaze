@@ -37,10 +37,17 @@ module.exports = {
 
             switch (event.eventName) {
               case constants.APPLICATION_CREATED:
+                application.id = payload.id;
                 application.userId = payload.userId;
                 application.userName = payload.userName;
                 application.timestamp = payload.timestamp;
                 application.status = 0;
+                break;
+              case constants.APPLICATION_APPROVED:
+                application.status = 1;
+                break;
+              case constants.APPLICATION_REJECTED:
+                application.status = -1;
                 break;
             }
           });

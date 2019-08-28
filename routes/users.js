@@ -16,6 +16,23 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+/* Advertiser Applications */
+
+// Get pending applications
+router.get("/apply", applicationHandler.getPendingApplications);
+
+// Get application by user id
+router.get("/apply/:id", applicationHandler.getApplicationByUserId);
+
+// Add new application
+router.post("/apply/new", applicationHandler.createApplication);
+
+// Approve application
+router.put("/apply/approve", applicationHandler.approveApplication);
+
+// Reject application
+router.put("/apply/reject", applicationHandler.rejectApplication);
+
 // Create new user account
 router.post("/new", userHandler.createUser);
 
@@ -45,13 +62,5 @@ router.get("/:id", userHandler.getUserById);
 
 /* GET users listing. */
 router.get("/", userHandler.getAllUsers);
-
-/* Advertiser Applications */
-
-// Get application by user id
-router.get("/apply/:id", applicationHandler.getApplicationByUserId);
-
-// Add new application
-router.post("/apply/new", applicationHandler.createApplication);
 
 module.exports = router;
