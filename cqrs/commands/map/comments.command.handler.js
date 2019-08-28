@@ -25,23 +25,16 @@ const Handler = {
         // if all tests pass, do important stuff
         if (valid) {
           // generate id
-          data.id = shortid.generate();
-
+          payload.id = shortid.generate();
+          let events = [];
           // Create event instance
-          let event = {
+          events.push({
             id: shortid.generate(),
             eventName: constants.COMMENT_CREATED,
             aggregateName: constants.COMMENT_AGGREGATE_NAME,
-            aggregateID: data.id,
-            payload: {
-              id: data.id,
-              userId: data.userId,
-              userName: data.userName,
-              reportId: data.reportId,
-              body: data.body,
-              timestamp: data.timestamp
-            }
-          };
+            aggregateID: payload.id,
+            payload: payload
+          });
 
           // emit the event after all data is good
           eventHandler.emit(constants.COMMENT_CREATED, event.payload);

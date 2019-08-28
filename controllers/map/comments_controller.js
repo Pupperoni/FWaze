@@ -1,5 +1,6 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
-const commandHandler = require("../../cqrs/commands/map/comments.command.handler");
+// const commandHandler = require("../../cqrs/commands/map/comments.command.handler");
+const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
 const Handler = {
   //
@@ -92,8 +93,16 @@ const Handler = {
 
   // Add a comment
   createComment(req, res, next) {
-    commandHandler
-      .commentCreated(req.body)
+    const payload = {
+      userId: req.body.userId,
+      userName: req.body.userName,
+      reportId: req.body.reportId,
+      body: req.body.body,
+      timestamp: req.body.timestamp
+    };
+    // commandHandler
+    //   .commentCreated(req.body)
+    CommonCommandHandler.sendCommand(payload, constants.COMMENT_CREATED)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
