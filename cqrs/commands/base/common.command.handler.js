@@ -1,5 +1,6 @@
 const fs = require("fs");
 const writeRepo = require("../../writeRepositories/write.repository");
+const constants = require("../../../constants");
 
 const CommonCommandHandler = {
   sendCommand(payload, commandName) {
@@ -12,7 +13,6 @@ const CommonCommandHandler = {
       .then(events => {
         // after the events, send to read and write models
         events.forEach(event => {
-          console.log(event);
           this.sendEvent(event);
           this.addEvent(event);
         });
@@ -35,11 +35,31 @@ const CommonCommandHandler = {
         }
       }
     }
-    return Promise.reject("bruh");
+    return Promise.reject(constants.COMMAND_NOT_EXISTS);
+  },
+
+  getComponent(aggregateName) {
+    let componentName = null;
+    switch (aggregateName) {
+      case constants.USER_AGGREGATE_NAME:
+        componentName = constants.USER_COMPONENT;
+        break;
+      case constants.REPORT_AGGREGATE_NAME:
+        componentName = constants.MAP_COMPONENT;
+        break;
+      case constants.AD_AGGREGATE_NAME:
+        componentName = constants.MAP_COMPONENT;
+        break;
+      case constants.COMMENT_AGGREGATE_NAME:
+        componentName = constants.MAP_COMPONENT;
+        break;
+    }
+    return componentName;
   },
 
   sendEvent(event) {
-    const eventHandler = require(`../../eventListeners/${event.aggregateName}/${event.aggregateName}.event.handler`);
+    const componentName = this.getComponent(event.aggregateName);
+    const eventHandler = require(`../../eventListeners/${componentName}/${event.aggregateName}.event.handler`);
 
     eventHandler.emit(event.eventName, event.payload);
   },

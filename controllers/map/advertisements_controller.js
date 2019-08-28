@@ -1,5 +1,6 @@
 const queryHandler = require("../../db/sql/map/advertisements.repository");
-const commandHandler = require("../../cqrs/commands/map/advertisements.command.handler");
+// const commandHandler = require("../../cqrs/commands/map/advertisements.command.handler");
+const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
 let Redis = require("ioredis");
 let redis = new Redis(process.env.REDIS_URL);
@@ -94,13 +95,24 @@ const Handler = {
 
   // Add an ad (only for users with role >= 1)
   createAd(req, res, next) {
-    commandHandler
-      .adCreated(req.body, req.file)
+    let payload = {
+      userId: req.body.userId,
+      userName: req.body.userName,
+      caption: req.body.caption,
+      latitude: req.body.latitude.toString(),
+      longitude: req.body.longitude.toString(),
+      location: req.body.location,
+      file: req.file
+    };
+    // commandHandler
+    //   .adCreated(req.body, req.file)
+    CommonCommandHandler.sendCommand(payload, constants.AD_CREATED)
       .then(result => {
         if (result)
           return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
+        console.log(e);
         return res.status(400).json({ err: e });
       });
   }

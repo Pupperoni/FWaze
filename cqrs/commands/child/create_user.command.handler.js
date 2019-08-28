@@ -2,6 +2,7 @@ const BaseCommandHandler = require("../base/base.command.handler");
 const bcrypt = require("bcryptjs");
 const shortid = require("shortid");
 const constants = require("../../../constants");
+const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function validateEmail(email) {
   let re = /\S+@\S+/;
@@ -22,6 +23,10 @@ Object.defineProperty(UserCreatedCommandHandler.prototype, "constructor", {
 
 UserCreatedCommandHandler.prototype.getCommands = function() {
   return [constants.USER_CREATED];
+};
+
+UserCreatedCommandHandler.prototype.getAggregate = function(id) {
+  return aggregate.getCurrentState(id);
 };
 
 UserCreatedCommandHandler.prototype.validate = function(payload) {

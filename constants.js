@@ -1,4 +1,8 @@
 module.exports = {
+  // Component names
+  USER_COMPONENT: "users",
+  MAP_COMPONENT: "map",
+
   // User aggregates constants
   USER_AGGREGATE_NAME: "users",
   USER_CREATED: "user_created",
@@ -14,7 +18,7 @@ module.exports = {
   REPORT_VOTE_DELETED: "report_vote_deleted",
 
   // Advertistement aggregate constants
-  AD_AGGREGATE_NAME: "ads",
+  AD_AGGREGATE_NAME: "advertisements",
   AD_CREATED: "ad_create",
 
   // Comment aggregate constants
@@ -41,5 +45,6 @@ module.exports = {
   AD_NOT_EXISTS: "This ad does not exist",
   COMMENT_NOT_EXISTS: "This comment does not exist",
   COMMENTS_NOT_FOUND: "No comments found",
-  FILE_NOT_FOUND: "File not found"
+  FILE_NOT_FOUND: "File not found",
+  COMMAND_NOT_EXISTS: "Command does not exist"
 };
