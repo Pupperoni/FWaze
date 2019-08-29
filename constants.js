@@ -10,6 +10,7 @@ module.exports = {
   USER_HOME_UPDATED: "user_home_updated",
   USER_WORK_UPDATED: "user_work_updated",
   USER_ROUTE_CREATED: "user_route_created",
+  USER_ROUTE_DELETED: "user_route_deleted",
 
   // Application aggregate constants
   APPLICATION_AGGREGATE_NAME: "applications",

@@ -21,6 +21,15 @@ BEGIN
     ORDER BY created_at;
 END;
 
+DROP PROCEDURE IF EXISTS GetAllApplications;
+
+CREATE PROCEDURE GetAllApplications()
+BEGIN
+    SELECT id, user_id, user_name, status, created_at
+    FROM advertiser_applications
+    ORDER BY created_at;
+END;
+
 DROP PROCEDURE IF EXISTS CreateApplication;
 
 CREATE PROCEDURE CreateApplication(

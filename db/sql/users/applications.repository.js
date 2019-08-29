@@ -17,6 +17,17 @@ const Handler = {
         throw e;
       });
   },
+  // Get all applications
+  getAllApplications() {
+    return knex
+      .raw("CALL GetAllApplications()")
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
 
   // Get all pending applications
   getPendingApplications() {

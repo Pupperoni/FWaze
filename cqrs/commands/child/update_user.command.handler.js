@@ -32,11 +32,11 @@ UserUpdatedCommandHandler.prototype.validate = function(payload) {
   let valid = true;
   let reasons = [];
   // email valid?
+
   if (payload.email && !validateEmail(payload.email)) {
     valid = false;
     reasons.push(constants.EMAIL_INVALID_FORMAT);
   }
-
   if (valid) return Promise.resolve(valid);
   else return Promise.reject(reasons);
 };

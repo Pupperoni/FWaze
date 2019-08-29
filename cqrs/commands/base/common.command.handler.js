@@ -5,6 +5,7 @@ const constants = require("../../../constants");
 const CommonCommandHandler = {
   sendCommand(payload, commandName) {
     // get appropriate command handler
+
     return this.getCommandHandler(commandName)
       .then(commandHandler => {
         // run the functions

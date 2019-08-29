@@ -174,7 +174,6 @@ const Handler = {
       id: req.body.id,
       name: req.body.name,
       email: req.body.email,
-      role: req.body.role,
       home: {
         latitude: req.body.homeLatitude,
         longitude: req.body.homeLongitude,
