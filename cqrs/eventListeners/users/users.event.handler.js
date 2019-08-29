@@ -121,4 +121,10 @@ emitter.on(constants.USER_ROUTE_CREATED, function(data) {
   queryHandler.createFaveRoute(data);
 });
 
+emitter.on(constants.USER_ROUTE_DELETED, function(data) {
+  console.log("event received: fave route deleted");
+
+  queryHandler.deleteFaveRoute(data);
+});
+
 module.exports = emitter;

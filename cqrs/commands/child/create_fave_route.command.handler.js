@@ -29,7 +29,6 @@ RouteCreatedCommandHandler.prototype.validate = function(payload) {
         valid = false;
         reasons.push(constants.USER_NOT_EXISTS);
       }
-      console.log(valid);
 
       if (valid) {
         return Promise.resolve(valid);

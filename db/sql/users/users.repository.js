@@ -96,6 +96,18 @@ const Handler = {
       });
   },
 
+  // Add a route to favorites
+  deleteFaveRoute(routeData) {
+    return knex
+      .raw("CALL DeleteFaveRoute(?)", [routeData.routeId])
+      .then(row => {
+        return Promise.resolve(row[0][0]);
+      })
+      .catch(e => {
+        throw e;
+      });
+  },
+
   // Get all faved routes
   getFaveRoutes(userId) {
     return knex

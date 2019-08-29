@@ -18,13 +18,23 @@ BEGIN
     VALUES (routeId, ST_GeomFromText(@s), ST_GeomFromText(@d), sourceStr, destStr, userId);
 END;
 
+DROP PROCEDURE IF EXISTS DeleteFaveRoute;
+
+CREATE PROCEDURE DeleteFaveRoute(
+    IN routeId VARCHAR(15)
+)
+BEGIN
+    DELETE FROM fave_routes
+    WHERE id = routeId;
+END;
+
 DROP PROCEDURE IF EXISTS GetRoutesByUserId;
 
 CREATE PROCEDURE GetRoutesByUserId(
     IN userId VARCHAR(15)
 )
 BEGIN
-    SELECT source_coords, destination_coords, source_string, destination_string
+    SELECT id, source_coords, destination_coords, source_string, destination_string
     FROM fave_routes
     WHERE user_id = userId;
 END;

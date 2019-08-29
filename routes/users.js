@@ -48,11 +48,14 @@ router.put("/home", userHandler.addHomeAddress);
 // Save work address
 router.put("/work", userHandler.addWorkAddress);
 
-// Get fave routes
-router.get("/faves/:id", userHandler.getFaveRoutes);
-
 // Add fave route
 router.post("/faves/new", userHandler.createFaveRoute);
+
+// Delete fave route
+router.post("/faves/delete", userHandler.deleteFaveRoute);
+
+// Get fave routes
+router.get("/faves/:id", userHandler.getFaveRoutes);
 
 // Get image of user
 router.get("/:id/image", userHandler.getImage);

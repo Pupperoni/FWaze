@@ -1,28 +1,29 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
 const constants = require("../../../constants");
+const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
-function RouteCreatedCommandHandler() {}
+function RouteDeletedCommandHandler() {}
 
-RouteCreatedCommandHandler.prototype = Object.create(
+RouteDeletedCommandHandler.prototype = Object.create(
   BaseCommandHandler.prototype
 );
 
-Object.defineProperty(RouteCreatedCommandHandler.prototype, "constructor", {
-  value: RouteCreatedCommandHandler,
+Object.defineProperty(RouteDeletedCommandHandler.prototype, "constructor", {
+  value: RouteDeletedCommandHandler,
   enumerable: false, // so that it does not appear in 'for in' loop
   writable: true
 });
 
-RouteCreatedCommandHandler.prototype.getCommands = function() {
+RouteDeletedCommandHandler.prototype.getCommands = function() {
   return [constants.USER_ROUTE_DELETED];
 };
 
-RouteCreatedCommandHandler.prototype.validate = function(payload) {
+RouteDeletedCommandHandler.prototype.validate = function(payload) {
   let valid = true;
   let reasons = [];
   return Promise.resolve(
-    aggregate.getCurrentState(payload.id).then(user => {
+    aggregate.getCurrentState(payload.userId).then(user => {
       // user does not exist
       if (!user) {
         valid = false;
@@ -36,27 +37,21 @@ RouteCreatedCommandHandler.prototype.validate = function(payload) {
   );
 };
 
-RouteCreatedCommandHandler.prototype.performCommand = function(payload) {
+RouteDeletedCommandHandler.prototype.performCommand = function(payload) {
   // Create event instance
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.USER_ROUTE_CREATED,
+    eventName: constants.USER_ROUTE_DELETED,
     aggregateName: constants.USER_AGGREGATE_NAME,
-    aggregateID: payload.id,
+    aggregateID: payload.userId,
     payload: {
-      id: payload.id,
-      routeId: shortid.generate(),
-      sourceLatitude: payload.sourceLatitude,
-      sourceLongitude: payload.sourceLongitude,
-      destinationLatitude: payload.destinationLatitude,
-      destinationLongitude: payload.destinationLongitude,
-      sourceString: payload.sourceString,
-      destinationString: payload.destinationString
+      id: payload.userId,
+      routeId: payload.routeId
     }
   });
 
   return Promise.resolve(events);
 };
 
-module.exports = RouteCreatedCommandHandler;
+module.exports = RouteDeletedCommandHandler;

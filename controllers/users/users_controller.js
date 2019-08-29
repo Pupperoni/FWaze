@@ -268,6 +268,22 @@ const Handler = {
       .catch(e => {
         return res.status(400).json({ err: e });
       });
+  },
+
+  // Delete a fave route
+  deleteFaveRoute(req, res, next) {
+    const payload = {
+      routeId: req.body.routeId,
+      userId: req.body.userId
+    };
+    CommonCommandHandler.sendCommand(payload, constants.USER_ROUTE_DELETED)
+      .then(result => {
+        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+      })
+      .catch(e => {
+        console.log(e);
+        return res.status(400).json({ err: e });
+      });
   }
 };
 
