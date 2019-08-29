@@ -253,6 +253,7 @@ const Handler = {
   createFaveRoute(req, res, next) {
     const payload = {
       routeId: req.body.routeId,
+      routeName: req.body.routeName,
       sourceLatitude: req.body.sourceLatitude,
       sourceLongitude: req.body.sourceLongitude,
       destinationLatitude: req.body.destinationLatitude,

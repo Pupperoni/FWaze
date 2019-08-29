@@ -47,8 +47,6 @@ ReportCreatedCommandHandler.prototype.performCommand = function(payload) {
   // generate unique id
   payload.id = shortid.generate();
 
-  console.log(payload);
-
   // Create event instance
   let events = [];
   events.push({

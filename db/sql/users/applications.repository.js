@@ -44,7 +44,7 @@ const Handler = {
   // Get all pending applications
   approveApplication(data) {
     return knex
-      .raw("CALL ApproveApplication(?)", data.userId)
+      .raw("CALL ApproveApplication(?)", [data.userId])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
@@ -56,7 +56,7 @@ const Handler = {
   // Get all pending applications
   rejectApplication(data) {
     return knex
-      .raw("CALL RejectApplication(?)", data.userId)
+      .raw("CALL RejectApplication(?)", [data.userId])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })

@@ -78,8 +78,9 @@ const Handler = {
   // Add a route to favorites
   createFaveRoute(routeData) {
     return knex
-      .raw("CALL CreateFaveRoute(?,?,?,?,?,?,?,?)", [
+      .raw("CALL CreateFaveRoute(?,?,?,?,?,?,?,?,?)", [
         routeData.routeId,
+        routeData.routeName,
         routeData.sourceLatitude,
         routeData.sourceLongitude,
         routeData.destinationLatitude,

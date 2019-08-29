@@ -27,7 +27,9 @@ CREATE PROCEDURE GetAllApplications()
 BEGIN
     SELECT id, user_id, user_name, status, created_at
     FROM advertiser_applications
-    ORDER BY created_at;
+    WHERE status != 0 
+    ORDER BY created_at DESC
+    LIMIT 100;
 END;
 
 DROP PROCEDURE IF EXISTS CreateApplication;

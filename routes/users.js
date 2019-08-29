@@ -19,7 +19,10 @@ const upload = multer({ storage: storage });
 /* Advertiser Applications */
 
 // Get pending applications
-router.get("/apply", applicationHandler.getPendingApplications);
+router.get("/apply/pending", applicationHandler.getPendingApplications);
+
+// Get pending applications
+router.get("/apply", applicationHandler.getAllApplications);
 
 // Get application by user id
 router.get("/apply/:id", applicationHandler.getApplicationByUserId);
