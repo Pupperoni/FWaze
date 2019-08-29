@@ -78,7 +78,12 @@ module.exports = {
                 if (!user.faveRoutes) {
                   user.faveRoutes = [];
                 }
-                user.faveRoutes.push(payload);
+                user.faveRoutes.push(payload.routeId);
+                break;
+              case constants.USER_ROUTE_DELETED:
+                let index = user.faveRoutes.indexOf(payload.routeId);
+                user.faveRoutes.splice(index, 1);
+                break;
             }
           });
 
