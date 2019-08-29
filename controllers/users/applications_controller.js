@@ -18,8 +18,7 @@ const Handler = {
       .then(result => {
         if (!result) return res.json({ msg: constants.APPLICATION_NOT_EXISTS });
         else {
-          redis.hget(`application:${result}`).then(result => {
-            console.log(result);
+          redis.hgetall(`application:${result}`).then(result => {
             if (result) return res.json({ data: result });
           });
         }

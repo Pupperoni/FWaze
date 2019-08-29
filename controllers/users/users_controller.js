@@ -126,10 +126,10 @@ const Handler = {
           });
         })
         .catch(e => {
-          return res.status(400).json({ msg: e });
+          return res.status(400).json({ err: e });
         });
     } else
-      return res.status(400).json({ msg: constants.DEFAULT_LOGIN_FAILURE });
+      return res.status(400).json({ err: constants.DEFAULT_LOGIN_FAILURE });
   },
 
   //
