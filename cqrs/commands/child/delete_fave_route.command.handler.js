@@ -24,7 +24,6 @@ RouteDeletedCommandHandler.prototype.validate = function(payload) {
   let reasons = [];
   return Promise.resolve(
     aggregate.getCurrentState(payload.userId).then(user => {
-      console.log(user);
       // user does not exist
       if (!user) {
         valid = false;

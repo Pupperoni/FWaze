@@ -35,8 +35,6 @@ ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
     userAggregate
       .getCurrentState(payload.userId)
       .then(user => {
-        console.log(user);
-
         // user does not exist
         if (!user) {
           valid = false;

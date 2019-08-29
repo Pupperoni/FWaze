@@ -28,6 +28,19 @@ const Handler = {
       });
   },
 
+  // Get all applications
+  getAllApplications(req, res, next) {
+    // Redis get
+    queryHandler
+      .getAllApplications()
+      .then(results => {
+        return res.json({ data: results });
+      })
+      .catch(e => {
+        return res.status(400).json({ err: e });
+      });
+  },
+
   // Get pending applications
   getPendingApplications(req, res, next) {
     // Redis get
