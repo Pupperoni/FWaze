@@ -41,12 +41,13 @@ module.exports = {
                 user.name = payload.name;
                 user.email = payload.email;
                 user.password = payload.password;
-                user.role = payload.role;
+                if (payload.role) user.role = payload.role;
+                else user.role = 0;
                 break;
               case constants.USER_UPDATED:
-                user.name = payload.name;
-                user.email = payload.email;
-                user.role = payload.role;
+                if (payload.name) user.name = payload.name;
+                if (payload.email) user.email = payload.email;
+                if (payload.role) user.role = payload.role;
                 if (payload.avatarPath) user.avatarPath = payload.avatarPath;
                 break;
               case constants.USER_HOME_UPDATED:

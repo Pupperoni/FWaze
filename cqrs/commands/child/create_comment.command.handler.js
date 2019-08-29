@@ -28,31 +28,24 @@ CommentCreatedCommandHandler.prototype.validate = function(payload) {
   let reportCheck = reportAggregate
     .getCurrentState(payload.reportId) // check if report exists
     .then(report => {
-      let subValid = true;
       // report doesn't exist
       if (!report) {
-        subValid = false;
+        valid = false;
         reasons.push(constants.REPORT_NOT_EXISTS);
       }
-      return Promise.resolve(subValid);
+      return Promise.resolve(valid);
     });
   let userCheck = userAggregate
     .getCurrentState(payload.userId) // check if user exists
     .then(user => {
-      let subValid = true;
       if (!user) {
-        subValid = false;
+        valid = false;
         reasons.push(constants.USER_NOT_EXISTS);
       }
-      return Promise.resolve(subValid);
+      return Promise.resolve(valid);
     });
 
   return Promise.all([reportCheck, userCheck]).then(results => {
-    results.forEach(value => {
-      // false value found so it must not be valid
-      if (!value) valid = value;
-    });
-
     if (valid) Promise.resolve(valid);
     else Promise.reject(reasons);
   });
