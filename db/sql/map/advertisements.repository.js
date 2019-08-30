@@ -1,4 +1,6 @@
-let knex = require("../../knex");
+const knex = require("../../knex");
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
 
 const Handler = {
   getAds() {
@@ -12,13 +14,52 @@ const Handler = {
       });
   },
 
-  createAd(adData) {
+  createAd(data) {
+    // Add to redis
+    if (data.photoPath) {
+      redis.hmset(
+        `ad:${data.id}`,
+        "id",
+        data.id,
+        "caption",
+        data.caption,
+        "userId",
+        data.userId,
+        "userName",
+        data.userName,
+        "longitude",
+        data.longitude,
+        "latitude",
+        data.latitude,
+        "location",
+        data.location,
+        "photoPath",
+        data.photoPath
+      );
+    } else {
+      redis.hmset(
+        `ad:${data.id}`,
+        "id",
+        data.id,
+        "caption",
+        data.caption,
+        "userId",
+        data.userId,
+        "userName",
+        data.userName,
+        "longitude",
+        data.longitude,
+        "latitude",
+        data.latitude,
+        "location",
+        data.location
+      );
+    }
+
+    redis.sadd(`ads:${data.userId}`, data.id);
+
     return knex
-      .raw("CALL CreateAd(?,?,?)", [
-        adData.id,
-        adData.longitude,
-        adData.latitude
-      ])
+      .raw("CALL CreateAd(?,?,?)", [data.id, data.longitude, data.latitude])
       .then(row => {
         return Promise.resolve(row[0]);
       })

@@ -1,4 +1,6 @@
-let knex = require("../../knex");
+const knex = require("../../knex");
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
 
 const Handler = {
   // Fetch all user names and emails
@@ -52,9 +54,18 @@ const Handler = {
   },
 
   // Set a home address for a user
-  setHomeAd(id, addr) {
+  setHomeAd(data) {
+    redis.hmset(
+      `user:${data.id}:home`,
+      `latitude`,
+      data.latitude,
+      `longitude`,
+      data.longitude,
+      `address`,
+      data.address
+    );
     return knex
-      .raw("CALL SetHomeAd(?,?)", [id, addr])
+      .raw("CALL SetHomeAd(?,?)", [data.id, data.address])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
@@ -64,9 +75,18 @@ const Handler = {
   },
 
   // Set a work address for a user
-  setWorkAd(id, addr) {
+  setWorkAd(data) {
+    redis.hmset(
+      `user:${data.id}:work`,
+      `latitude`,
+      data.latitude,
+      `longitude`,
+      data.longitude,
+      `address`,
+      data.address
+    );
     return knex
-      .raw("CALL SetWorkAd(?,?)", [id, addr])
+      .raw("CALL SetWorkAd(?,?)", [data.id, data.address])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
@@ -76,18 +96,18 @@ const Handler = {
   },
 
   // Add a route to favorites
-  createFaveRoute(routeData) {
+  createFaveRoute(data) {
     return knex
       .raw("CALL CreateFaveRoute(?,?,?,?,?,?,?,?,?)", [
-        routeData.routeId,
-        routeData.routeName,
-        routeData.sourceLatitude,
-        routeData.sourceLongitude,
-        routeData.destinationLatitude,
-        routeData.destinationLongitude,
-        routeData.sourceString,
-        routeData.destinationString,
-        routeData.id
+        data.routeId,
+        data.routeName,
+        data.sourceLatitude,
+        data.sourceLongitude,
+        data.destinationLatitude,
+        data.destinationLongitude,
+        data.sourceString,
+        data.destinationString,
+        data.id
       ])
       .then(row => {
         return Promise.resolve(row[0][0]);
@@ -98,9 +118,9 @@ const Handler = {
   },
 
   // Add a route to favorites
-  deleteFaveRoute(routeData) {
+  deleteFaveRoute(data) {
     return knex
-      .raw("CALL DeleteFaveRoute(?)", [routeData.routeId])
+      .raw("CALL DeleteFaveRoute(?)", [data.routeId])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
@@ -122,14 +142,52 @@ const Handler = {
   },
 
   // Insert new user to 'users'
-  createUser(user) {
-    // return knex('users').insert(user)
+  createUser(data) {
+    redis
+      .hmset(
+        `user:${data.id}`,
+        `id`,
+        data.id,
+        `name`,
+        data.name,
+        `email`,
+        data.email,
+        `password`,
+        data.password,
+        `role`,
+        data.role
+      )
+      .then(() => {
+        // To access a user by his name, we store his id somewhere
+        redis.set(`user:name:${data.name}`, data.id);
+
+        // save home and work (initially none)
+        redis.hmset(
+          `user:${data.id}:home`,
+          `latitude`,
+          "",
+          `longitude`,
+          "",
+          `address`,
+          ""
+        );
+        redis.hmset(
+          `user:${data.id}:work`,
+          `latitude`,
+          "",
+          `longitude`,
+          "",
+          `address`,
+          ""
+        );
+      });
+
     return knex
       .raw("CALL CreateUser(?,?,?,?)", [
-        user.id,
-        user.name,
-        user.email,
-        user.password
+        data.id,
+        data.name,
+        data.email,
+        data.password
       ])
       .then(row => {
         return Promise.resolve(row[0]);
@@ -140,15 +198,45 @@ const Handler = {
   },
 
   // Update user details
-  updateUser(user) {
-    return knex
-      .raw("CALL UpdateUser(?,?,?)", [user.name, user.email, user.id])
-      .then(row => {
-        return Promise.resolve(row[0]);
-      })
-      .catch(e => {
-        throw e;
+  updateUser(data) {
+    // Update redis data
+    if (data.name) {
+      // delete old name checker
+      redis.del(`user:name:${data.name}`);
+      // set new name
+      redis.hset(`user:${data.id}`, `name`, data.name);
+      // Update reports
+      redis.smembers(`reports:${data.id}`).then(reportIds => {
+        reportIds.forEach(id => {
+          redis.hset(`report:${id}`, `userName`, data.name);
+        });
       });
+      // Update ads
+      redis.smembers(`ads:${data.id}`).then(reportIds => {
+        reportIds.forEach(id => {
+          redis.hset(`ad:${id}`, `userName`, data.name);
+        });
+      });
+      // Update name checker
+      redis.set(`user:name:${data.name}`, data.id);
+    }
+
+    if (data.email) redis.hset(`user:${data.id}`, `email`, data.email);
+    if (data.role) redis.hset(`user:${data.id}`, `role`, data.role);
+
+    if (data.avatarPath)
+      redis.hset(`user:${data.id}`, `avatarPath`, data.avatarPath);
+    // Update MySQL data
+    if (data.name && data.email) {
+      return knex
+        .raw("CALL UpdateUser(?,?,?)", [data.name, data.email, data.id])
+        .then(row => {
+          return Promise.resolve(row[0]);
+        })
+        .catch(e => {
+          throw e;
+        });
+    }
   }
 };
 

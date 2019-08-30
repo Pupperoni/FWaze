@@ -1,4 +1,4 @@
-let knex = require("../../knex");
+const knex = require("../../knex");
 
 const Handler = {
   createComment(commentData) {

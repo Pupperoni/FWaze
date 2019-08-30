@@ -1,13 +1,13 @@
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
-var cors = require("cors");
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var mapRouter = require("./routes/map");
+let express = require("express");
+let path = require("path");
+let cookieParser = require("cookie-parser");
+let logger = require("morgan");
+let cors = require("cors");
+let indexRouter = require("./routes/index");
+let usersRouter = require("./routes/users");
+let mapRouter = require("./routes/map");
 
-var app = express();
+let app = express();
 
 app.use(logger("dev"));
 app.use(express.json());

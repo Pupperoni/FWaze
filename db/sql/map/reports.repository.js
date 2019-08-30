@@ -1,13 +1,58 @@
-let knex = require("../../knex");
+const knex = require("../../knex");
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
 
 const Handler = {
-  createReport(reportData) {
+  createReport(data) {
+    // Add to redis
+    if (data.photoPath) {
+      redis.hmset(
+        `report:${data.id}`,
+        `id`,
+        data.id,
+        `userId`,
+        data.userId,
+        `userName`,
+        data.userName,
+        `longitude`,
+        data.longitude,
+        `latitude`,
+        data.latitude,
+        `location`,
+        data.location,
+        `type`,
+        data.type,
+        "photoPath",
+        data.photoPath
+      );
+    } else {
+      redis.hmset(
+        `report:${data.id}`,
+        `id`,
+        data.id,
+        `userId`,
+        data.userId,
+        `userName`,
+        data.userName,
+        `longitude`,
+        data.longitude,
+        `latitude`,
+        data.latitude,
+        `location`,
+        data.location,
+        `type`,
+        data.type
+      );
+    }
+
+    // Link users and reports
+    redis.sadd(`reports:${data.userId}`, data.id);
     return knex
       .raw("CALL CreateReport(?,?,?,?)", [
-        reportData.id,
-        reportData.type,
-        reportData.longitude,
-        reportData.latitude
+        data.id,
+        data.type,
+        data.longitude,
+        data.latitude
       ])
       .then(row => {
         return Promise.resolve(row[0]);
@@ -17,9 +62,11 @@ const Handler = {
       });
   },
 
-  addVote(reportId, userId) {
+  addVote(data) {
+    redis.sadd(`user:${data.userId}:upvoting`, data.id);
+    redis.sadd(`report:${data.id}:upvoters`, data.userId);
     return knex
-      .raw("CALL AddVote(?,?)", [reportId, userId])
+      .raw("CALL AddVote(?,?)", [data.id, data.userId])
       .then(row => {
         return Promise.resolve(row[0]);
       })
@@ -28,9 +75,11 @@ const Handler = {
       });
   },
 
-  removeVote(reportId, userId) {
+  removeVote(data) {
+    redis.srem(`user:${data.userId}:upvoting`, data.id);
+    redis.srem(`report:${data.id}:upvoters`, data.userId);
     return knex
-      .raw("CALL RemoveVote(?,?)", [reportId, userId])
+      .raw("CALL RemoveVote(?,?)", [data.id, data.userId])
       .then(row => {
         return Promise.resolve(row[0]);
       })
