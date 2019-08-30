@@ -48,7 +48,7 @@ RouteCreatedCommandHandler.prototype.performCommand = function(payload) {
     payload: {
       id: payload.id,
       routeName: payload.routeName,
-      routeId: shortid.generate(),
+      routeId: payload.routeId,
       sourceLatitude: payload.sourceLatitude,
       sourceLongitude: payload.sourceLongitude,
       destinationLatitude: payload.destinationLatitude,

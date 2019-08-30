@@ -1,5 +1,6 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
+const shortid = require("shortid");
 const constants = require("../../constants");
 const Handler = {
   //
@@ -93,6 +94,7 @@ const Handler = {
   // Add a comment
   createComment(req, res, next) {
     const payload = {
+      id: shortid.generate(),
       userId: req.body.userId,
       userName: req.body.userName,
       reportId: req.body.reportId,

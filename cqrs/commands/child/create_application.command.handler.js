@@ -1,6 +1,7 @@
 const BaseCommandHandler = require("../base/base.command.handler");
-const shortid = require("shortid");
 const constants = require("../../../constants");
+const shortid = require("shortid");
+
 // will fix
 const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
 const applicationAggregate = require("../../aggregateHelpers/users/applications.aggregate");
@@ -65,7 +66,6 @@ ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
 };
 
 ApplicationCreatedCommandHandler.prototype.performCommand = function(payload) {
-  payload.id = shortid.generate();
   // Create event instance
   let events = [];
   events.push({

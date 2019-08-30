@@ -1,8 +1,9 @@
 const queryHandler = require("../../db/sql/map/advertisements.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
-let Redis = require("ioredis");
-let redis = new Redis(process.env.REDIS_URL);
+const shortid = require("shortid");
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
 const Handler = {
   //
   //  Query responsibility
@@ -95,6 +96,7 @@ const Handler = {
   // Add an ad (only for users with role >= 1)
   createAd(req, res, next) {
     let payload = {
+      id: shortid.generate(),
       userId: req.body.userId,
       userName: req.body.userName,
       caption: req.body.caption,

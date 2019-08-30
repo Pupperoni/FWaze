@@ -2,7 +2,7 @@ const queryHandler = require("../../db/sql/users/users.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
 const bcrypt = require("bcryptjs");
-
+const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
@@ -139,6 +139,7 @@ const Handler = {
   // Add a new user
   createUser(req, res, next) {
     const payload = {
+      id: shortid.generate(),
       name: req.body.name,
       email: req.body.email,
       role: req.body.role,
@@ -252,7 +253,7 @@ const Handler = {
   // Add a new fave route
   createFaveRoute(req, res, next) {
     const payload = {
-      routeId: req.body.routeId,
+      routeId: shortid.generate(),
       routeName: req.body.routeName,
       sourceLatitude: req.body.sourceLatitude,
       sourceLongitude: req.body.sourceLongitude,

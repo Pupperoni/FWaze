@@ -1,7 +1,7 @@
 const queryHandler = require("../../db/sql/users/applications.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const constants = require("../../constants");
-
+const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
@@ -57,6 +57,7 @@ const Handler = {
   // Add a new application for advertiser
   createApplication(req, res, next) {
     const payload = {
+      id: shortid.generate(),
       userId: req.body.userId,
       userName: req.body.userName,
       timestamp: req.body.timestamp

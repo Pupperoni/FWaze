@@ -2,24 +2,56 @@ const fs = require("fs");
 const writeRepo = require("../../writeRepositories/write.repository");
 const constants = require("../../../constants");
 
+const async = require("async");
+
 const CommonCommandHandler = {
+  commandQueue: async.queue(function(task, callback) {
+    console.log(`Running ${task.commandName}`);
+    callback(task.self, task.commandHandler, task.payload);
+  }),
+
   sendCommand(payload, commandName) {
     // get appropriate command handler
 
-    return this.getCommandHandler(commandName)
-      .then(commandHandler => {
-        // run the functions
-        return commandHandler.commandChain(payload);
-      })
-      .then(events => {
-        // after the events, send to read and write models
-        events.forEach(event => {
-          this.sendEvent(event);
-          this.addEvent(event);
+    return this.getCommandHandler(commandName).then(commandHandler => {
+      // run the functions
+      return commandHandler
+        .validate(payload)
+        .then(valid => {
+          // add command to queue
+          this.enqueueCommand(commandHandler, commandName, payload);
+          return payload;
+        })
+        .catch(e => {
+          return Promise.reject(e);
         });
+    });
+  },
 
-        return events[0].payload;
-      });
+  enqueueCommand(commandHandler, commandName, payload) {
+    let self = this;
+    try {
+      this.commandQueue.push(
+        {
+          self: self,
+          commandName: commandName,
+          commandHandler: commandHandler,
+          payload: payload
+        },
+        // perform command
+        function(self, commandHandler, payload) {
+          commandHandler.performCommand(payload).then(events => {
+            // after the events, send to read and write models
+            events.forEach(event => {
+              self.sendEvent(event);
+              self.addEvent(event);
+            });
+          });
+        }
+      );
+    } catch (e) {
+      console.log(e);
+    }
   },
 
   getCommandHandler(commandName) {

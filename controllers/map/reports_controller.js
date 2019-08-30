@@ -1,8 +1,9 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
 const constants = require("../../constants");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
-let Redis = require("ioredis");
-let redis = new Redis(process.env.REDIS_URL);
+const shortid = require("shortid");
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
 
 const reportTypes = {
   traffic_jam: 0,
@@ -189,6 +190,8 @@ const Handler = {
   // Add a new report
   createReport(req, res, next) {
     const payload = {
+      // generate unique id
+      id: shortid.generate(),
       userId: req.body.userId,
       userName: req.body.userName,
       latitude: req.body.latitude,
@@ -202,6 +205,7 @@ const Handler = {
     //   .reportCreated(req.body, req.file)
     CommonCommandHandler.sendCommand(payload, constants.REPORT_CREATED)
       .then(result => {
+        console.log(result);
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {

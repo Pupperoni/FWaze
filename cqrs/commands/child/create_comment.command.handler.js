@@ -52,9 +52,6 @@ CommentCreatedCommandHandler.prototype.validate = function(payload) {
 };
 
 CommentCreatedCommandHandler.prototype.performCommand = function(payload) {
-  // generate unique id
-  payload.id = shortid.generate();
-
   // Create event instance
   let events = [];
   events.push({

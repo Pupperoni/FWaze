@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
-const bcrypt = require("bcryptjs");
 const shortid = require("shortid");
+const bcrypt = require("bcryptjs");
 const constants = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
@@ -50,8 +50,6 @@ UserCreatedCommandHandler.prototype.validate = function(payload) {
 };
 
 UserCreatedCommandHandler.prototype.performCommand = function(payload) {
-  // generate unique id
-  payload.id = shortid.generate();
   // Hash password
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(payload.password, salt);
