@@ -75,6 +75,7 @@ const Handler = {
   // Approve application
   approveApplication(req, res, next) {
     const payload = {
+      id: req.body.id,
       adminId: req.body.adminId,
       userId: req.body.userId
     };
@@ -91,6 +92,7 @@ const Handler = {
   // Reject application
   rejectApplication(req, res, next) {
     const payload = {
+      id: req.body.id,
       adminId: req.body.adminId,
       userId: req.body.userId
     };

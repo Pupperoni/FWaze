@@ -1,9 +1,8 @@
 /**
  * Module dependencies.
  */
-const debug = require("debug")("fwaze:server");
-const http = require("http");
 const express = require("express");
+const debug = require("debug")("fwaze:server");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
@@ -11,9 +10,10 @@ const cors = require("cors");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const mapRouter = require("./routes/map");
-const socket = require("socket.io");
+const appData = require("./socket");
 
-const app = express();
+const app = appData.app;
+const server = appData.server;
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -34,61 +34,12 @@ var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
 /**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
  * Listen on provided port, on all network interfaces.
  */
 
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
-
-/**
- * Socket setup
- */
-const io = socket(server);
-io.on("connection", socket => {
-  // Handle report events
-  socket.on("addReport", data => {
-    io.emit("newReport", data); // send back new report to everyone
-  });
-  socket.on("addVote", data => {
-    socket.broadcast.emit("voteIncr", data);
-  });
-  socket.on("deleteVote", data => {
-    socket.broadcast.emit("voteDecr", data);
-  });
-
-  // Handle comments
-  socket.on("addComment", data => {
-    socket.broadcast.emit("newComment", data);
-  });
-
-  // Handle ad events
-  socket.on("addAd", data => {
-    io.emit("newAd", data);
-  });
-
-  // Handle applications events
-  socket.on("addApplication", data => {
-    io.emit("newApplication", data);
-  });
-
-  socket.on("acceptApplication", data => {
-    console.log(data);
-    io.emit("applicationAccepted", data);
-    io.emit("currentUser", data);
-  });
-
-  socket.on("rejectApplication", data => {
-    io.emit("applicationRejected", data);
-  });
-});
-
 /**
  * Normalize a port into a number, string, or false.
  */

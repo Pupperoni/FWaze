@@ -75,10 +75,9 @@ ApplicationRejectedCommandHandler.prototype.performCommand = function(payload) {
     eventName: constants.APPLICATION_REJECTED,
     aggregateName: constants.APPLICATION_AGGREGATE_NAME,
     aggregateID: payload.userId,
-    payload: {
-      userId: payload.userId
-    }
+    payload: payload
   });
+  console.log(payload);
 
   return Promise.resolve(events);
 };

@@ -35,36 +35,36 @@ END;
 DROP PROCEDURE IF EXISTS CreateApplication;
 
 CREATE PROCEDURE CreateApplication(
-    IN advertisementId VARCHAR(15),
+    IN applicationId VARCHAR(15),
     IN userId VARCHAR(15),
     IN userName VARCHAR(255),
     IN timenow TIMESTAMP
 )
 BEGIN
     INSERT INTO advertiser_applications (id, user_id, user_name, created_at)
-    VALUES (advertisementId, userId, userName, timenow);
+    VALUES (applicationId, userId, userName, timenow);
 END;
 
 DROP PROCEDURE IF EXISTS ApproveApplication;
 
 CREATE PROCEDURE ApproveApplication(
-    IN userId VARCHAR(15)
+    IN applicationId VARCHAR(15)
 )
 BEGIN
     UPDATE advertiser_applications
     SET status = 1
-    WHERE user_id = userId;
+    WHERE id = applicationId;
 END;
 
 DROP PROCEDURE IF EXISTS RejectApplication;
 
 CREATE PROCEDURE RejectApplication(
-    IN userId VARCHAR(15)
+    IN applicationId VARCHAR(15)
 )
 BEGIN
     UPDATE advertiser_applications
     SET status = -1
-    WHERE user_id = userId;
+    WHERE id = applicationId;
 END;
 
 -- Create index

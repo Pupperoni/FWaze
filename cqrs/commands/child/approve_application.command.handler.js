@@ -76,6 +76,7 @@ ApplicationApprovedCommandHandler.prototype.performCommand = function(payload) {
     aggregateName: constants.APPLICATION_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: {
+      id: payload.id,
       userId: payload.userId
     }
   });

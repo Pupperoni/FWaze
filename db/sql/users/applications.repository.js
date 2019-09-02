@@ -59,11 +59,12 @@ const Handler = {
 
   // Get all pending applications
   approveApplication(data) {
+    console.log(data);
     redis.hmset(`application:${data.userId}`, `status`, 1);
 
     redis.del(`user:${data.userId}:application`);
     return knex
-      .raw("CALL ApproveApplication(?)", [data.userId])
+      .raw("CALL ApproveApplication(?)", [data.id])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
@@ -74,10 +75,11 @@ const Handler = {
 
   // Get all pending applications
   rejectApplication(data) {
+    console.log(data);
     redis.hmset(`application:${data.userId}`, `status`, -1);
     redis.del(`user:${data.userId}:application`);
     return knex
-      .raw("CALL RejectApplication(?)", [data.userId])
+      .raw("CALL RejectApplication(?)", [data.id])
       .then(row => {
         return Promise.resolve(row[0][0]);
       })
