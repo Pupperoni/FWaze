@@ -53,8 +53,8 @@ server.on("listening", onListening);
 const io = socket(server);
 io.on("connection", socket => {
   // Handle report events
-  socket.on("addReport", report => {
-    io.emit("newReport", report); // send back new report to everyone
+  socket.on("addReport", data => {
+    io.emit("newReport", data); // send back new report to everyone
   });
   socket.on("addVote", data => {
     socket.broadcast.emit("voteIncr", data);
@@ -64,13 +64,28 @@ io.on("connection", socket => {
   });
 
   // Handle comments
-  socket.on("addComment", comment => {
-    socket.broadcast.emit("newComment", comment);
+  socket.on("addComment", data => {
+    socket.broadcast.emit("newComment", data);
   });
 
   // Handle ad events
-  socket.on("addAd", ad => {
-    io.emit("newAd", ad);
+  socket.on("addAd", data => {
+    io.emit("newAd", data);
+  });
+
+  // Handle applications events
+  socket.on("addApplication", data => {
+    io.emit("newApplication", data);
+  });
+
+  socket.on("acceptApplication", data => {
+    console.log(data);
+    io.emit("applicationAccepted", data);
+    io.emit("currentUser", data);
+  });
+
+  socket.on("rejectApplication", data => {
+    io.emit("applicationRejected", data);
   });
 });
 
