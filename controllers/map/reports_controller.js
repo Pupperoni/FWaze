@@ -201,11 +201,8 @@ const Handler = {
       file: req.file
     };
 
-    // commandHandler
-    //   .reportCreated(req.body, req.file)
     CommonCommandHandler.sendCommand(payload, constants.REPORT_CREATED)
       .then(result => {
-        console.log(result);
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
       })
       .catch(e => {
@@ -219,8 +216,7 @@ const Handler = {
       id: req.body.reportId,
       userId: req.body.userId
     };
-    // commandHandler
-    //   .voteCreated(req.body)
+
     CommonCommandHandler.sendCommand(payload, constants.REPORT_VOTE_CREATED)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
@@ -236,8 +232,7 @@ const Handler = {
       id: req.body.reportId,
       userId: req.body.userId
     };
-    // commandHandler
-    //   .voteDeleted(req.body)
+
     CommonCommandHandler.sendCommand(payload, constants.REPORT_VOTE_DELETED)
       .then(result => {
         return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
