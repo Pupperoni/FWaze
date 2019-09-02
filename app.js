@@ -63,6 +63,11 @@ io.on("connection", socket => {
     socket.broadcast.emit("voteDecr", data);
   });
 
+  // Handle comments
+  socket.on("addComment", comment => {
+    socket.broadcast.emit("newComment", comment);
+  });
+
   // Handle ad events
   socket.on("addAd", ad => {
     io.emit("newAd", ad);
