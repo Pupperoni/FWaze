@@ -5,6 +5,7 @@ const constants = require("../../../constants");
 const async = require("async");
 
 const CommonCommandHandler = {
+  // queue for issuing commands sequentially
   commandQueue: async.queue(function(task, callback) {
     console.log(`Running ${task.commandName}`);
     callback(task.self, task.commandHandler, task.payload);
@@ -12,7 +13,6 @@ const CommonCommandHandler = {
 
   sendCommand(payload, commandName) {
     // get appropriate command handler
-
     return this.getCommandHandler(commandName).then(commandHandler => {
       // run the functions
       return commandHandler
@@ -51,6 +51,7 @@ const CommonCommandHandler = {
       );
     } catch (e) {
       console.log(e);
+      throw e;
     }
   },
 

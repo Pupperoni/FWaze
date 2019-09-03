@@ -59,7 +59,6 @@ const Handler = {
 
   // Get all pending applications
   approveApplication(data) {
-    console.log(data);
     redis.hmset(`application:${data.userId}`, `status`, 1);
 
     redis.del(`user:${data.userId}:application`);
@@ -75,7 +74,6 @@ const Handler = {
 
   // Get all pending applications
   rejectApplication(data) {
-    console.log(data);
     redis.hmset(`application:${data.userId}`, `status`, -1);
     redis.del(`user:${data.userId}:application`);
     return knex
