@@ -13,40 +13,48 @@ var server = http.createServer(app);
  * Socket setup
  */
 const io = socket(server);
-io.on("connection", socket => {
-  // Handle report events
-  socket.on("addReport", data => {
-    io.emit("newReport", data); // send back new report to everyone
+
+// Handle report events
+io.of("/reports").on("connection", socket => {
+  socket.on("onCreated", data => {
+    io.of("/reports").emit("reportCreated", data); // send back new report to everyone
   });
-  socket.on("addVote", data => {
-    socket.broadcast.emit("voteIncr", data);
+  socket.on("onUpVoted", data => {
+    socket.broadcast.emit("voteCreated", data);
   });
-  socket.on("deleteVote", data => {
-    socket.broadcast.emit("voteDecr", data);
+  socket.on("onDownVoted", data => {
+    socket.broadcast.emit("voteDeleted", data);
+  });
+});
+
+// Handle comments
+io.of("/comments").on("connection", socket => {
+  socket.on("onCreated", data => {
+    socket.broadcast.emit("commentCreated", data);
+  });
+});
+
+// Handle ad events
+io.of("/ads").on("connection", socket => {
+  socket.on("onCreated", data => {
+    io.of("/ads").emit("adCreated", data);
+  });
+});
+
+// Handle applications events
+io.of("/applications", socket => {
+  socket.on("onCreated", data => {
+    io.of("/applications").emit("applicationCreated", data);
   });
 
-  // Handle comments
-  socket.on("addComment", data => {
-    socket.broadcast.emit("newComment", data);
+  socket.on("onAccepted", data => {
+    io.of("/applications").emit("applicationAccepted", data);
+    io.of("/applications").emit("currentUser", data);
   });
 
-  // Handle ad events
-  socket.on("addAd", data => {
-    io.emit("newAd", data);
-  });
-
-  // Handle applications events
-  socket.on("addApplication", data => {
-    io.emit("newApplication", data);
-  });
-
-  socket.on("acceptApplication", data => {
-    io.emit("applicationAccepted", data);
-    io.emit("currentUser", data);
-  });
-
-  socket.on("rejectApplication", data => {
-    io.emit("applicationRejected", data);
+  socket.on("onRejected", data => {
+    console.log("he");
+    io.of("/applications").emit("applicationRejected", data);
   });
 });
 
