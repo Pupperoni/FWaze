@@ -18,32 +18,24 @@ const io = socket(server);
 io.of("/events").on("connection", socket => {
   console.log("Connected");
 
-  console.log(socket.handshake.query);
-  socket.join("room " + socket.handshake.query.userId);
-  // socket.join("admin");
+  // socket.join("room " + socket.handshake.query.userId);
 
-  io.of("/events")
-    .to("room mNy-jjHblx")
-    .emit("event", "gej");
+  // io.of("/events")
+  //   .to("room mNy-jjHblx")
+  //   .emit("event", "gej");
 
-  socket.on("test", data => {
-    io.of("/events")
-      .to("room mNy-jjHblx")
-      .emit("event", "testing");
-  });
-
-  let rooms = [];
+  // socket.on("test", data => {
+  //   io.of("/events")
+  //     .to("room mNy-jjHblx")
+  //     .emit("event", "testing");
+  // });
 
   // login
   socket.on("login", data => {
     // when a user logs in, he joins a private room with himself
-    console.log(data);
-    // socket.on("");
-    rooms.push(`room ${data.id}`);
     socket.join(`room ${data.id}`, () => {
       if (data.role == 2) {
         console.log("Joined admins");
-        rooms.push(`admins`);
         socket.join("admins", () => {
           console.log(Object.keys(socket.rooms));
         });
@@ -53,32 +45,32 @@ io.of("/events").on("connection", socket => {
 
   socket.on("applicationCreated", data => {
     console.log("Application created");
-    // socket.join(rooms);
     console.log(data);
+    console.log(socket.rooms);
     io.of("/events")
       .to("admins")
       .emit("applicationSent", data);
   });
 
-  // socket.on("onAccepted", data => {
-  //   // io.of("/applications").emit("applicationAccepted", data);
-  //   // io.of("/applications").emit("currentUser", data);
-  //   socket.join(rooms);
-  //   io.of("/events")
-  //     .to(`room ${data.data.userId}`)
-  //     .emit("applicationAccepted", data);
-  //   io.of("/events")
-  //     .to(`room ${data.data.userId}`)
-  //     .emit("currentUser", data);
-  // });
+  socket.on("onAccepted", data => {
+    console.log(data);
+    console.log(socket.rooms);
+    io.of("/events")
+      .to(`room ${data.data.userId}`)
+      .emit("applicationAccepted", data);
+    io.of("/events")
+      .to(`room ${data.data.userId}`)
+      .emit("changeToAdvertiser", data);
+  });
 
-  // socket.on("onRejected", data => {
-  //   socket.join(rooms);
-  //   // io.of("/applications").emit("applicationRejected", data);
-  //   io.of("/events")
-  //     .to(`room ${data.data.id}`)
-  //     .emit("applicationRejected", data);
-  // });
+  socket.on("onRejected", data => {
+    console.log(data);
+    console.log(socket.rooms);
+    // io.of("/applications").emit("applicationRejected", data);
+    io.of("/events")
+      .to(`room ${data.data.userId}`)
+      .emit("applicationRejected", data);
+  });
 
   // socket.on("disconnecting", reason => {
   //   console.log(reason);
