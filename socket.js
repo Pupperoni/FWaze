@@ -16,45 +16,34 @@ const io = socket(server);
 // init
 
 io.of("/events").on("connection", socket => {
-  console.log("Connected");
+  // upon reconnect
+  socket.on("reconnect", data => {
+    // join private room
+    socket.join(`room ${data.id}`);
 
-  // socket.join("room " + socket.handshake.query.userId);
-
-  // io.of("/events")
-  //   .to("room mNy-jjHblx")
-  //   .emit("event", "gej");
-
-  // socket.on("test", data => {
-  //   io.of("/events")
-  //     .to("room mNy-jjHblx")
-  //     .emit("event", "testing");
-  // });
+    // join admins room if admin role
+    if (data.role == 2) socket.join("admins");
+  });
 
   // login
   socket.on("login", data => {
     // when a user logs in, he joins a private room with himself
     socket.join(`room ${data.id}`, () => {
       if (data.role == 2) {
-        console.log("Joined admins");
-        socket.join("admins", () => {
-          console.log(Object.keys(socket.rooms));
-        });
+        socket.join("admins");
       }
     });
   });
 
+  // new application
   socket.on("applicationCreated", data => {
-    console.log("Application created");
-    console.log(data);
-    console.log(socket.rooms);
     io.of("/events")
       .to("admins")
       .emit("applicationSent", data);
   });
 
+  // accepted application
   socket.on("onAccepted", data => {
-    console.log(data);
-    console.log(socket.rooms);
     io.of("/events")
       .to(`room ${data.data.userId}`)
       .emit("applicationAccepted", data);
@@ -63,19 +52,47 @@ io.of("/events").on("connection", socket => {
       .emit("changeToAdvertiser", data);
   });
 
+  // application rejected
   socket.on("onRejected", data => {
-    console.log(data);
-    console.log(socket.rooms);
-    // io.of("/applications").emit("applicationRejected", data);
     io.of("/events")
       .to(`room ${data.data.userId}`)
       .emit("applicationRejected", data);
   });
 
-  // socket.on("disconnecting", reason => {
-  //   console.log(reason);
-  //   console.log(Object.keys(socket.rooms));
-  // });
+  socket.on("mapVisited", () => {
+    // join map viewing room
+    console.log("Joining map...");
+    socket.join("map viewers");
+  });
+
+  socket.on("mapExited", () => {
+    // leave map room
+    console.log("Leaving map...");
+    socket.leave("map viewers");
+  });
+
+  // new report
+  socket.on("reportSubmitted", data => {
+    io.of("/events")
+      .in("map viewers")
+      .emit("reportCreated", data); // send back new report to everyone viewing map
+  });
+
+  // report upvoted
+  socket.on("onUpVoted", data => {
+    // socket.broadcast.emit("voteCreated", data);
+    io.of("/events")
+      .to("map viewers")
+      .emit("voteCreated", data);
+  });
+
+  // report downvoted
+  socket.on("onDownVoted", data => {
+    // socket.broadcast.emit("voteDeleted", data);
+    io.of("/events")
+      .to("map viewers")
+      .emit("voteDeleted", data);
+  });
 });
 
 // // Handle report events
