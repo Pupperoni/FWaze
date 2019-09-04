@@ -16,8 +16,10 @@ const io = socket(server);
 // init
 
 io.of("/events").on("connection", socket => {
+  console.log("Connected");
   // upon reconnect
-  socket.on("reconnect", data => {
+  socket.on("initialize", data => {
+    console.log("Reconnecting");
     // join private room
     socket.join(`room ${data.id}`);
 
@@ -27,6 +29,7 @@ io.of("/events").on("connection", socket => {
 
   // login
   socket.on("login", data => {
+    console.log("Logging in");
     // when a user logs in, he joins a private room with himself
     socket.join(`room ${data.id}`, () => {
       if (data.role == 2) {
@@ -80,7 +83,6 @@ io.of("/events").on("connection", socket => {
 
   // report upvoted
   socket.on("onUpVoted", data => {
-    // socket.broadcast.emit("voteCreated", data);
     io.of("/events")
       .to("map viewers")
       .emit("voteCreated", data);
@@ -88,42 +90,25 @@ io.of("/events").on("connection", socket => {
 
   // report downvoted
   socket.on("onDownVoted", data => {
-    // socket.broadcast.emit("voteDeleted", data);
     io.of("/events")
       .to("map viewers")
       .emit("voteDeleted", data);
   });
+
+  // Handle ad events
+  socket.on("adSubmitted", data => {
+    io.of("/events")
+      .to("map viewers")
+      .emit("adCreated", data);
+  });
+
+  // Handle comments
+  socket.on("commentSubmitted", data => {
+    io.of("/events")
+      .to("map viewers")
+      .emit("commentCreated", data);
+  });
 });
-
-// // Handle report events
-// io.of("/reports").on("connection", socket => {
-//   socket.on("onCreated", data => {
-//     io.of("/reports").emit("reportCreated", data); // send back new report to everyone
-//   });
-//   socket.on("onUpVoted", data => {
-//     socket.broadcast.emit("voteCreated", data);
-//   });
-//   socket.on("onDownVoted", data => {
-//     socket.broadcast.emit("voteDeleted", data);
-//   });
-// });
-
-// // Handle comments
-// io.of("/comments").on("connection", socket => {
-//   socket.on("onCreated", data => {
-//     socket.broadcast.emit("commentCreated", data);
-//   });
-// });
-
-// // Handle ad events
-// io.of("/ads").on("connection", socket => {
-//   socket.on("onCreated", data => {
-//     io.of("/ads").emit("adCreated", data);
-//   });
-// });
-
-// // Handle applications events
-// io.of("/applications", socket => {});
 
 const data = {
   app: app,
