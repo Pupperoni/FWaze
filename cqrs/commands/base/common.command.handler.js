@@ -1,8 +1,38 @@
 const fs = require("fs");
 const writeRepo = require("../../writeRepositories/write.repository");
 const constants = require("../../../constants");
+const kafka = require("kafka-node");
 
 const async = require("async");
+
+// kafka functionality
+console.log("Creating client");
+const client = new kafka.KafkaClient({
+  kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
+});
+
+console.log("Creating consumer");
+const consumer = new kafka.Consumer(client, [{ topic: "commandQueue" }]);
+
+// when consumer receives a message, push it to the command queue
+consumer.on("message", message => {
+  console.log("Received message");
+  // deserialize the message
+  let deserialized = JSON.parse(message.value);
+  let payload = deserialized.payload;
+  let commandName = deserialized.commandName;
+
+  // extract the next command in the waiting room
+  let commandHandler = CommonCommandHandler.waitingCommands.splice(0, 1)[0];
+  CommonCommandHandler.enqueueCommand(commandHandler, commandName, payload);
+});
+
+console.log("Creating producer");
+const producer = new kafka.Producer(client);
+
+producer.on("ready", () => {
+  console.log("Producer is ready to send messages");
+});
 
 const CommonCommandHandler = {
   // queue for issuing commands sequentially
@@ -11,6 +41,9 @@ const CommonCommandHandler = {
     callback(task.self, task.commandHandler, task.payload);
   }),
 
+  // commandHandler waiting room
+  waitingCommands: [],
+
   sendCommand(payload, commandName) {
     // get appropriate command handler
     return this.getCommandHandler(commandName).then(commandHandler => {
@@ -18,8 +51,23 @@ const CommonCommandHandler = {
       return commandHandler
         .validate(payload)
         .then(valid => {
-          // add command to queue
-          this.enqueueCommand(commandHandler, commandName, payload);
+          // Publish command and payload to kafka
+          console.log("Sending...");
+          let formattedPayload = {
+            payload: payload,
+            commandName: commandName
+          };
+
+          // queue the command handler
+          this.waitingCommands.push(commandHandler);
+
+          let messagesToBeSent = [
+            {
+              topic: "commandQueue",
+              messages: JSON.stringify(formattedPayload)
+            }
+          ];
+          producer.send(messagesToBeSent, (err, results) => {});
           return payload;
         })
         .catch(e => {
