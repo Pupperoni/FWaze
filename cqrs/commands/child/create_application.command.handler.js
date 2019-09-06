@@ -1,5 +1,5 @@
 const BaseCommandHandler = require("../base/base.command.handler");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const shortid = require("shortid");
 
 // will fix
@@ -23,7 +23,7 @@ Object.defineProperty(
 );
 
 ApplicationCreatedCommandHandler.prototype.getCommands = function() {
-  return [constants.APPLICATION_CREATED];
+  return [CONSTANTS.COMMANDS.APPLICATION_CREATED];
 };
 
 ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
@@ -39,12 +39,12 @@ ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
         // user does not exist
         if (!user) {
           valid = false;
-          reasons.push(constants.USER_NOT_EXISTS);
+          reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
         }
         // user is not regular (not valid)
         else if (user.role != 0) {
           valid = false;
-          reasons.push(constants.USER_NOT_PERMITTED);
+          reasons.push(CONSTANTS.ERRORS.USER_NOT_PERMITTED);
         }
         if (valid) {
           return applicationAggregate.getCurrentState(payload.userId);
@@ -55,7 +55,7 @@ ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
         if (application) {
           if (application.status && application.status === 0) {
             valid = false;
-            reasons.push(constants.DUPLICATE_APPLICATION);
+            reasons.push(CONSTANTS.ERRORS.DUPLICATE_APPLICATION);
           }
         }
 
@@ -70,8 +70,8 @@ ApplicationCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.APPLICATION_CREATED,
-    aggregateName: constants.APPLICATION_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.CREATE_APPLICATION,
+    aggregateName: CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: payload
   });

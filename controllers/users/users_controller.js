@@ -1,6 +1,6 @@
 const queryHandler = require("../../db/sql/users/users.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
-const constants = require("../../constants");
+const CONSTANTS = require("../../constants");
 const bcrypt = require("bcryptjs");
 const shortid = require("shortid");
 const Redis = require("ioredis");
@@ -17,7 +17,9 @@ const Handler = {
       .getAllUsers()
       .then(results => {
         if (results.length == 0)
-          return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.USER_NOT_EXISTS });
         return res.json({ users: results });
       })
       .catch(e => {
@@ -32,7 +34,9 @@ const Handler = {
       .hgetall(`user:${req.params.id}`)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.USER_NOT_EXISTS });
         // Convert string role to int
         result.role = parseInt(result.role);
 
@@ -61,13 +65,16 @@ const Handler = {
       .then(user => {
         if (user) {
           if (user.avatarPath) return res.sendFile(user.avatarPath, options);
-          else return res.json({ msg: constants.FILE_NOT_FOUND });
-        } else return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
+          else return res.json({ msg: CONSTANTS.ERRORS.FILE_NOT_FOUND });
+        } else
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.USER_NOT_EXISTS });
       })
       .catch(e => {
         return res
           .status(500)
-          .json({ msg: constants.DEFAULT_SERVER_ERROR, err: e });
+          .json({ msg: CONSTANTS.ERRORS.DEFAULT_SERVER_ERROR, err: e });
       });
   },
 
@@ -75,7 +82,7 @@ const Handler = {
   getFaveRoutes(req, res, next) {
     redis.hgetall(`user:${req.params.id}`).then(user => {
       if (!user)
-        return res.status(400).json({ msg: constants.USER_NOT_EXISTS });
+        return res.status(400).json({ msg: CONSTANTS.ERRORS.USER_NOT_EXISTS });
       queryHandler
         .getFaveRoutes(req.params.id)
         .then(results => {
@@ -99,7 +106,8 @@ const Handler = {
       redis
         .get(`user:name:${name}`) // check if user exists
         .then(userId => {
-          if (!userId) return Promise.reject(constants.DEFAULT_LOGIN_FAILURE);
+          if (!userId)
+            return Promise.reject(CONSTANTS.ERRORS.DEFAULT_LOGIN_FAILURE);
           id = userId;
           return redis.hgetall(`user:${id}`);
         })
@@ -111,7 +119,7 @@ const Handler = {
           if (isMatch) {
             // Get home address haha
             return redis.hgetall(`user:${id}:home`); // get home details
-          } else return Promise.reject(constants.DEFAULT_LOGIN_FAILURE);
+          } else return Promise.reject(CONSTANTS.ERRORS.DEFAULT_LOGIN_FAILURE);
         })
         .then(home => {
           if (home) user.home = home;
@@ -121,7 +129,7 @@ const Handler = {
         .then(work => {
           if (work) user.work = work;
           return res.json({
-            msg: constants.LOGIN_SUCCESS,
+            msg: CONSTANTS.SUCCESS.LOGIN_SUCCESS,
             user: user
           });
         })
@@ -129,7 +137,9 @@ const Handler = {
           return res.status(400).json({ err: e });
         });
     } else
-      return res.status(400).json({ err: constants.DEFAULT_LOGIN_FAILURE });
+      return res
+        .status(400)
+        .json({ err: CONSTANTS.ERRORS.DEFAULT_LOGIN_FAILURE });
   },
 
   //
@@ -150,19 +160,27 @@ const Handler = {
     queryHandler
       .getUserByName(payload.name) // checks name
       .then(user => {
-        if (user.length > 0) return Promise.reject(constants.USERNAME_TAKEN);
+        if (user.length > 0)
+          return Promise.reject(CONSTANTS.ERRORS.USERNAME_TAKEN);
         else return Promise.resolve(queryHandler.getUserByEmail(payload.email)); // checks email
       })
       .then(user => {
-        if (user.length > 0) return Promise.reject(constants.EMAIL_TAKEN);
+        if (user.length > 0)
+          return Promise.reject(CONSTANTS.ERRORS.EMAIL_TAKEN);
         else return Promise.resolve(true);
       })
       .then(() => {
         // all good
-        CommonCommandHandler.sendCommand(payload, constants.USER_CREATED);
+        CommonCommandHandler.sendCommand(
+          payload,
+          CONSTANTS.COMMANDS.USER_CREATED
+        );
       })
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -192,20 +210,26 @@ const Handler = {
       .getUserByName(payload.name) // checks name
       .then(user => {
         if (user.length > 0 && user[0].id !== payload.id)
-          return Promise.reject(constants.USERNAME_TAKEN);
+          return Promise.reject(CONSTANTS.ERRORS.USERNAME_TAKEN);
         else return Promise.resolve(queryHandler.getUserByEmail(payload.email)); // checks email
       })
       .then(user => {
         if (user.length > 0 && user[0].id !== payload.id)
-          return Promise.reject(constants.EMAIL_TAKEN);
+          return Promise.reject(CONSTANTS.ERRORS.EMAIL_TAKEN);
         else return Promise.resolve(true);
       })
       .then(() => {
         // commandHandler.userUpdated(req.body, req.file);
-        CommonCommandHandler.sendCommand(payload, constants.USER_UPDATED);
+        CommonCommandHandler.sendCommand(
+          payload,
+          CONSTANTS.COMMANDS.USER_UPDATED
+        );
       })
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -224,7 +248,10 @@ const Handler = {
     commandHandler
       .homeAddressUpdated(payload)
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -243,7 +270,10 @@ const Handler = {
     commandHandler
       .workAddressUpdated(payload)
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -263,9 +293,15 @@ const Handler = {
       destinationString: req.body.destinationString,
       id: req.body.userId
     };
-    CommonCommandHandler.sendCommand(payload, constants.USER_ROUTE_CREATED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.USER_ROUTE_CREATED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -278,9 +314,15 @@ const Handler = {
       routeId: req.body.routeId,
       userId: req.body.userId
     };
-    CommonCommandHandler.sendCommand(payload, constants.USER_ROUTE_DELETED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.USER_ROUTE_DELETED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         console.log(e);

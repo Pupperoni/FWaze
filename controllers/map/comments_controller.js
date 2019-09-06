@@ -1,7 +1,7 @@
 const queryHandler = require("../../db/sql/map/comments.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const shortid = require("shortid");
-const constants = require("../../constants");
+const CONSTANTS = require("../../constants");
 const Handler = {
   //
   //  Query responsibility
@@ -25,7 +25,9 @@ const Handler = {
       .getCommentById(req.params.id)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: constants.COMMENT_NOT_EXISTS });
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.COMMENT_NOT_EXISTS });
         return res.json({ data: result });
       })
       .catch(e => {
@@ -39,7 +41,10 @@ const Handler = {
       .getCommentsByReportId(req.params.id, req.query.page)
       .then(results => {
         if (results.length == 0)
-          return res.json({ msg: constants.COMMENTS_NOT_FOUND, data: [] });
+          return res.json({
+            msg: CONSTANTS.ERRORS.COMMENTS_NOT_FOUND,
+            data: []
+          });
         return res.json({ data: results });
       })
       .catch(e => {
@@ -53,7 +58,10 @@ const Handler = {
       .getCommentsByReportIdExplain(req.params.id, req.query.page)
       .then(results => {
         if (results.length == 0)
-          return res.json({ msg: constants.COMMENTS_NOT_FOUND, data: [] });
+          return res.json({
+            msg: CONSTANTS.ERRORS.COMMENTS_NOT_FOUND,
+            data: []
+          });
         return res.json({ data: results });
       })
       .catch(e => {
@@ -79,7 +87,9 @@ const Handler = {
       .getCommentsByUserId(req.params.id)
       .then(results => {
         if (results.length == 0)
-          return res.status(400).json({ msg: constants.COMMENTS_NOT_FOUND });
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.COMMENTS_NOT_FOUND });
         return res.json({ data: results });
       })
       .catch(e => {
@@ -103,9 +113,15 @@ const Handler = {
     };
     // commandHandler
     //   .commentCreated(req.body)
-    CommonCommandHandler.sendCommand(payload, constants.COMMENT_CREATED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.COMMENT_CREATED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });

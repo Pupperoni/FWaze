@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 
 function validateEmail(email) {
   let re = /\S+@\S+/;
@@ -21,9 +21,9 @@ Object.defineProperty(UserUpdatedCommandHandler.prototype, "constructor", {
 
 UserUpdatedCommandHandler.prototype.getCommands = function() {
   return [
-    constants.USER_UPDATED,
-    constants.USER_HOME_UPDATED,
-    constants.USER_WORK_UPDATED
+    CONSTANTS.COMMANDS.USER_UPDATED,
+    CONSTANTS.COMMANDS.USER_HOME_UPDATED,
+    CONSTANTS.COMMANDS.USER_WORK_UPDATED
   ];
 };
 
@@ -35,7 +35,7 @@ UserUpdatedCommandHandler.prototype.validate = function(payload) {
 
   if (payload.email && !validateEmail(payload.email)) {
     valid = false;
-    reasons.push(constants.EMAIL_INVALID_FORMAT);
+    reasons.push(CONSTANTS.ERRORS.EMAIL_INVALID_FORMAT);
   }
   if (valid) return Promise.resolve(valid);
   else return Promise.reject(reasons);
@@ -46,8 +46,8 @@ UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
   // Create event instance
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.USER_UPDATED,
-    aggregateName: constants.USER_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.UPDATE_USER,
+    aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: {
       id: payload.id,
@@ -66,8 +66,8 @@ UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
   ) {
     events.push({
       eventId: shortid.generate(),
-      eventName: constants.USER_HOME_UPDATED,
-      aggregateName: constants.USER_AGGREGATE_NAME,
+      eventName: CONSTANTS.EVENTS.UPDATE_USER_HOME,
+      aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
       aggregateID: payload.id,
       payload: {
         id: payload.id,
@@ -83,8 +83,8 @@ UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
   )
     events.push({
       eventId: shortid.generate(),
-      eventName: constants.USER_WORK_UPDATED,
-      aggregateName: constants.USER_AGGREGATE_NAME,
+      eventName: CONSTANTS.EVENTS.UPDATE_USER_WORK,
+      aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
       aggregateID: payload.id,
       payload: {
         id: payload.id,

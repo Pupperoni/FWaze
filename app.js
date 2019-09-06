@@ -11,6 +11,7 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const mapRouter = require("./routes/map");
 const appData = require("./socket");
+const eventHandler = require("./cqrs/eventListeners/common.event.handler");
 
 const app = appData.app;
 const server = appData.server;

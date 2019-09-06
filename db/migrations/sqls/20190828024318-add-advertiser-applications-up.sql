@@ -6,7 +6,7 @@ CREATE TABLE advertiser_applications(
     `user_id` VARCHAR(15) NOT NULL,
     `user_name` VARCHAR(255) NOT NULL,
     `status` INT NOT NULL DEFAULT 0,
-    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_at` timestamp ,
     PRIMARY KEY(`id`)
 );
 

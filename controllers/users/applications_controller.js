@@ -1,6 +1,6 @@
 const queryHandler = require("../../db/sql/users/applications.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
-const constants = require("../../constants");
+const CONSTANTS = require("../../constants");
 const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
@@ -16,7 +16,8 @@ const Handler = {
     redis
       .get(`user:${req.params.id}:application`)
       .then(result => {
-        if (!result) return res.json({ msg: constants.APPLICATION_NOT_EXISTS });
+        if (!result)
+          return res.json({ msg: CONSTANTS.ERRORS.APPLICATION_NOT_EXISTS });
         else {
           redis.hgetall(`application:${result}`).then(result => {
             if (result) return res.json({ data: result });
@@ -63,9 +64,15 @@ const Handler = {
       timestamp: req.body.timestamp
     };
 
-    CommonCommandHandler.sendCommand(payload, constants.APPLICATION_CREATED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.APPLICATION_CREATED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -80,9 +87,15 @@ const Handler = {
       userId: req.body.userId
     };
 
-    CommonCommandHandler.sendCommand(payload, constants.APPLICATION_APPROVED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.APPLICATION_APPROVED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -97,9 +110,15 @@ const Handler = {
       userId: req.body.userId
     };
 
-    CommonCommandHandler.sendCommand(payload, constants.APPLICATION_REJECTED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.APPLICATION_REJECTED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });

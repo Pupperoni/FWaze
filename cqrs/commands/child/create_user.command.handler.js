@@ -1,7 +1,7 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
 const bcrypt = require("bcryptjs");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function validateEmail(email) {
@@ -22,7 +22,7 @@ Object.defineProperty(UserCreatedCommandHandler.prototype, "constructor", {
 });
 
 UserCreatedCommandHandler.prototype.getCommands = function() {
-  return [constants.USER_CREATED];
+  return [CONSTANTS.COMMANDS.USER_CREATED];
 };
 
 UserCreatedCommandHandler.prototype.getAggregate = function(id) {
@@ -36,13 +36,13 @@ UserCreatedCommandHandler.prototype.validate = function(payload) {
   // passwords match?
   if (payload.password !== payload.confirmPassword) {
     valid = false;
-    reasons.push(constants.PASSWORDS_NOT_MATCH);
+    reasons.push(CONSTANTS.ERRORS.PASSWORDS_NOT_MATCH);
   }
 
   // email valid?
   if (!validateEmail(payload.email)) {
     valid = false;
-    reasons.push(constants.EMAIL_INVALID_FORMAT);
+    reasons.push(CONSTANTS.ERRORS.EMAIL_INVALID_FORMAT);
   }
 
   if (valid) return Promise.resolve(valid);
@@ -59,8 +59,8 @@ UserCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.USER_CREATED,
-    aggregateName: constants.USER_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.CREATE_USER,
+    aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: {
       id: payload.id,

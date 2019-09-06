@@ -1,5 +1,5 @@
 const BaseCommandHandler = require("../base/base.command.handler");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const shortid = require("shortid");
 // will fix
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
@@ -15,7 +15,7 @@ Object.defineProperty(AdCreatedCommandHandler.prototype, "constructor", {
 });
 
 AdCreatedCommandHandler.prototype.getCommands = function() {
-  return [constants.AD_CREATED];
+  return [CONSTANTS.COMMANDS.AD_CREATED];
 };
 
 AdCreatedCommandHandler.prototype.validate = function(payload) {
@@ -29,12 +29,12 @@ AdCreatedCommandHandler.prototype.validate = function(payload) {
       // user does not exist
       if (!user) {
         valid = false;
-        reasons.push(constants.USER_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
       }
       // user is regular (not valid)
       else if (user.role === "0" || user.role === 0) {
         valid = false;
-        reasons.push(constants.USER_NOT_PERMITTED);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_PERMITTED);
       }
 
       if (valid) return Promise.resolve(valid);
@@ -48,8 +48,8 @@ AdCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.AD_CREATED,
-    aggregateName: constants.AD_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.CREATE_AD,
+    aggregateName: CONSTANTS.AGGREGATES.AD_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: payload
   });

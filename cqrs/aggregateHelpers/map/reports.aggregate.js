@@ -1,6 +1,6 @@
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 
 module.exports = {
   getCurrentState(id) {
@@ -10,7 +10,7 @@ module.exports = {
     return Promise.resolve(
       // check if snapshot exists
       redis
-        .hgetall(`snapshot:${constants.REPORT_AGGREGATE_NAME}:${id}`)
+        .hgetall(`snapshot:${CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME}:${id}`)
         .then(snapshot => {
           // snapshot exists - start here
           if (snapshot.offset && snapshot.currentState) {
@@ -18,7 +18,7 @@ module.exports = {
             lastOffset = snapshot.offset + 1;
           }
           return redis.zrange(
-            `events:${constants.REPORT_AGGREGATE_NAME}:${id}`,
+            `events:${CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME}:${id}`,
             lastOffset,
             -1
           );
@@ -30,7 +30,7 @@ module.exports = {
             let payload = event.payload;
 
             switch (event.eventName) {
-              case constants.REPORT_CREATED:
+              case CONSTANTS.EVENTS.CREATE_REPORT:
                 report.id = payload.id;
                 report.userId = payload.userId;
                 report.userName = payload.userName;
@@ -40,13 +40,13 @@ module.exports = {
                 report.location = payload.location;
                 // report = payload
                 break;
-              case constants.REPORT_VOTE_CREATED:
+              case CONSTANTS.EVENTS.CREATE_REPORT_VOTE:
                 if (!report.votes) report.votes = 0;
                 report.votes++;
                 if (!report.voters) report.voters = [];
                 report.voters.push(payload.userId);
                 break;
-              case constants.REPORT_VOTE_DELETED:
+              case CONSTANTS.EVENTS.DELETE_REPORT_VOTE:
                 report.votes--;
                 let index = report.voters.indexOf(payload.userId);
                 if (index != -1) report.voters.splice(index, 1);

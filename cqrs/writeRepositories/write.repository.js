@@ -1,6 +1,6 @@
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-const constants = require("../../constants");
+const CONSTANTS = require("../../constants");
 const userAggregate = require("../aggregateHelpers/users/users.aggregate");
 const reportAggregate = require("../aggregateHelpers/map/reports.aggregate");
 const applicationAggregate = require("../aggregateHelpers/users/applications.aggregate");
@@ -35,11 +35,11 @@ module.exports = {
         if ((offset + 1) % 50 === 0) {
           // could separate these into multiple files for cleaner code i guess
           switch (aggregateName) {
-            case constants.USER_AGGREGATE_NAME:
+            case CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME:
               return userAggregate.getCurrentState(aggregateID);
-            case constants.REPORT_AGGREGATE_NAME:
+            case CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME:
               return reportAggregate.getCurrentState(aggregateID);
-            case constants.APPLICATION_AGGREGATE_NAME:
+            case CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME:
               return applicationAggregate.getCurrentState(aggregateID);
           }
         }

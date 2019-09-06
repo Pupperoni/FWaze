@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function RouteCreatedCommandHandler() {}
@@ -16,7 +16,7 @@ Object.defineProperty(RouteCreatedCommandHandler.prototype, "constructor", {
 });
 
 RouteCreatedCommandHandler.prototype.getCommands = function() {
-  return [constants.USER_ROUTE_CREATED];
+  return [CONSTANTS.COMMANDS.USER_ROUTE_CREATED];
 };
 
 RouteCreatedCommandHandler.prototype.validate = function(payload) {
@@ -27,7 +27,7 @@ RouteCreatedCommandHandler.prototype.validate = function(payload) {
       // user does not exist
       if (!user) {
         valid = false;
-        reasons.push(constants.USER_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
       }
 
       if (valid) {
@@ -42,8 +42,8 @@ RouteCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.USER_ROUTE_CREATED,
-    aggregateName: constants.USER_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.CREATE_USER_ROUTE,
+    aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: {
       id: payload.id,

@@ -1,12 +1,20 @@
-const EventEmitter = require("events");
 const queryHandler = require("../../../db/sql/map/advertisements.repository");
-class MyEmitter extends EventEmitter {}
-const emitter = new MyEmitter();
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 
-emitter.on(constants.AD_CREATED, function(data) {
-  console.log("event received: ad created");
-  queryHandler.createAd(data);
-});
+const eventHandler = {
+  sendToReadStore: event => {
+    switch (event.eventName) {
+      case CONSTANTS.EVENTS.CREATE_AD:
+        console.log("event received: ad created");
+        queryHandler.createAd(event.payload);
+        break;
+    }
+  }
+};
 
-module.exports = emitter;
+// emitter.on(CONSTANTS.EVENTS.CREATE_AD, function(data) {
+//   console.log("event received: ad created");
+//   queryHandler.createAd(data);
+// });
+
+module.exports = eventHandler;

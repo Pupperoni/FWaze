@@ -1,6 +1,6 @@
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 
 module.exports = {
   getCurrentState(id) {
@@ -11,7 +11,7 @@ module.exports = {
     return Promise.resolve(
       // check if snapshot exists
       redis
-        .hgetall(`snapshot:${constants.USER_AGGREGATE_NAME}:${id}`)
+        .hgetall(`snapshot:${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME}:${id}`)
         .then(snapshot => {
           // snapshot exists - start here
           if (snapshot.offset && snapshot.currentState) {
@@ -19,7 +19,7 @@ module.exports = {
             lastOffset = parseInt(snapshot.offset) + 1;
           }
           return redis.zrange(
-            `events:${constants.USER_AGGREGATE_NAME}:${id}`,
+            `events:${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME}:${id}`,
             lastOffset,
             -1
           );
@@ -36,7 +36,7 @@ module.exports = {
             let payload = event.payload;
 
             switch (event.eventName) {
-              case constants.USER_CREATED:
+              case CONSTANTS.EVENTS.CREATE_USER:
                 user.id = payload.id;
                 user.name = payload.name;
                 user.email = payload.email;
@@ -44,13 +44,13 @@ module.exports = {
                 if (payload.role) user.role = payload.role;
                 else user.role = 0;
                 break;
-              case constants.USER_UPDATED:
+              case CONSTANTS.EVENTS.UPDATE_USER:
                 if (payload.name) user.name = payload.name;
                 if (payload.email) user.email = payload.email;
                 if (payload.role) user.role = payload.role;
                 if (payload.avatarPath) user.avatarPath = payload.avatarPath;
                 break;
-              case constants.USER_HOME_UPDATED:
+              case CONSTANTS.EVENTS.UPDATE_USER_HOME:
                 if (!user.home) {
                   user.home = {
                     latitude: undefined,
@@ -62,7 +62,7 @@ module.exports = {
                 user.home.longitude = payload.longitude;
                 user.home.address = payload.address;
                 break;
-              case constants.USER_WORK_UPDATED:
+              case CONSTANTS.EVENTS.UPDATE_USER_WORK:
                 if (!user.work) {
                   user.work = {
                     latitude: undefined,
@@ -74,13 +74,13 @@ module.exports = {
                 user.work.longitude = payload.longitude;
                 user.work.address = payload.address;
                 break;
-              case constants.USER_ROUTE_CREATED:
+              case CONSTANTS.EVENTS.CREATE_USER_ROUTE:
                 if (!user.faveRoutes) {
                   user.faveRoutes = [];
                 }
                 user.faveRoutes.push(payload.routeId);
                 break;
-              case constants.USER_ROUTE_DELETED:
+              case CONSTANTS.EVENTS.DELETE_USER_ROUTE:
                 let index = user.faveRoutes.indexOf(payload.routeId);
                 user.faveRoutes.splice(index, 1);
                 break;

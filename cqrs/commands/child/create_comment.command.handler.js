@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
 const reportAggregate = require("../../aggregateHelpers/map/reports.aggregate");
 
@@ -17,7 +17,7 @@ Object.defineProperty(CommentCreatedCommandHandler.prototype, "constructor", {
 });
 
 CommentCreatedCommandHandler.prototype.getCommands = function() {
-  return [constants.COMMENT_CREATED];
+  return [CONSTANTS.COMMANDS.COMMENT_CREATED];
 };
 
 CommentCreatedCommandHandler.prototype.validate = function(payload) {
@@ -31,7 +31,7 @@ CommentCreatedCommandHandler.prototype.validate = function(payload) {
       // report doesn't exist
       if (!report) {
         valid = false;
-        reasons.push(constants.REPORT_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.REPORT_NOT_EXISTS);
       }
       return Promise.resolve(valid);
     });
@@ -40,7 +40,7 @@ CommentCreatedCommandHandler.prototype.validate = function(payload) {
     .then(user => {
       if (!user) {
         valid = false;
-        reasons.push(constants.USER_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
       }
       return Promise.resolve(valid);
     });
@@ -56,8 +56,8 @@ CommentCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.COMMENT_CREATED,
-    aggregateName: constants.COMMENT_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.CREATE_COMMENT,
+    aggregateName: CONSTANTS.AGGREGATES.COMMENT_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: payload
   });

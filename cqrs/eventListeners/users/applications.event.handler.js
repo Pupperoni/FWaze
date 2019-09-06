@@ -1,22 +1,38 @@
-const EventEmitter = require("events");
-const queryHandler = require("../../../db/sql/users/applications.repository");
-class MyEmitter extends EventEmitter {}
-const emitter = new MyEmitter();
-const constants = require("../../../constants");
+const queryHandler = require("../../../db/sql/users/users.repository");
+const CONSTANTS = require("../../../constants");
 
-emitter.on(constants.APPLICATION_CREATED, function(data) {
-  console.log("event received: application created");
-  queryHandler.createApplication(data);
-});
+const eventHandler = {
+  sendToReadStore: event => {
+    switch (event.eventName) {
+      case CONSTANTS.EVENTS.CREATE_APPLICATION:
+        console.log("event received: application created");
+        queryHandler.createApplication(event.payload);
+        break;
+      case CONSTANTS.EVENTS.APPROVE_APPLICATION:
+        console.log("event received: application approved");
+        queryHandler.approveApplication(event.payload);
+        break;
+      case CONSTANTS.EVENTS.REJECT_APPLICATION:
+        console.log("event received: application rejected");
+        queryHandler.rejectApplication(event.payload);
+        break;
+    }
+  }
+};
 
-emitter.on(constants.APPLICATION_APPROVED, function(data) {
-  console.log("event received: application approved");
-  queryHandler.approveApplication(data);
-});
+// emitter.on(CONSTANTS.EVENTS.CREATE_APPLICATION, function(data) {
+//   console.log("event received: application created");
+//   queryHandler.createApplication(data);
+// });
 
-emitter.on(constants.APPLICATION_REJECTED, function(data) {
-  console.log("event received: application rejected");
-  queryHandler.rejectApplication(data);
-});
+// emitter.on(CONSTANTS.EVENTS.APPROVE_APPLICATION, function(data) {
+//   console.log("event received: application approved");
+//   queryHandler.approveApplication(data);
+// });
 
-module.exports = emitter;
+// emitter.on(CONSTANTS.EVENTS.REJECT_APPLICATION, function(data) {
+//   console.log("event received: application rejected");
+//   queryHandler.rejectApplication(data);
+// });
+
+module.exports = eventHandler;

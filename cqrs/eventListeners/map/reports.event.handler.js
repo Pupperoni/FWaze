@@ -1,22 +1,38 @@
-const EventEmitter = require("events");
 const queryHandler = require("../../../db/sql/map/reports.repository");
-class MyEmitter extends EventEmitter {}
-const emitter = new MyEmitter();
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 
-emitter.on(constants.REPORT_CREATED, function(data) {
-  console.log("event received: report created");
-  queryHandler.createReport(data);
-});
+const eventHandler = {
+  sendToReadStore: event => {
+    switch (event.eventName) {
+      case CONSTANTS.EVENTS.CREATE_REPORT:
+        console.log("event received: report created");
+        queryHandler.createReport(event.payload);
+        break;
+      case CONSTANTS.EVENTS.CREATE_REPORT_VOTE:
+        console.log("event received: vote created");
+        queryHandler.addVote(event.payload);
+        break;
+      case CONSTANTS.EVENTS.DELETE_REPORT_VOTE:
+        console.log("event received: vote deleted");
+        queryHandler.removeVote(event.payload);
+        break;
+    }
+  }
+};
 
-emitter.on(constants.REPORT_VOTE_CREATED, function(data) {
-  console.log("event received: vote created");
-  queryHandler.addVote(data);
-});
+// emitter.on(CONSTANTS.EVENTS.CREATE_REPORT, function(data) {
+//   console.log("event received: report created");
+//   queryHandler.createReport(data);
+// });
 
-emitter.on(constants.REPORT_VOTE_DELETED, function(data) {
-  console.log("event received: vote deleted");
-  queryHandler.removeVote(data);
-});
+// emitter.on(CONSTANTS.EVENTS.CREATE_REPORT_VOTE, function(data) {
+//   console.log("event received: vote created");
+//   queryHandler.addVote(data);
+// });
 
-module.exports = emitter;
+// emitter.on(CONSTANTS.EVENTS.DELETE_REPORT_VOTE, function(data) {
+//   console.log("event received: vote deleted");
+//   queryHandler.removeVote(data);
+// });
+
+module.exports = eventHandler;

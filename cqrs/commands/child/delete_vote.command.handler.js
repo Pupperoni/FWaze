@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const reportAggregate = require("../../aggregateHelpers/map/reports.aggregate");
 const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
 
@@ -17,7 +17,7 @@ Object.defineProperty(VoteDeletedCommandHandler.prototype, "constructor", {
 });
 
 VoteDeletedCommandHandler.prototype.getCommands = function() {
-  return [constants.REPORT_VOTE_DELETED];
+  return [CONSTANTS.COMMANDS.REPORT_VOTE_DELETED];
 };
 
 VoteDeletedCommandHandler.prototype.validate = function(payload) {
@@ -31,7 +31,7 @@ VoteDeletedCommandHandler.prototype.validate = function(payload) {
       // report doesn't exist
       if (!report) {
         valid = false;
-        reasons.push(constants.REPORT_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.REPORT_NOT_EXISTS);
       }
       return Promise.resolve(valid);
     });
@@ -40,7 +40,7 @@ VoteDeletedCommandHandler.prototype.validate = function(payload) {
     .then(user => {
       if (!user) {
         valid = false;
-        reasons.push(constants.USER_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
       }
       return Promise.resolve(valid);
     });
@@ -61,8 +61,8 @@ VoteDeletedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.REPORT_VOTE_DELETED,
-    aggregateName: constants.REPORT_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.DELETE_REPORT_VOTE,
+    aggregateName: CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: payload
   });

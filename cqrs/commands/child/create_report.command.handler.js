@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function ReportCreatedCommandHandler() {}
@@ -16,7 +16,7 @@ Object.defineProperty(ReportCreatedCommandHandler.prototype, "constructor", {
 });
 
 ReportCreatedCommandHandler.prototype.getCommands = function() {
-  return [constants.REPORT_CREATED];
+  return [CONSTANTS.COMMANDS.REPORT_CREATED];
 };
 
 ReportCreatedCommandHandler.prototype.validate = function(payload) {
@@ -29,12 +29,12 @@ ReportCreatedCommandHandler.prototype.validate = function(payload) {
       // user does not exist
       if (!user) {
         valid = false;
-        reasons.push(constants.USER_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
       }
       // invalid report type
       if (payload.type < 0 || payload.type > 8) {
         valid = false;
-        reasons.push(constants.INVALID_REPORT_TYPE);
+        reasons.push(CONSTANTS.ERRORS.INVALID_REPORT_TYPE);
       }
 
       if (valid) return Promise.resolve(valid);
@@ -48,8 +48,8 @@ ReportCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.REPORT_CREATED,
-    aggregateName: constants.REPORT_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.CREATE_REPORT,
+    aggregateName: CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: {
       id: payload.id,

@@ -1,39 +1,30 @@
 const fs = require("fs");
 const writeRepo = require("../../writeRepositories/write.repository");
-const constants = require("../../../constants");
-const kafka = require("kafka-node");
-
+const CONSTANTS = require("../../../constants");
 const async = require("async");
+const broker = require("../../../kafka");
 
-// kafka functionality
-console.log("Creating client");
-const client = new kafka.KafkaClient({
-  kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
-});
-
-console.log("Creating consumer");
-const consumer = new kafka.Consumer(client, [{ topic: "commandQueue" }], {
-  autoCommit: false
-});
-
-// when consumer receives a message, push it to the command queue
-consumer.on("message", message => {
-  console.log("Received message");
-  // console.log(message);
-  // deserialize the message
-  let deserialized = JSON.parse(message.value);
-  let payload = deserialized.payload;
-  let commandName = deserialized.commandName;
-
-  CommonCommandHandler.enqueueCommand(commandName, payload);
-});
-
-console.log("Creating producer");
-const producer = new kafka.Producer(client);
-
-producer.on("ready", () => {
-  console.log("Producer is ready to send messages");
-});
+// push command and payload to command queue
+function enqueueCommand(commandName, payload) {
+  CommonCommandHandler.commandQueue.push(
+    {
+      commandName: commandName,
+      payload: payload
+    },
+    // perform command
+    function(commandName, payload) {
+      let commandHandler = CommonCommandHandler.commandHandlerList[commandName];
+      commandHandler.performCommand(payload).then(events => {
+        // after the events, send to read and write models
+        events.forEach(event => {
+          CommonCommandHandler.sendEvent(event);
+          CommonCommandHandler.addEvent(event);
+        });
+      });
+    }
+  );
+  return Promise.resolve();
+}
 
 const CommonCommandHandler = {
   // List of command handler instances
@@ -42,7 +33,7 @@ const CommonCommandHandler = {
   // queue for issuing commands sequentially
   commandQueue: async.queue(function(task, callback) {
     console.log(`Running ${task.commandName}`);
-    callback(task.self, task.commandName, task.payload);
+    callback(task.commandName, task.payload);
   }),
 
   // save command handler instances
@@ -61,7 +52,6 @@ const CommonCommandHandler = {
         });
       }
       console.log("Done initializing");
-      console.log(this.commandHandlerList);
     });
   },
 
@@ -79,52 +69,13 @@ const CommonCommandHandler = {
             payload: payload,
             commandName: commandName
           };
-
-          let messagesToBeSent = [
-            {
-              topic: "commandQueue",
-              messages: JSON.stringify(formattedPayload)
-            }
-          ];
-          producer.send(messagesToBeSent, (err, results) => {});
+          broker.publish(CONSTANTS.TOPICS.COMMAND, formattedPayload);
           return payload;
         })
         .catch(e => {
           return Promise.reject(e);
         });
     });
-  },
-
-  // push command and payload to command queue
-  enqueueCommand(commandName, payload) {
-    let self = this;
-    try {
-      this.commandQueue.push(
-        {
-          self: self,
-          commandName: commandName,
-          payload: payload
-        },
-        // perform command
-        function(self, commandName, payload) {
-          let commandHandler = self.commandHandlerList[commandName];
-          commandHandler.performCommand(payload).then(events => {
-            consumer.commit((err, data) => {
-              console.log(data);
-              console.log("Consumer committed");
-            });
-            // after the events, send to read and write models
-            events.forEach(event => {
-              self.sendEvent(event);
-              self.addEvent(event);
-            });
-          });
-        }
-      );
-    } catch (e) {
-      console.log(e);
-      throw e;
-    }
   },
 
   // gets command handler of corresponding command name
@@ -135,39 +86,13 @@ const CommonCommandHandler = {
       return Promise.resolve(commandHandler);
     } catch (e) {
       // reject if command name not found
-      return Promise.reject(constants.COMMAND_NOT_EXISTS);
+      return Promise.reject(CONSTANTS.ERRORS.COMMAND_NOT_EXISTS);
     }
-  },
-
-  getComponent(aggregateName) {
-    let componentName = null;
-    switch (aggregateName) {
-      case constants.USER_AGGREGATE_NAME:
-        componentName = constants.USER_COMPONENT;
-        break;
-      case constants.REPORT_AGGREGATE_NAME:
-        componentName = constants.MAP_COMPONENT;
-        break;
-      case constants.AD_AGGREGATE_NAME:
-        componentName = constants.MAP_COMPONENT;
-        break;
-      case constants.COMMENT_AGGREGATE_NAME:
-        componentName = constants.MAP_COMPONENT;
-        break;
-      case constants.APPLICATION_AGGREGATE_NAME:
-        componentName = constants.USER_COMPONENT;
-        break;
-    }
-    return componentName;
   },
 
   // send event to read repo
   sendEvent(event) {
-    // get component name
-    const componentName = this.getComponent(event.aggregateName);
-    // import the corresponding event handler
-    const eventHandler = require(`../../eventListeners/${componentName}/${event.aggregateName}.event.handler`);
-    eventHandler.emit(event.eventName, event.payload);
+    broker.publish(CONSTANTS.TOPICS.EVENT, event);
   },
 
   // add event to write repo
@@ -180,4 +105,6 @@ const CommonCommandHandler = {
 console.log("Initializing Common Command Handler");
 CommonCommandHandler.initialzeCommandHandlers();
 
+// Wait for messages
+broker.commandSubscribe(enqueueCommand);
 module.exports = CommonCommandHandler;

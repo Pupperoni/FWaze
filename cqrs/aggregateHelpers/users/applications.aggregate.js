@@ -1,6 +1,6 @@
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 
 module.exports = {
   getCurrentState(id) {
@@ -11,7 +11,9 @@ module.exports = {
     return Promise.resolve(
       // check if snapshot exists
       redis
-        .hgetall(`snapshot:${constants.APPLICATION_AGGREGATE_NAME}:${id}`)
+        .hgetall(
+          `snapshot:${CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME}:${id}`
+        )
         .then(snapshot => {
           // snapshot exists - start here
           if (snapshot.offset && snapshot.currentState) {
@@ -19,7 +21,7 @@ module.exports = {
             lastOffset = parseInt(snapshot.offset) + 1;
           }
           return redis.zrange(
-            `events:${constants.APPLICATION_AGGREGATE_NAME}:${id}`,
+            `events:${CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME}:${id}`,
             lastOffset,
             -1
           );
@@ -36,17 +38,17 @@ module.exports = {
             let payload = event.payload;
 
             switch (event.eventName) {
-              case constants.APPLICATION_CREATED:
+              case CONSTANTS.EVENTS.CREATE_APPLICATION:
                 application.id = payload.id;
                 application.userId = payload.userId;
                 application.userName = payload.userName;
                 application.timestamp = payload.timestamp;
                 application.status = 0;
                 break;
-              case constants.APPLICATION_APPROVED:
+              case CONSTANTS.EVENTS.APPROVE_APPLICATION:
                 application.status = 1;
                 break;
-              case constants.APPLICATION_REJECTED:
+              case CONSTANTS.EVENTS.REJECT_APPLICATION:
                 application.status = -1;
                 break;
             }

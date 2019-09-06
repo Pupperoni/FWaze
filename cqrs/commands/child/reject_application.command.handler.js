@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 // will fix
 const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
 const applicationAggregate = require("../../aggregateHelpers/users/applications.aggregate");
@@ -22,7 +22,7 @@ Object.defineProperty(
 );
 
 ApplicationRejectedCommandHandler.prototype.getCommands = function() {
-  return [constants.APPLICATION_REJECTED];
+  return [CONSTANTS.COMMANDS.APPLICATION_REJECTED];
 };
 
 ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
@@ -38,12 +38,12 @@ ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
         // user does not exist
         if (!user) {
           valid = false;
-          reasons.push(constants.USER_NOT_EXISTS);
+          reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
         }
         // should be admin
         else if (user.role != 2) {
           valid = false;
-          reasons.push(constants.USER_NOT_PERMITTED);
+          reasons.push(CONSTANTS.ERRORS.USER_NOT_PERMITTED);
         }
         if (valid) {
           // check if application exists
@@ -54,12 +54,12 @@ ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
         // application does not exist; cannot reject
         if (!application) {
           valid = false;
-          reasons.push(constants.APPLICATION_NOT_EXISTS);
+          reasons.push(CONSTANTS.APPLICATION_NOT_EXISTS);
         }
         // application not pending
         else if (application.status !== 0) {
           valid = false;
-          reasons.push(constants.APPLICATION_NOT_EXISTS);
+          reasons.push(CONSTANTS.APPLICATION_NOT_EXISTS);
         }
         if (valid) return Promise.resolve(valid);
         else return Promise.reject(reasons);
@@ -72,8 +72,8 @@ ApplicationRejectedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.APPLICATION_REJECTED,
-    aggregateName: constants.APPLICATION_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.REJECT_APPLICATION,
+    aggregateName: CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: payload
   });

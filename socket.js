@@ -17,6 +17,7 @@ const io = socket(server);
 
 io.of("/events").on("connection", socket => {
   console.log("Connected");
+
   // upon reconnect
   socket.on("initialize", data => {
     console.log("Reconnecting");

@@ -1,6 +1,6 @@
 const queryHandler = require("../../db/sql/map/advertisements.repository");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
-const constants = require("../../constants");
+const CONSTANTS = require("../../constants");
 const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
@@ -27,7 +27,7 @@ const Handler = {
       .hgetall(`ad:${req.params.id}`)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: constants.AD_NOT_EXISTS });
+          return res.status(400).json({ msg: CONSTANTS.ERRORS.AD_NOT_EXISTS });
         return res.json({ ad: result });
       })
       .catch(e => {
@@ -79,13 +79,14 @@ const Handler = {
       .then(ad => {
         if (ad) {
           if (ad.photoPath) return res.sendFile(ad.photoPath, options);
-          else return res.json({ msg: constants.FILE_NOT_FOUND });
-        } else return res.status(400).json({ msg: constants.AD_NOT_EXISTS });
+          else return res.json({ msg: CONSTANTS.ERRORS.FILE_NOT_FOUND });
+        } else
+          return res.status(400).json({ msg: CONSTANTS.ERRORS.AD_NOT_EXISTS });
       })
       .catch(e => {
         return res
           .status(500)
-          .json({ msg: constants.DEFAULT_SERVER_ERROR, err: e });
+          .json({ msg: CONSTANTS.ERRORS.DEFAULT_SERVER_ERROR, err: e });
       });
   },
 
@@ -107,10 +108,13 @@ const Handler = {
     };
     // commandHandler
     //   .adCreated(req.body, req.file)
-    CommonCommandHandler.sendCommand(payload, constants.AD_CREATED)
+    CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.AD_CREATED)
       .then(result => {
         if (result)
-          return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+          return res.json({
+            msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+            data: result
+          });
       })
       .catch(e => {
         console.log(e);

@@ -1,6 +1,6 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function RouteDeletedCommandHandler() {}
@@ -16,7 +16,7 @@ Object.defineProperty(RouteDeletedCommandHandler.prototype, "constructor", {
 });
 
 RouteDeletedCommandHandler.prototype.getCommands = function() {
-  return [constants.USER_ROUTE_DELETED];
+  return [CONSTANTS.COMMANDS.USER_ROUTE_DELETED];
 };
 
 RouteDeletedCommandHandler.prototype.validate = function(payload) {
@@ -27,12 +27,12 @@ RouteDeletedCommandHandler.prototype.validate = function(payload) {
       // user does not exist
       if (!user) {
         valid = false;
-        reasons.push(constants.USER_NOT_EXISTS);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
       }
       // route doesnt belong to user
       else if (!user.faveRoutes.includes(payload.routeId)) {
         valid = false;
-        reasons.push(constants.USER_NOT_PERMITTED);
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_PERMITTED);
       }
       if (valid) {
         return Promise.resolve(valid);
@@ -46,8 +46,8 @@ RouteDeletedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: constants.USER_ROUTE_DELETED,
-    aggregateName: constants.USER_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.DELETE_USER_ROUTE,
+    aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: {
       id: payload.userId,

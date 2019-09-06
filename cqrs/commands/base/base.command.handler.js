@@ -1,4 +1,4 @@
-const constants = require("../../../constants");
+const CONSTANTS = require("../../../constants");
 
 function BaseCommandHandler() {}
 
@@ -9,7 +9,7 @@ BaseCommandHandler.prototype.getCommands = function() {
 BaseCommandHandler.prototype.validate = function(payload) {
   /* validate data here and resolve promise if valid */
   if (payload) return Promise.resolve(true);
-  else return Promise.reject([constants.DEFAULT_INVALID_DATA]);
+  else return Promise.reject([CONSTANTS.ERRORS.DEFAULT_INVALID_DATA]);
 };
 
 BaseCommandHandler.prototype.performCommand = function(payload) {

@@ -1,5 +1,5 @@
 const queryHandler = require("../../db/sql/map/reports.repository");
-const constants = require("../../constants");
+const CONSTANTS = require("../../constants");
 const CommonCommandHandler = require("../../cqrs/commands/base/common.command.handler");
 const shortid = require("shortid");
 const Redis = require("ioredis");
@@ -40,7 +40,9 @@ const Handler = {
       .hgetall(`report:${req.params.id}`)
       .then(result => {
         if (!result)
-          return res.status(400).json({ msg: constants.REPORT_NOT_EXISTS });
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.REPORT_NOT_EXISTS });
         // count number of votes in a report
         redis.scard(`report:${req.params.id}:upvoters`).then(count => {
           result.votes = count;
@@ -58,7 +60,9 @@ const Handler = {
       .getReportsByType(reportTypes[req.params.type])
       .then(results => {
         if (results.length == 0)
-          return res.status(400).json({ msg: constants.REPORT_TYPE_EMPTY });
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.REPORT_TYPE_EMPTY });
         return res.json({ reports: results });
       })
       .catch(e => {
@@ -172,14 +176,16 @@ const Handler = {
       .then(ad => {
         if (ad) {
           if (ad.photoPath) return res.sendFile(ad.photoPath, options);
-          else return res.json({ msg: constants.FILE_NOT_FOUND });
+          else return res.json({ msg: CONSTANTS.ERRORS.FILE_NOT_FOUND });
         } else
-          return res.status(400).json({ msg: constants.REPORT_NOT_EXISTS });
+          return res
+            .status(400)
+            .json({ msg: CONSTANTS.ERRORS.REPORT_NOT_EXISTS });
       })
       .catch(e => {
         return res
           .status(500)
-          .json({ msg: constants.DEFAULT_SERVER_ERROR, err: e });
+          .json({ msg: CONSTANTS.ERRORS.DEFAULT_SERVER_ERROR, err: e });
       });
   },
 
@@ -201,9 +207,12 @@ const Handler = {
       file: req.file
     };
 
-    CommonCommandHandler.sendCommand(payload, constants.REPORT_CREATED)
+    CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.REPORT_CREATED)
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -217,9 +226,15 @@ const Handler = {
       userId: req.body.userId
     };
 
-    CommonCommandHandler.sendCommand(payload, constants.REPORT_VOTE_CREATED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.REPORT_VOTE_CREATED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
@@ -233,9 +248,15 @@ const Handler = {
       userId: req.body.userId
     };
 
-    CommonCommandHandler.sendCommand(payload, constants.REPORT_VOTE_DELETED)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.REPORT_VOTE_DELETED
+    )
       .then(result => {
-        return res.json({ msg: constants.DEFAULT_SUCCESS, data: result });
+        return res.json({
+          msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
+          data: result
+        });
       })
       .catch(e => {
         return res.status(400).json({ err: e });
