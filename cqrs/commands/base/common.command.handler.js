@@ -12,7 +12,9 @@ const client = new kafka.KafkaClient({
 });
 
 console.log("Creating consumer");
-const consumer = new kafka.Consumer(client, [{ topic: "commandQueue" }]);
+const consumer = new kafka.Consumer(client, [{ topic: "commandQueue" }], {
+  autoCommit: false
+});
 
 // when consumer receives a message, push it to the command queue
 consumer.on("message", message => {
@@ -40,7 +42,7 @@ const CommonCommandHandler = {
   // queue for issuing commands sequentially
   commandQueue: async.queue(function(task, callback) {
     console.log(`Running ${task.commandName}`);
-    callback(task.self, task.commandHandler, task.payload);
+    callback(task.self, task.commandName, task.payload);
   }),
 
   // save command handler instances
@@ -58,6 +60,8 @@ const CommonCommandHandler = {
           this.commandHandlerList[command] = commandHandler;
         });
       }
+      console.log("Done initializing");
+      console.log(this.commandHandlerList);
     });
   },
 
@@ -105,6 +109,10 @@ const CommonCommandHandler = {
         function(self, commandName, payload) {
           let commandHandler = self.commandHandlerList[commandName];
           commandHandler.performCommand(payload).then(events => {
+            consumer.commit((err, data) => {
+              console.log(data);
+              console.log("Consumer committed");
+            });
             // after the events, send to read and write models
             events.forEach(event => {
               self.sendEvent(event);
@@ -171,4 +179,5 @@ const CommonCommandHandler = {
 
 console.log("Initializing Common Command Handler");
 CommonCommandHandler.initialzeCommandHandlers();
+
 module.exports = CommonCommandHandler;
