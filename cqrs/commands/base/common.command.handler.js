@@ -17,14 +17,13 @@ const consumer = new kafka.Consumer(client, [{ topic: "commandQueue" }]);
 // when consumer receives a message, push it to the command queue
 consumer.on("message", message => {
   console.log("Received message");
+  // console.log(message);
   // deserialize the message
   let deserialized = JSON.parse(message.value);
   let payload = deserialized.payload;
   let commandName = deserialized.commandName;
 
-  // extract the next command in the waiting room
-  let commandHandler = CommonCommandHandler.waitingCommands.splice(0, 1)[0];
-  CommonCommandHandler.enqueueCommand(commandHandler, commandName, payload);
+  CommonCommandHandler.enqueueCommand(commandName, payload);
 });
 
 console.log("Creating producer");
@@ -35,15 +34,34 @@ producer.on("ready", () => {
 });
 
 const CommonCommandHandler = {
+  // List of command handler instances
+  commandHandlerList: {},
+
   // queue for issuing commands sequentially
   commandQueue: async.queue(function(task, callback) {
     console.log(`Running ${task.commandName}`);
     callback(task.self, task.commandHandler, task.payload);
   }),
 
-  // commandHandler waiting room
-  waitingCommands: [],
+  // save command handler instances
+  initialzeCommandHandlers() {
+    // scan all files in the commands directory
+    fs.readdir(`/usr/src/app/cqrs/commands/child`, (err, files) => {
+      for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+        // get command names from each file
+        const handler = require(`/usr/src/app/cqrs/commands/child/${files[fileIndex]}`);
+        let commandHandler = new handler();
+        let commands = commandHandler.getCommands();
 
+        // save the command handler with the command name
+        commands.forEach(command => {
+          this.commandHandlerList[command] = commandHandler;
+        });
+      }
+    });
+  },
+
+  // send command to actual command handlers
   sendCommand(payload, commandName) {
     // get appropriate command handler
     return this.getCommandHandler(commandName).then(commandHandler => {
@@ -57,9 +75,6 @@ const CommonCommandHandler = {
             payload: payload,
             commandName: commandName
           };
-
-          // queue the command handler
-          this.waitingCommands.push(commandHandler);
 
           let messagesToBeSent = [
             {
@@ -76,18 +91,19 @@ const CommonCommandHandler = {
     });
   },
 
-  enqueueCommand(commandHandler, commandName, payload) {
+  // push command and payload to command queue
+  enqueueCommand(commandName, payload) {
     let self = this;
     try {
       this.commandQueue.push(
         {
           self: self,
           commandName: commandName,
-          commandHandler: commandHandler,
           payload: payload
         },
         // perform command
-        function(self, commandHandler, payload) {
+        function(self, commandName, payload) {
+          let commandHandler = self.commandHandlerList[commandName];
           commandHandler.performCommand(payload).then(events => {
             // after the events, send to read and write models
             events.forEach(event => {
@@ -103,19 +119,16 @@ const CommonCommandHandler = {
     }
   },
 
+  // gets command handler of corresponding command name
   getCommandHandler(commandName) {
-    // scan all files in the commands directory
-    let files = fs.readdirSync(`/usr/src/app/cqrs/commands/child`);
-    for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
-      // get command names from each file
-      const handler = require(`/usr/src/app/cqrs/commands/child/${files[fileIndex]}`);
-      let commandHandler = new handler();
-      let commands = commandHandler.getCommands();
-      // return command handler if command name found
-      if (commands.includes(commandName))
-        return Promise.resolve(commandHandler);
+    try {
+      // extract the command handler from commandHandlerList using the command name
+      let commandHandler = this.commandHandlerList[commandName];
+      return Promise.resolve(commandHandler);
+    } catch (e) {
+      // reject if command name not found
+      return Promise.reject(constants.COMMAND_NOT_EXISTS);
     }
-    return Promise.reject(constants.COMMAND_NOT_EXISTS);
   },
 
   getComponent(aggregateName) {
@@ -140,6 +153,7 @@ const CommonCommandHandler = {
     return componentName;
   },
 
+  // send event to read repo
   sendEvent(event) {
     // get component name
     const componentName = this.getComponent(event.aggregateName);
@@ -148,10 +162,13 @@ const CommonCommandHandler = {
     eventHandler.emit(event.eventName, event.payload);
   },
 
+  // add event to write repo
   addEvent(event) {
     // call write repo to save to event store
     writeRepo.saveEvent(event);
   }
 };
 
+console.log("Initializing Common Command Handler");
+CommonCommandHandler.initialzeCommandHandlers();
 module.exports = CommonCommandHandler;
