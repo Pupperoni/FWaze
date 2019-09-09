@@ -54,6 +54,9 @@ const CommonEventHandler = {
   }
 };
 
-broker.eventSubscribe(enqueueEvent);
+broker.eventSubscribe(message => {
+  let event = JSON.parse(message.value);
+  return enqueueEvent(event);
+});
 
 module.exports = CommonEventHandler;

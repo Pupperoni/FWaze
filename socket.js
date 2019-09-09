@@ -2,6 +2,8 @@ const express = require("express");
 const http = require("http");
 const app = express();
 const socket = require("socket.io");
+const broker = require("./kafka");
+const CONSTANTS = require("./constants");
 
 /**
  * Create HTTP server.
@@ -13,16 +15,39 @@ var server = http.createServer(app);
  * Socket setup
  */
 const io = socket(server);
-// init
+const eventsNameSpace = io.of("/events");
 
-io.of("/events").on("connection", socket => {
+broker.eventFinished(message => {
+  let event = JSON.parse(message.value);
+  // looking at map (handle this!)
+  let room = `${event.aggregateName} ${event.aggregateID}`;
+  if (
+    event.eventName === CONSTANTS.EVENTS.CREATE_REPORT ||
+    event.eventName === CONSTANTS.EVENTS.CREATE_AD
+  ) {
+    room = "map viewers";
+  } else if (event.eventName === CONSTANTS.EVENTS.CREATE_APPLICATION) {
+    room = "admins";
+  } else if (event.eventName === CONSTANTS.EVENTS.CREATE_COMMENT) {
+    room = `${CONSTANTS.AGGREGATES.COMMENT_AGGREGATE_NAME} ${event.payload.reportId}`;
+  } else if (
+    event.eventName === CONSTANTS.EVENTS.APPROVE_APPLICATION ||
+    event.eventName === CONSTANTS.EVENTS.REJECT_APPLICATION
+  ) {
+    room = `${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${event.payload.userId}`;
+  }
+  // emit to client
+  eventsNameSpace.to(room).emit(event.eventName, event.payload);
+});
+
+eventsNameSpace.on("connection", socket => {
   console.log("Connected");
 
   // upon reconnect
   socket.on("initialize", data => {
     console.log("Reconnecting");
     // join private room
-    socket.join(`room ${data.id}`);
+    socket.join(`${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${data.id}`);
 
     // join admins room if admin role
     if (data.role == 2) socket.join("admins");
@@ -32,96 +57,24 @@ io.of("/events").on("connection", socket => {
   socket.on("login", data => {
     console.log("Logging in");
     // when a user logs in, he joins a private room with himself
-    socket.join(`room ${data.id}`, () => {
-      if (data.role == 2) {
-        socket.join("admins");
+    socket.join(
+      `${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${data.id}`,
+      () => {
+        if (data.role == 2) {
+          socket.join("admins");
+        }
       }
-    });
+    );
   });
 
-  // new application
-  socket.on("applicationCreated", data => {
-    io.of("/events")
-      .to("admins")
-      .emit("applicationSent", data);
+  socket.on("subscribe", data => {
+    console.log("Joined", data);
+    socket.join(data);
   });
 
-  // accepted application
-  socket.on("onAccepted", data => {
-    io.of("/events")
-      .to(`room ${data.data.userId}`)
-      .emit("applicationAccepted", data);
-    io.of("/events")
-      .to(`room ${data.data.userId}`)
-      .emit("changeToAdvertiser", data);
-  });
-
-  // application rejected
-  socket.on("onRejected", data => {
-    io.of("/events")
-      .to(`room ${data.data.userId}`)
-      .emit("applicationRejected", data);
-  });
-
-  socket.on("mapVisited", () => {
-    // join map viewing room
-    console.log("Joining map...");
-    socket.join("map viewers");
-  });
-
-  socket.on("mapExited", () => {
-    // leave map room
-    console.log("Leaving map...");
-    socket.leave("map viewers");
-  });
-
-  socket.on("viewReport", data => {
-    // report viewing room
-    console.log("Joining report", data);
-    socket.join(`report ${data}`);
-  });
-
-  socket.on("leaveReport", data => {
-    // report viewing room
-    console.log("Leaving report", data);
-    socket.leave(`report ${data}`);
-  });
-
-  // new report
-  socket.on("reportSubmitted", data => {
-    io.of("/events")
-      .in("map viewers")
-      .emit("reportCreated", data); // send back new report to everyone viewing map
-  });
-
-  // report upvoted
-  socket.on("onUpVoted", data => {
-    console.log(socket.rooms);
-    io.of("/events")
-      .to(`report ${data.id}`)
-      .emit("voteCreated", data);
-  });
-
-  // report downvoted
-  socket.on("onDownVoted", data => {
-    console.log(socket.rooms);
-    io.of("/events")
-      .to(`report ${data.id}`)
-      .emit("voteDeleted", data);
-  });
-
-  // Handle ad events
-  socket.on("adSubmitted", data => {
-    io.of("/events")
-      .to("map viewers")
-      .emit("adCreated", data);
-  });
-
-  // Handle comments
-  socket.on("commentSubmitted", data => {
-    io.of("/events")
-      .to("map viewers")
-      .emit("commentCreated", data);
+  socket.on("unsubscribe", data => {
+    console.log("Left", data);
+    socket.leave(data);
   });
 });
 

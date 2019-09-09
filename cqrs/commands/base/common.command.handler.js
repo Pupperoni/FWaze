@@ -106,5 +106,11 @@ console.log("Initializing Common Command Handler");
 CommonCommandHandler.initialzeCommandHandlers();
 
 // Wait for messages
-broker.commandSubscribe(enqueueCommand);
+broker.commandSubscribe(message => {
+  let deserialized = JSON.parse(message.value);
+  let payload = deserialized.payload;
+  let commandName = deserialized.commandName;
+  return enqueueCommand(commandName, payload);
+});
+
 module.exports = CommonCommandHandler;

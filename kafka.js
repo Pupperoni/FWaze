@@ -43,10 +43,7 @@ const broker = {
     kafkaEndPoints.commandConsumer.on("message", message => {
       console.log("Command received");
       // deserialize the message
-      let deserialized = JSON.parse(message.value);
-      let payload = deserialized.payload;
-      let commandName = deserialized.commandName;
-      callback(commandName, payload).then(() => {
+      callback(message).then(() => {
         // commit (assuming everything goes smoothly)
         kafkaEndPoints.commandConsumer.commit((err, data) => {
           console.log("Committing...");
@@ -56,17 +53,22 @@ const broker = {
     });
   },
 
-  eventSubscribe: callback => {
+  eventSubscribe(callback) {
     // when consumer receives a message, pass it to event handler
     kafkaEndPoints.eventConsumer.on("message", message => {
       console.log("Event received");
-      let event = JSON.parse(message.value);
-      callback(event).then(() => {
+      callback(message).then(() => {
         kafkaEndPoints.eventConsumer.commit((err, data) => {
           console.log("Committing...");
           console.log(data);
         });
       });
+    });
+  },
+
+  eventFinished(callback) {
+    kafkaEndPoints.eventConsumer.on("message", message => {
+      callback(message);
     });
   },
 
