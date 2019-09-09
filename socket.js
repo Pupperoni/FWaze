@@ -75,6 +75,18 @@ io.of("/events").on("connection", socket => {
     socket.leave("map viewers");
   });
 
+  socket.on("viewReport", data => {
+    // report viewing room
+    console.log("Joining report", data);
+    socket.join(`report ${data}`);
+  });
+
+  socket.on("leaveReport", data => {
+    // report viewing room
+    console.log("Leaving report", data);
+    socket.leave(`report ${data}`);
+  });
+
   // new report
   socket.on("reportSubmitted", data => {
     io.of("/events")
@@ -84,15 +96,17 @@ io.of("/events").on("connection", socket => {
 
   // report upvoted
   socket.on("onUpVoted", data => {
+    console.log(socket.rooms);
     io.of("/events")
-      .to("map viewers")
+      .to(`report ${data.id}`)
       .emit("voteCreated", data);
   });
 
   // report downvoted
   socket.on("onDownVoted", data => {
+    console.log(socket.rooms);
     io.of("/events")
-      .to("map viewers")
+      .to(`report ${data.id}`)
       .emit("voteDeleted", data);
   });
 
