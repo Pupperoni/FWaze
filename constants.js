@@ -26,8 +26,8 @@ module.exports = {
   },
 
   TOPICS: {
-    COMMAND: "commandQueue",
-    EVENT: "eventQueue"
+    COMMAND: "fwaze_commands",
+    EVENT: "fwaze_events"
   },
 
   EVENTS: {
