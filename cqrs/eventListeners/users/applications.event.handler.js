@@ -1,4 +1,4 @@
-const queryHandler = require("../../../db/sql/users/users.repository");
+const queryHandler = require("../../../db/sql/users/applications.repository");
 const CONSTANTS = require("../../../constants");
 
 const eventHandler = {
