@@ -83,8 +83,8 @@ ApplicationApprovedCommandHandler.prototype.performCommand = function(payload) {
 
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.USER_UPDATED,
-    aggregateName: CONSTANTS.AGGREGATE.USER_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.UPDATE_USER,
+    aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: {
       id: payload.userId,
