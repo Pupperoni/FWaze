@@ -9,6 +9,5 @@ CREATE TABLE `fave_routes`(
     `destination_string` varchar(255) NOT NULL,
     `user_id` varchar(15) NOT NULL,
     PRIMARY KEY (`id`),
-    KEY `fave_routes_user_id_foreign` (`user_id`),
-    CONSTRAINT `fave_routes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
