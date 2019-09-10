@@ -51,7 +51,6 @@ const CommonCommandHandler = {
           this.commandHandlerList[command] = commandHandler;
         });
       }
-      console.log("Done initializing");
     });
   },
 
