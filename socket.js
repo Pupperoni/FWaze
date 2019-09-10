@@ -17,25 +17,30 @@ var server = http.createServer(app);
 const io = socket(server);
 const eventsNameSpace = io.of("/events");
 
-broker.eventFinished(message => {
+broker.eventSocketsSubscribe(message => {
   let event = JSON.parse(message.value);
-  // looking at map (handle this!)
   let room = `${event.aggregateName} ${event.aggregateID}`;
+
   if (
     event.eventName === CONSTANTS.EVENTS.CREATE_REPORT ||
     event.eventName === CONSTANTS.EVENTS.CREATE_AD
   ) {
+    // users viewing map must receive new reports and ads
     room = "map viewers";
   } else if (event.eventName === CONSTANTS.EVENTS.CREATE_APPLICATION) {
+    // users that are admins must receive new applications
     room = "admins";
   } else if (event.eventName === CONSTANTS.EVENTS.CREATE_COMMENT) {
+    // users viewing comments will receive new comments of the report
     room = `${CONSTANTS.AGGREGATES.COMMENT_AGGREGATE_NAME} ${event.payload.reportId}`;
   } else if (
     event.eventName === CONSTANTS.EVENTS.APPROVE_APPLICATION ||
     event.eventName === CONSTANTS.EVENTS.REJECT_APPLICATION
   ) {
+    // users that applied must receive response
     room = `${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${event.payload.userId}`;
   }
+  console.log("Sending to room", room);
   // emit to client
   eventsNameSpace.to(room).emit(event.eventName, event.payload);
 });

@@ -39,14 +39,12 @@ kafkaEndPoints.producer.on("ready", () => {
 
 const broker = {
   commandSubscribe: callback => {
-    // when consumer receives a message, push it to the command queue
     kafkaEndPoints.commandConsumer.on("message", message => {
-      console.log("Command received");
       // deserialize the message
       callback(message).then(() => {
         // commit (assuming everything goes smoothly)
         kafkaEndPoints.commandConsumer.commit((err, data) => {
-          console.log("Committing...");
+          // console.log("Committing...");
           console.log(data);
         });
       });
@@ -56,17 +54,16 @@ const broker = {
   eventSubscribe(callback) {
     // when consumer receives a message, pass it to event handler
     kafkaEndPoints.eventConsumer.on("message", message => {
-      console.log("Event received");
       callback(message).then(() => {
         kafkaEndPoints.eventConsumer.commit((err, data) => {
-          console.log("Committing...");
+          // console.log("Committing...");
           console.log(data);
         });
       });
     });
   },
 
-  eventFinished(callback) {
+  eventSocketsSubscribe(callback) {
     kafkaEndPoints.eventConsumer.on("message", message => {
       callback(message);
     });
@@ -79,7 +76,6 @@ const broker = {
         messages: JSON.stringify(payload)
       }
     ];
-    console.log("Sending to", messagesToBeSent[0].topic);
     kafkaEndPoints.producer.send(messagesToBeSent, (err, results) => {});
   }
 };
