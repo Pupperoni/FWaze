@@ -18,6 +18,11 @@ AdCreatedCommandHandler.prototype.getCommands = function() {
   return [CONSTANTS.COMMANDS.CREATE_AD];
 };
 
+// gets user aggregate
+AdCreatedCommandHandler.prototype.getAggregate = function(id) {
+  return aggregate.getCurrentState(id);
+};
+
 AdCreatedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;
@@ -25,7 +30,7 @@ AdCreatedCommandHandler.prototype.validate = function(payload) {
 
   // get role of user and check if advertiser
   return Promise.resolve(
-    aggregate.getCurrentState(payload.userId).then(user => {
+    this.getAggregate(payload.userId).then(user => {
       // user does not exist
       if (!user) {
         valid = false;
