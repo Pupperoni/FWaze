@@ -4,33 +4,10 @@ const CONSTANTS = require("../../../constants");
 const async = require("async");
 const broker = require("../../../kafka");
 
-// push command and payload to command queue
-function enqueueCommand(commandName, payload) {
-  CommonCommandHandler.commandQueue.push(
-    {
-      commandName: commandName,
-      payload: payload
-    },
-    // perform command
-    function(commandName, payload) {
-      let commandHandler = CommonCommandHandler.commandHandlerList[commandName];
-      commandHandler.performCommand(payload).then(events => {
-        // after the events, send to read and write models
-        events.forEach(event => {
-          CommonCommandHandler.sendEvent(event);
-          CommonCommandHandler.addEvent(event);
-        });
-      });
-    }
-  );
-  return Promise.resolve();
-}
-
 const CommonCommandHandler = {
   // List of command handler instances
   commandHandlerList: {},
 
-  // queue for issuing commands sequentially
   commandQueue: async.queue(function(task, callback) {
     console.log(`Running ${task.commandName}`);
     callback(task.commandName, task.payload);
@@ -103,6 +80,30 @@ const CommonCommandHandler = {
 
 console.log("Initializing Common Command Handler");
 CommonCommandHandler.initialzeCommandHandlers();
+
+// push command and payload to command queue
+function enqueueCommand(commandName, payload) {
+  return Promise.resolve(
+    CommonCommandHandler.commandQueue.push(
+      {
+        commandName: commandName,
+        payload: payload
+      },
+      // perform command
+      function(commandName, payload) {
+        let commandHandler =
+          CommonCommandHandler.commandHandlerList[commandName];
+        commandHandler.performCommand(payload).then(events => {
+          // after the events, send to read and write models
+          events.forEach(event => {
+            CommonCommandHandler.sendEvent(event);
+            CommonCommandHandler.addEvent(event);
+          });
+        });
+      }
+    )
+  );
+}
 
 // Wait for messages
 broker.commandSubscribe(message => {

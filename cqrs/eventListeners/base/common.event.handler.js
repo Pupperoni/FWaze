@@ -4,29 +4,6 @@ const CONSTANTS = require("../../../constants");
 const async = require("async");
 const broker = require("../../../kafka");
 
-function enqueueEvent(event) {
-  CommonEventHandler.eventQueue.push(
-    { event: event },
-    // perform event
-    function(event) {
-      CommonEventHandler.sendEvent(event).then(commands => {
-        // if there are additional commands, send them to common command handler
-        commands.forEach(command => {
-          console.log("Doing", command.commandName);
-          let commandName = command.commandName;
-          let payload = command.payload;
-          CommonCommandHandler.sendCommand(payload, commandName).then(
-            result => {
-              console.log(commandName, "done");
-            }
-          );
-        });
-      });
-    }
-  );
-  return Promise.resolve();
-}
-
 const CommonEventHandler = {
   // List of event handler instances
   eventHandlerList: {},
@@ -78,6 +55,30 @@ const CommonEventHandler = {
 
 console.log("Initializing Common Event Handler");
 CommonEventHandler.initialzeEventHandlers();
+
+function enqueueEvent(event) {
+  return Promise.resolve(
+    CommonEventHandler.eventQueue.push(
+      { event: event },
+      // perform event
+      function(event) {
+        CommonEventHandler.sendEvent(event).then(commands => {
+          // if there are additional commands, send them to common command handler
+          commands.forEach(command => {
+            console.log("Doing", command.commandName);
+            let commandName = command.commandName;
+            let payload = command.payload;
+            CommonCommandHandler.sendCommand(payload, commandName).then(
+              result => {
+                console.log(commandName, "done");
+              }
+            );
+          });
+        });
+      }
+    )
+  );
+}
 
 broker.eventSubscribe(message => {
   let event = JSON.parse(message.value);

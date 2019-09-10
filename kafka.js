@@ -1,6 +1,36 @@
 const kafka = require("kafka-node");
 const CONSTANTS = require("./constants");
 
+let commandOptions = {
+  kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`, // connect directly to kafka broker (instantiates a KafkaClient)
+  batch: undefined, // put client batch settings if you need them
+  groupId: "commandGroup",
+  sessionTimeout: 15000,
+  protocol: ["roundrobin"],
+  encoding: "utf8", // default is utf8, use 'buffer' for binary data
+  fromOffset: "latest", // default
+  commitOffsetsOnFirstJoin: true,
+  outOfRangeOffset: "earliest", // default
+  onRebalance: (isAlreadyMember, callback) => {
+    callback();
+  } // or null
+};
+
+let eventOptions = {
+  kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`, // connect directly to kafka broker (instantiates a KafkaClient)
+  batch: undefined, // put client batch settings if you need them
+  groupId: "eventGroup",
+  sessionTimeout: 15000,
+  protocol: ["roundrobin"],
+  encoding: "utf8", // default is utf8, use 'buffer' for binary data
+  fromOffset: "latest", // default
+  commitOffsetsOnFirstJoin: true,
+  outOfRangeOffset: "earliest", // default
+  onRebalance: (isAlreadyMember, callback) => {
+    callback();
+  } // or null
+};
+
 const producerClient = new kafka.KafkaClient({
   kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
 });
@@ -14,20 +44,14 @@ const eventClient = new kafka.KafkaClient({
 });
 
 const kafkaEndPoints = {
-  commandConsumer: new kafka.Consumer(
-    commandClient,
-    [{ topic: CONSTANTS.TOPICS.COMMAND }],
-    {
-      autoCommit: false
-    }
+  commandConsumerGroup: new kafka.ConsumerGroup(
+    commandOptions,
+    CONSTANTS.TOPICS.COMMAND
   ),
 
-  eventConsumer: new kafka.Consumer(
-    eventClient,
-    [{ topic: CONSTANTS.TOPICS.EVENT }],
-    {
-      autoCommit: false
-    }
+  eventConsumerGroup: new kafka.ConsumerGroup(
+    eventOptions,
+    CONSTANTS.TOPICS.EVENT
   ),
 
   producer: new kafka.Producer(producerClient)
@@ -39,11 +63,11 @@ kafkaEndPoints.producer.on("ready", () => {
 
 const broker = {
   commandSubscribe: callback => {
-    kafkaEndPoints.commandConsumer.on("message", message => {
+    kafkaEndPoints.commandConsumerGroup.on("message", message => {
       // deserialize the message
       callback(message).then(() => {
         // commit (assuming everything goes smoothly)
-        kafkaEndPoints.commandConsumer.commit((err, data) => {
+        kafkaEndPoints.commandConsumerGroup.commit((err, data) => {
           // console.log("Committing...");
           console.log(data);
         });
@@ -53,9 +77,9 @@ const broker = {
 
   eventSubscribe(callback) {
     // when consumer receives a message, pass it to event handler
-    kafkaEndPoints.eventConsumer.on("message", message => {
+    kafkaEndPoints.eventConsumerGroup.on("message", message => {
       callback(message).then(() => {
-        kafkaEndPoints.eventConsumer.commit((err, data) => {
+        kafkaEndPoints.eventConsumerGroup.commit((err, data) => {
           // console.log("Committing...");
           console.log(data);
         });
@@ -64,7 +88,7 @@ const broker = {
   },
 
   eventSocketsSubscribe(callback) {
-    kafkaEndPoints.eventConsumer.on("message", message => {
+    kafkaEndPoints.eventConsumerGroup.on("message", message => {
       callback(message);
     });
   },
