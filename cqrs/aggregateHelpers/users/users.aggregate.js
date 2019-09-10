@@ -36,7 +36,7 @@ module.exports = {
             let payload = event.payload;
 
             switch (event.eventName) {
-              case CONSTANTS.EVENTS.CREATE_USER:
+              case CONSTANTS.EVENTS.USER_CREATED:
                 user.id = payload.id;
                 user.name = payload.name;
                 user.email = payload.email;
@@ -44,13 +44,13 @@ module.exports = {
                 if (payload.role) user.role = payload.role;
                 else user.role = 0;
                 break;
-              case CONSTANTS.EVENTS.UPDATE_USER:
+              case CONSTANTS.EVENTS.USER_UPDATED:
                 if (payload.name) user.name = payload.name;
                 if (payload.email) user.email = payload.email;
                 if (payload.role) user.role = payload.role;
                 if (payload.avatarPath) user.avatarPath = payload.avatarPath;
                 break;
-              case CONSTANTS.EVENTS.UPDATE_USER_HOME:
+              case CONSTANTS.EVENTS.USER_HOME_UPDATED:
                 if (!user.home) {
                   user.home = {
                     latitude: undefined,
@@ -62,7 +62,7 @@ module.exports = {
                 user.home.longitude = payload.longitude;
                 user.home.address = payload.address;
                 break;
-              case CONSTANTS.EVENTS.UPDATE_USER_WORK:
+              case CONSTANTS.EVENTS.USER_WORK_UPDATED:
                 if (!user.work) {
                   user.work = {
                     latitude: undefined,
@@ -74,13 +74,13 @@ module.exports = {
                 user.work.longitude = payload.longitude;
                 user.work.address = payload.address;
                 break;
-              case CONSTANTS.EVENTS.CREATE_USER_ROUTE:
+              case CONSTANTS.EVENTS.USER_ROUTE_CREATED:
                 if (!user.faveRoutes) {
                   user.faveRoutes = [];
                 }
                 user.faveRoutes.push(payload.routeId);
                 break;
-              case CONSTANTS.EVENTS.DELETE_USER_ROUTE:
+              case CONSTANTS.EVENTS.USER_ROUTE_DELETED:
                 let index = user.faveRoutes.indexOf(payload.routeId);
                 user.faveRoutes.splice(index, 1);
                 break;

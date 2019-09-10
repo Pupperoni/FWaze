@@ -1,37 +1,6 @@
 module.exports = {
   COMMANDS: {
     // User aggregates constants
-    USER_CREATED: "user_created",
-    USER_UPDATED: "user_updated",
-    USER_HOME_UPDATED: "user_home_updated",
-    USER_WORK_UPDATED: "user_work_updated",
-    USER_ROUTE_CREATED: "user_route_created",
-    USER_ROUTE_DELETED: "user_route_deleted",
-
-    // Application aggregate constants
-    APPLICATION_CREATED: "application_created",
-    APPLICATION_APPROVED: "application_approved",
-    APPLICATION_REJECTED: "application_rejected",
-
-    // Report aggregate constants
-    REPORT_CREATED: "report_created",
-    REPORT_VOTE_CREATED: "report_vote_created",
-    REPORT_VOTE_DELETED: "report_vote_deleted",
-
-    // Advertistement aggregate constants
-    AD_CREATED: "ad_create",
-
-    // Comment aggregate constants
-    COMMENT_CREATED: "comment_created"
-  },
-
-  TOPICS: {
-    COMMAND: "fwaze_commands",
-    EVENT: "fwaze_events"
-  },
-
-  EVENTS: {
-    // User aggregates constants
     CREATE_USER: "create_user",
     UPDATE_USER: "update_user",
     UPDATE_USER_HOME: "update_user_home",
@@ -46,14 +15,49 @@ module.exports = {
 
     // Report aggregate constants
     CREATE_REPORT: "create_report",
+    UPDATE_REPORT_USER_NAME: "update_report_user_name",
     CREATE_REPORT_VOTE: "create_report_vote",
     DELETE_REPORT_VOTE: "delete_report_vote",
 
     // Advertistement aggregate constants
     CREATE_AD: "create_ad",
+    UPDATE_AD_USER_NAME: "update_ad_user_name",
 
     // Comment aggregate constants
     CREATE_COMMENT: "create_comment"
+  },
+
+  TOPICS: {
+    COMMAND: "fwaze_commands",
+    EVENT: "fwaze_events"
+  },
+
+  EVENTS: {
+    // User aggregates constants
+    USER_CREATED: "user_created",
+    USER_UPDATED: "user_updated",
+    USER_HOME_UPDATED: "user_home_updated",
+    USER_WORK_UPDATED: "user_work_updated",
+    USER_ROUTE_CREATED: "user_route_created",
+    USER_ROUTE_DELETED: "user_route_deleted",
+
+    // Application aggregate constants
+    APPLICATION_CREATED: "application_created",
+    APPLICATION_APPROVED: "application_approved",
+    APPLICATION_REJECTED: "application_rejected",
+
+    // Report aggregate constants
+    REPORT_CREATED: "report_created",
+    REPORT_USER_NAME_UPDATED: "report_user_name_updated",
+    REPORT_VOTE_CREATED: "report_vote_created",
+    REPORT_VOTE_DELETED: "report_vote_deleted",
+
+    // Advertistement aggregate constants
+    AD_CREATED: "ad_created",
+    AD_USER_NAME_UPDATED: "ad_user_name_updated",
+
+    // Comment aggregate constants
+    COMMENT_CREATED: "comment_created"
   },
 
   AGGREGATES: {

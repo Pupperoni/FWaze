@@ -17,7 +17,7 @@ Object.defineProperty(CommentCreatedCommandHandler.prototype, "constructor", {
 });
 
 CommentCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.COMMENT_CREATED];
+  return [CONSTANTS.COMMANDS.CREATE_COMMENT];
 };
 
 CommentCreatedCommandHandler.prototype.validate = function(payload) {
@@ -56,7 +56,7 @@ CommentCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.CREATE_COMMENT,
+    eventName: CONSTANTS.EVENTS.COMMENT_CREATED,
     aggregateName: CONSTANTS.AGGREGATES.COMMENT_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: payload

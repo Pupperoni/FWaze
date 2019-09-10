@@ -16,7 +16,7 @@ Object.defineProperty(RouteCreatedCommandHandler.prototype, "constructor", {
 });
 
 RouteCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.USER_ROUTE_CREATED];
+  return [CONSTANTS.COMMANDS.CREATE_USER_ROUTE];
 };
 
 RouteCreatedCommandHandler.prototype.validate = function(payload) {
@@ -42,7 +42,7 @@ RouteCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.CREATE_USER_ROUTE,
+    eventName: CONSTANTS.EVENTS.USER_ROUTE_CREATED,
     aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: {

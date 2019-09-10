@@ -16,7 +16,7 @@ Object.defineProperty(RouteDeletedCommandHandler.prototype, "constructor", {
 });
 
 RouteDeletedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.USER_ROUTE_DELETED];
+  return [CONSTANTS.COMMANDS.DELETE_USER_ROUTE];
 };
 
 RouteDeletedCommandHandler.prototype.validate = function(payload) {
@@ -46,7 +46,7 @@ RouteDeletedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.DELETE_USER_ROUTE,
+    eventName: CONSTANTS.EVENTS.USER_ROUTE_DELETED,
     aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: {

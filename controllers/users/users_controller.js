@@ -173,7 +173,7 @@ const Handler = {
         // all good
         CommonCommandHandler.sendCommand(
           payload,
-          CONSTANTS.COMMANDS.USER_CREATED
+          CONSTANTS.COMMANDS.CREATE_USER
         );
       })
       .then(result => {
@@ -222,7 +222,7 @@ const Handler = {
         // commandHandler.userUpdated(req.body, req.file);
         CommonCommandHandler.sendCommand(
           payload,
-          CONSTANTS.COMMANDS.USER_UPDATED
+          CONSTANTS.COMMANDS.UPDATE_USER
         );
       })
       .then(result => {
@@ -295,7 +295,7 @@ const Handler = {
     };
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.USER_ROUTE_CREATED
+      CONSTANTS.COMMANDS.CREATE_USER_ROUTE
     )
       .then(result => {
         return res.json({
@@ -316,7 +316,7 @@ const Handler = {
     };
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.USER_ROUTE_DELETED
+      CONSTANTS.COMMANDS.DELETE_USER_ROUTE
     )
       .then(result => {
         return res.json({

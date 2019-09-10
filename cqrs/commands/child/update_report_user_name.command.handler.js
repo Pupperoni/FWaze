@@ -3,43 +3,37 @@ const shortid = require("shortid");
 const CONSTANTS = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
-function ReportCreatedCommandHandler() {}
+function ReportUserNameUpdatedCommandHandler() {}
 
-ReportCreatedCommandHandler.prototype = Object.create(
+ReportUserNameUpdatedCommandHandler.prototype = Object.create(
   BaseCommandHandler.prototype
 );
 
-Object.defineProperty(ReportCreatedCommandHandler.prototype, "constructor", {
-  value: ReportCreatedCommandHandler,
-  enumerable: false, // so that it does not appear in 'for in' loop
-  writable: true
-});
+Object.defineProperty(
+  ReportUserNameUpdatedCommandHandler.prototype,
+  "constructor",
+  {
+    value: ReportUserNameUpdatedCommandHandler,
+    enumerable: false, // so that it does not appear in 'for in' loop
+    writable: true
+  }
+);
 
-ReportCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.CREATE_REPORT];
+ReportUserNameUpdatedCommandHandler.prototype.getCommands = function() {
+  return [CONSTANTS.COMMANDS.UPDATE_REPORT_USER_NAME];
 };
 
-// gets user aggregate
-ReportCreatedCommandHandler.prototype.getAggregate = function(id) {
-  return aggregate.getCurrentState(id);
-};
-
-ReportCreatedCommandHandler.prototype.validate = function(payload) {
+ReportUserNameUpdatedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;
   let reasons = [];
   // check type of report
   return Promise.resolve(
-    this.getAggregate(payload.userId).then(user => {
+    aggregate.getCurrentState(payload.userId).then(user => {
       // user does not exist
       if (!user) {
         valid = false;
         reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
-      }
-      // invalid report type
-      if (payload.type < 0 || payload.type > 8) {
-        valid = false;
-        reasons.push(CONSTANTS.ERRORS.INVALID_REPORT_TYPE);
       }
 
       if (valid) return Promise.resolve(valid);
@@ -48,7 +42,9 @@ ReportCreatedCommandHandler.prototype.validate = function(payload) {
   );
 };
 
-ReportCreatedCommandHandler.prototype.performCommand = function(payload) {
+ReportUserNameUpdatedCommandHandler.prototype.performCommand = function(
+  payload
+) {
   // Create event instance
   let events = [];
   events.push({
@@ -73,4 +69,4 @@ ReportCreatedCommandHandler.prototype.performCommand = function(payload) {
   return Promise.resolve(events);
 };
 
-module.exports = ReportCreatedCommandHandler;
+module.exports = ReportUserNameUpdatedCommandHandler;

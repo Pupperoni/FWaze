@@ -22,20 +22,20 @@ broker.eventSocketsSubscribe(message => {
   let room = `${event.aggregateName} ${event.aggregateID}`;
 
   if (
-    event.eventName === CONSTANTS.EVENTS.CREATE_REPORT ||
-    event.eventName === CONSTANTS.EVENTS.CREATE_AD
+    event.eventName === CONSTANTS.EVENTS.REPORT_CREATED ||
+    event.eventName === CONSTANTS.EVENTS.AD_CREATED
   ) {
     // users viewing map must receive new reports and ads
     room = "map viewers";
-  } else if (event.eventName === CONSTANTS.EVENTS.CREATE_APPLICATION) {
+  } else if (event.eventName === CONSTANTS.EVENTS.APPLICATION_CREATED) {
     // users that are admins must receive new applications
     room = "admins";
-  } else if (event.eventName === CONSTANTS.EVENTS.CREATE_COMMENT) {
+  } else if (event.eventName === CONSTANTS.EVENTS.COMMENT_CREATED) {
     // users viewing comments will receive new comments of the report
     room = `${CONSTANTS.AGGREGATES.COMMENT_AGGREGATE_NAME} ${event.payload.reportId}`;
   } else if (
-    event.eventName === CONSTANTS.EVENTS.APPROVE_APPLICATION ||
-    event.eventName === CONSTANTS.EVENTS.REJECT_APPLICATION
+    event.eventName === CONSTANTS.EVENTS.APPLICATION_APPROVED ||
+    event.eventName === CONSTANTS.EVENTS.APPLICATION_REJECTED
   ) {
     // users that applied must receive response
     room = `${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${event.payload.userId}`;

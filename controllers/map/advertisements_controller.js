@@ -108,7 +108,7 @@ const Handler = {
     };
     // commandHandler
     //   .adCreated(req.body, req.file)
-    CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.AD_CREATED)
+    CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.CREATE_AD)
       .then(result => {
         if (result)
           return res.json({

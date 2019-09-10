@@ -22,7 +22,7 @@ Object.defineProperty(UserCreatedCommandHandler.prototype, "constructor", {
 });
 
 UserCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.USER_CREATED];
+  return [CONSTANTS.COMMANDS.CREATE_USER];
 };
 
 UserCreatedCommandHandler.prototype.getAggregate = function(id) {
@@ -59,7 +59,7 @@ UserCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.CREATE_USER,
+    eventName: CONSTANTS.EVENTS.USER_CREATED,
     aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: {

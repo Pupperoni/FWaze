@@ -207,7 +207,7 @@ const Handler = {
       file: req.file
     };
 
-    CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.REPORT_CREATED)
+    CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.CREATE_REPORT)
       .then(result => {
         return res.json({
           msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
@@ -228,7 +228,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.REPORT_VOTE_CREATED
+      CONSTANTS.COMMANDS.CREATE_REPORT_VOTE
     )
       .then(result => {
         return res.json({
@@ -250,7 +250,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.REPORT_VOTE_DELETED
+      CONSTANTS.COMMANDS.DELETE_REPORT_VOTE
     )
       .then(result => {
         return res.json({

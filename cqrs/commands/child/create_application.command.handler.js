@@ -23,7 +23,7 @@ Object.defineProperty(
 );
 
 ApplicationCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.APPLICATION_CREATED];
+  return [CONSTANTS.COMMANDS.CREATE_APPLICATION];
 };
 
 ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
@@ -70,7 +70,7 @@ ApplicationCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.CREATE_APPLICATION,
+    eventName: CONSTANTS.EVENTS.APPLICATION_CREATED,
     aggregateName: CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: payload

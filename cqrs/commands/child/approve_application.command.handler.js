@@ -22,7 +22,7 @@ Object.defineProperty(
 );
 
 ApplicationApprovedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.APPLICATION_APPROVED];
+  return [CONSTANTS.COMMANDS.APPROVE_APPLICATION];
 };
 
 ApplicationApprovedCommandHandler.prototype.validate = function(payload) {
@@ -72,7 +72,7 @@ ApplicationApprovedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.APPROVE_APPLICATION,
+    eventName: CONSTANTS.EVENTS.APPLICATION_APPROVED,
     aggregateName: CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: {
@@ -83,7 +83,7 @@ ApplicationApprovedCommandHandler.prototype.performCommand = function(payload) {
 
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.UPDATE_USER,
+    eventName: CONSTANTS.EVENTS.USER_UPDATED,
     aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: {

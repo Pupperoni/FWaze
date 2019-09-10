@@ -17,7 +17,7 @@ Object.defineProperty(VoteDeletedCommandHandler.prototype, "constructor", {
 });
 
 VoteDeletedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.REPORT_VOTE_DELETED];
+  return [CONSTANTS.COMMANDS.DELETE_REPORT_VOTE];
 };
 
 VoteDeletedCommandHandler.prototype.validate = function(payload) {
@@ -61,7 +61,7 @@ VoteDeletedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.DELETE_REPORT_VOTE,
+    eventName: CONSTANTS.EVENTS.REPORT_VOTE_DELETED,
     aggregateName: CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: payload

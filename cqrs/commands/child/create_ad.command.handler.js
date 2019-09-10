@@ -15,7 +15,7 @@ Object.defineProperty(AdCreatedCommandHandler.prototype, "constructor", {
 });
 
 AdCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.AD_CREATED];
+  return [CONSTANTS.COMMANDS.CREATE_AD];
 };
 
 AdCreatedCommandHandler.prototype.validate = function(payload) {
@@ -48,7 +48,7 @@ AdCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.CREATE_AD,
+    eventName: CONSTANTS.EVENTS.AD_CREATED,
     aggregateName: CONSTANTS.AGGREGATES.AD_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: payload

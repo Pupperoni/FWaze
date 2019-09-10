@@ -21,9 +21,9 @@ Object.defineProperty(UserUpdatedCommandHandler.prototype, "constructor", {
 
 UserUpdatedCommandHandler.prototype.getCommands = function() {
   return [
-    CONSTANTS.COMMANDS.USER_UPDATED,
-    CONSTANTS.COMMANDS.USER_HOME_UPDATED,
-    CONSTANTS.COMMANDS.USER_WORK_UPDATED
+    CONSTANTS.COMMANDS.UPDATE_USER,
+    CONSTANTS.COMMANDS.UPDATE_USER_HOME,
+    CONSTANTS.COMMANDS.UPDATE_USER_WORK
   ];
 };
 
@@ -46,7 +46,7 @@ UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
   // Create event instance
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.UPDATE_USER,
+    eventName: CONSTANTS.EVENTS.USER_UPDATED,
     aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: {
@@ -66,7 +66,7 @@ UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
   ) {
     events.push({
       eventId: shortid.generate(),
-      eventName: CONSTANTS.EVENTS.UPDATE_USER_HOME,
+      eventName: CONSTANTS.EVENTS.USER_HOME_UPDATED,
       aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
       aggregateID: payload.id,
       payload: {
@@ -83,7 +83,7 @@ UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
   )
     events.push({
       eventId: shortid.generate(),
-      eventName: CONSTANTS.EVENTS.UPDATE_USER_WORK,
+      eventName: CONSTANTS.EVENTS.USER_WORK_UPDATED,
       aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
       aggregateID: payload.id,
       payload: {

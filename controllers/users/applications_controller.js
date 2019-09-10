@@ -55,6 +55,10 @@ const Handler = {
       });
   },
 
+  //
+  //  Commands responsibility section
+  //
+
   // Add a new application for advertiser
   createApplication(req, res, next) {
     const payload = {
@@ -66,7 +70,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.APPLICATION_CREATED
+      CONSTANTS.COMMANDS.CREATE_APPLICATION
     )
       .then(result => {
         return res.json({
@@ -89,7 +93,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.APPLICATION_APPROVED
+      CONSTANTS.COMMANDS.APPROVE_APPLICATION
     )
       .then(result => {
         return res.json({
@@ -112,7 +116,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.APPLICATION_REJECTED
+      CONSTANTS.COMMANDS.REJECT_APPLICATION
     )
       .then(result => {
         return res.json({

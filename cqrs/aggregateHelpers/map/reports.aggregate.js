@@ -30,7 +30,7 @@ module.exports = {
             let payload = event.payload;
 
             switch (event.eventName) {
-              case CONSTANTS.EVENTS.CREATE_REPORT:
+              case CONSTANTS.EVENTS.REPORT_CREATED:
                 report.id = payload.id;
                 report.userId = payload.userId;
                 report.userName = payload.userName;
@@ -40,13 +40,13 @@ module.exports = {
                 report.location = payload.location;
                 // report = payload
                 break;
-              case CONSTANTS.EVENTS.CREATE_REPORT_VOTE:
+              case CONSTANTS.EVENTS.REPORT_VOTE_CREATED:
                 if (!report.votes) report.votes = 0;
                 report.votes++;
                 if (!report.voters) report.voters = [];
                 report.voters.push(payload.userId);
                 break;
-              case CONSTANTS.EVENTS.DELETE_REPORT_VOTE:
+              case CONSTANTS.EVENTS.REPORT_VOTE_DELETED:
                 report.votes--;
                 let index = report.voters.indexOf(payload.userId);
                 if (index != -1) report.voters.splice(index, 1);

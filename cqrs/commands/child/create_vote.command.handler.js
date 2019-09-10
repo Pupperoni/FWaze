@@ -17,7 +17,7 @@ Object.defineProperty(VoteCreatedCommandHandler.prototype, "constructor", {
 });
 
 VoteCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.REPORT_VOTE_CREATED];
+  return [CONSTANTS.COMMANDS.CREATE_REPORT_VOTE];
 };
 
 VoteCreatedCommandHandler.prototype.validate = function(payload) {
@@ -60,7 +60,7 @@ VoteCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.CREATE_REPORT_VOTE,
+    eventName: CONSTANTS.EVENTS.REPORT_VOTE_CREATED,
     aggregateName: CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME,
     aggregateID: payload.id,
     payload: payload

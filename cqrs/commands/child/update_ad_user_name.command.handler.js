@@ -22,7 +22,7 @@ Object.defineProperty(
 );
 
 ApplicationRejectedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.REJECT_APPLICATION];
+  return [CONSTANTS.COMMANDS.UPDATE_AD_USER_NAME];
 };
 
 ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
