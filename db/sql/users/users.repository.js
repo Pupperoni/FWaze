@@ -206,15 +206,17 @@ const Handler = {
       // set new name
       redis.hset(`user:${data.id}`, `name`, data.name);
       // Update reports
-      redis.smembers(`reports:${data.id}`).then(reportIds => {
-        reportIds.forEach(id => {
-          redis.hset(`report:${id}`, `userName`, data.name);
+      redis.scan(0, "match", `report:${data.id}:*`).then(results => {
+        let keys = results[1];
+        keys.forEach(key => {
+          redis.hset(key, "userName", data.name);
         });
       });
       // Update ads
-      redis.smembers(`ads:${data.id}`).then(reportIds => {
-        reportIds.forEach(id => {
-          redis.hset(`ad:${id}`, `userName`, data.name);
+      redis.scan(0, "match", `ad:${data.id}:*`).then(results => {
+        let keys = results[1];
+        keys.forEach(key => {
+          redis.hset(key, "userName", data.name);
         });
       });
       // Update name checker

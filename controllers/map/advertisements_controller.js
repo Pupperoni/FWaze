@@ -24,7 +24,11 @@ const Handler = {
   // Get ad by ad id
   getAdById(req, res, next) {
     redis
-      .hgetall(`ad:${req.params.id}`)
+      .scan(0, "match", `report:*:${req.params.id}`)
+      .then(results => {
+        let key = results[1];
+        return redis.hgetall(key);
+      })
       .then(result => {
         if (!result)
           return res.status(400).json({ msg: CONSTANTS.ERRORS.AD_NOT_EXISTS });
@@ -75,7 +79,11 @@ const Handler = {
       root: "/usr/src/app/"
     };
     redis
-      .hgetall(`ad:${req.params.id}`)
+      .scan(0, "match", `report:*:${req.params.id}`)
+      .then(results => {
+        let key = results[1];
+        return redis.hgetall(key);
+      })
       .then(ad => {
         if (ad) {
           if (ad.photoPath) return res.sendFile(ad.photoPath, options);

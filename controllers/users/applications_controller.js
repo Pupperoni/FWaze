@@ -98,7 +98,10 @@ const Handler = {
       .then(result => {
         return res.json({
           msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
-          data: result
+          data: {
+            id: payload.id,
+            userId: payload.userId
+          }
         });
       })
       .catch(e => {
@@ -121,7 +124,10 @@ const Handler = {
       .then(result => {
         return res.json({
           msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
-          data: result
+          data: {
+            id: payload.id,
+            userId: payload.userId
+          }
         });
       })
       .catch(e => {

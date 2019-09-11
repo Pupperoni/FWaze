@@ -36,8 +36,13 @@ const Handler = {
 
   // Get report by report id
   getReportById(req, res, next) {
+    // scan to get keys
     redis
-      .hgetall(`report:${req.params.id}`)
+      .scan(0, "match", `report:*:${req.params.id}`)
+      .then(results => {
+        let key = results[1];
+        return redis.hgetall(key);
+      })
       .then(result => {
         if (!result)
           return res
@@ -172,10 +177,14 @@ const Handler = {
       root: "/usr/src/app/"
     };
     redis
-      .hgetall(`report:${req.params.id}`)
-      .then(ad => {
-        if (ad) {
-          if (ad.photoPath) return res.sendFile(ad.photoPath, options);
+      .scan(0, "match", `report:*:${req.params.id}`)
+      .then(results => {
+        let key = results[1];
+        return redis.hgetall(key);
+      })
+      .then(report => {
+        if (report) {
+          if (report.photoPath) return res.sendFile(report.photoPath, options);
           else return res.json({ msg: CONSTANTS.ERRORS.FILE_NOT_FOUND });
         } else
           return res

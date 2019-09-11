@@ -18,7 +18,7 @@ const Handler = {
     // Add to redis
     if (data.photoPath) {
       redis.hmset(
-        `ad:${data.id}`,
+        `ad:${data.userId}:${data.id}`,
         "id",
         data.id,
         "caption",
@@ -38,7 +38,7 @@ const Handler = {
       );
     } else {
       redis.hmset(
-        `ad:${data.id}`,
+        `ad:${data.userId}:${data.id}`,
         "id",
         data.id,
         "caption",

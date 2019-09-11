@@ -8,6 +8,6 @@ CREATE TABLE `fave_routes`(
     `source_string` varchar(255) NOT NULL,
     `destination_string` varchar(255) NOT NULL,
     `user_id` varchar(15) NOT NULL,
-    PRIMARY KEY (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
+    PRIMARY KEY (`id`)
+  -- FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -7,7 +7,7 @@ const Handler = {
     // Add to redis
     if (data.photoPath) {
       redis.hmset(
-        `report:${data.id}`,
+        `report:${data.userId}:${data.id}`,
         `id`,
         data.id,
         `userId`,
@@ -27,7 +27,7 @@ const Handler = {
       );
     } else {
       redis.hmset(
-        `report:${data.id}`,
+        `report:${data.userId}:${data.id}`,
         `id`,
         data.id,
         `userId`,
@@ -45,8 +45,6 @@ const Handler = {
       );
     }
 
-    // Link users and reports
-    redis.sadd(`reports:${data.userId}`, data.id);
     return knex
       .raw("CALL CreateReport(?,?,?,?)", [
         data.id,
