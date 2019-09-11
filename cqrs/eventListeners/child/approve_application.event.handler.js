@@ -19,7 +19,7 @@ Object.defineProperty(
 );
 
 ApplicationApprovedEventHandler.prototype.getEvents = function() {
-  return [CONSTANTS.EVENTS.APPLICATION_APPROVED];
+  return [CONSTANTS.EVENTS.USER_APPLICATION_APPROVED];
 };
 
 ApplicationApprovedEventHandler.prototype.performEvent = function(event) {

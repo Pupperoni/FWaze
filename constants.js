@@ -7,24 +7,20 @@ module.exports = {
     UPDATE_USER_WORK: "update_user_work",
     CREATE_USER_ROUTE: "create_user_route",
     DELETE_USER_ROUTE: "delete_user_route",
-
-    // Application aggregate constants
-    CREATE_APPLICATION: "create_application",
-    APPROVE_APPLICATION: "approve_application",
-    REJECT_APPLICATION: "reject_application",
+    CREATE_USER_APPLICATION: "create_user_application",
+    APPROVE_USER_APPLICATION: "approve_user_application",
+    REJECT_USER_APPLICATION: "reject_user_application",
 
     // Report aggregate constants
     CREATE_REPORT: "create_report",
     UPDATE_REPORT_USER_NAME: "update_report_user_name",
     CREATE_REPORT_VOTE: "create_report_vote",
     DELETE_REPORT_VOTE: "delete_report_vote",
+    CREATE_REPORT_COMMENT: "create_report_comment",
 
     // Advertistement aggregate constants
     CREATE_AD: "create_ad",
-    UPDATE_AD_USER_NAME: "update_ad_user_name",
-
-    // Comment aggregate constants
-    CREATE_COMMENT: "create_comment"
+    UPDATE_AD_USER_NAME: "update_ad_user_name"
   },
 
   TOPICS: {
@@ -42,9 +38,9 @@ module.exports = {
     USER_ROUTE_DELETED: "user_route_deleted",
 
     // Application aggregate constants
-    APPLICATION_CREATED: "application_created",
-    APPLICATION_APPROVED: "application_approved",
-    APPLICATION_REJECTED: "application_rejected",
+    USER_APPLICATION_CREATED: "user_application_created",
+    USER_APPLICATION_APPROVED: "user_application_approved",
+    USER_APPLICATION_REJECTED: "user_application_rejected",
 
     // Report aggregate constants
     REPORT_CREATED: "report_created",
@@ -57,7 +53,7 @@ module.exports = {
     AD_USER_NAME_UPDATED: "ad_user_name_updated",
 
     // Comment aggregate constants
-    COMMENT_CREATED: "comment_created"
+    REPORT_COMMENT_CREATED: "report_comment_created"
   },
 
   AGGREGATES: {

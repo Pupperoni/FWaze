@@ -27,19 +27,11 @@ broker.eventSocketsSubscribe(message => {
   ) {
     // users viewing map must receive new reports and ads
     room = "map viewers";
-  } else if (event.eventName === CONSTANTS.EVENTS.APPLICATION_CREATED) {
+  } else if (event.eventName === CONSTANTS.EVENTS.USER_APPLICATION_CREATED) {
     // users that are admins must receive new applications
     room = "admins";
-  } else if (event.eventName === CONSTANTS.EVENTS.COMMENT_CREATED) {
-    // users viewing comments will receive new comments of the report
-    room = `${CONSTANTS.AGGREGATES.COMMENT_AGGREGATE_NAME} ${event.payload.reportId}`;
-  } else if (
-    event.eventName === CONSTANTS.EVENTS.APPLICATION_APPROVED ||
-    event.eventName === CONSTANTS.EVENTS.APPLICATION_REJECTED
-  ) {
-    // users that applied must receive response
-    room = `${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${event.payload.userId}`;
   }
+
   console.log("Sending to room", room);
   // emit to client
   eventsNameSpace.to(room).emit(event.eventName, event.payload);

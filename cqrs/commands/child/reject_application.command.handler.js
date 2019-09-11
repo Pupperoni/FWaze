@@ -2,8 +2,7 @@ const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
 const CONSTANTS = require("../../../constants");
 // will fix
-const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
-const applicationAggregate = require("../../aggregateHelpers/users/applications.aggregate");
+const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function ApplicationRejectedCommandHandler() {}
 
@@ -22,7 +21,11 @@ Object.defineProperty(
 );
 
 ApplicationRejectedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.REJECT_APPLICATION];
+  return [CONSTANTS.COMMANDS.REJECT_USER_APPLICATION];
+};
+
+ApplicationRejectedCommandHandler.prototype.getAggregate = function(id) {
+  return aggregate.getCurrentState(id);
 };
 
 ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
@@ -32,8 +35,7 @@ ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
 
   // get role of user that made the request (should be admin) and check if admin
   return Promise.resolve(
-    userAggregate
-      .getCurrentState(payload.adminId)
+    this.getAggregate(payload.adminId)
       .then(user => {
         // user does not exist
         if (!user) {
@@ -47,7 +49,7 @@ ApplicationRejectedCommandHandler.prototype.validate = function(payload) {
         }
         if (valid) {
           // check if application exists
-          return applicationAggregate.getCurrentState(payload.userId);
+          return this.getAggregate(payload.userId);
         } else return Promise.reject(reasons);
       })
       .then(application => {
@@ -72,8 +74,8 @@ ApplicationRejectedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.APPLICATION_REJECTED,
-    aggregateName: CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.USER_APPLICATION_REJECTED,
+    aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: payload
   });

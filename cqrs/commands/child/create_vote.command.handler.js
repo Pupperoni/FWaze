@@ -20,6 +20,10 @@ VoteCreatedCommandHandler.prototype.getCommands = function() {
   return [CONSTANTS.COMMANDS.CREATE_REPORT_VOTE];
 };
 
+VoteCreatedCommandHandler.prototype.getAggregate = function(id) {
+  return reportAggregate.getCurrentState(id);
+};
+
 VoteCreatedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;

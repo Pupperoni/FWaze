@@ -3,8 +3,7 @@ const CONSTANTS = require("../../../constants");
 const shortid = require("shortid");
 
 // will fix
-const userAggregate = require("../../aggregateHelpers/users/users.aggregate");
-const applicationAggregate = require("../../aggregateHelpers/users/applications.aggregate");
+const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function ApplicationCreatedCommandHandler() {}
 
@@ -23,7 +22,11 @@ Object.defineProperty(
 );
 
 ApplicationCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.CREATE_APPLICATION];
+  return [CONSTANTS.COMMANDS.CREATE_USER_APPLICATION];
+};
+
+ApplicationCreatedCommandHandler.prototype.getAggregate = function(id) {
+  return aggregate.getCurrentState(id);
 };
 
 ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
@@ -33,35 +36,27 @@ ApplicationCreatedCommandHandler.prototype.validate = function(payload) {
 
   // get role of user and check if regular
   return Promise.resolve(
-    userAggregate
-      .getCurrentState(payload.userId)
-      .then(user => {
-        // user does not exist
-        if (!user) {
-          valid = false;
-          reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
-        }
-        // user is not regular (not valid)
-        else if (user.role != 0) {
-          valid = false;
-          reasons.push(CONSTANTS.ERRORS.USER_NOT_PERMITTED);
-        }
-        if (valid) {
-          return applicationAggregate.getCurrentState(payload.userId);
-        } else return Promise.reject(reasons);
-      })
-      .then(application => {
-        // pending application exists
-        if (application) {
-          if (application.status && application.status === 0) {
-            valid = false;
-            reasons.push(CONSTANTS.ERRORS.DUPLICATE_APPLICATION);
-          }
-        }
+    this.getAggregate(payload.userId).then(user => {
+      // user does not exist
+      if (!user) {
+        valid = false;
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
+      }
+      // user is not regular (not valid)
+      else if (user.role != 0) {
+        valid = false;
+        reasons.push(CONSTANTS.ERRORS.USER_NOT_PERMITTED);
+      }
 
-        if (valid) return Promise.resolve(valid);
-        else return Promise.reject(reasons);
-      })
+      // if user exists and pending/approved - dont create
+      if (user.status && (user.status === 0 || user.status === 1)) {
+        valid = false;
+        reasons.push(CONSTANTS.ERRORS.DUPLICATE_APPLICATION);
+      }
+
+      if (valid) return Promise.resolve(valid);
+      else return Promise.reject(reasons);
+    })
   );
 };
 
@@ -70,8 +65,8 @@ ApplicationCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.APPLICATION_CREATED,
-    aggregateName: CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME,
+    eventName: CONSTANTS.EVENTS.USER_APPLICATION_CREATED,
+    aggregateName: CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME,
     aggregateID: payload.userId,
     payload: payload
   });

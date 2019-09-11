@@ -20,6 +20,10 @@ VoteDeletedCommandHandler.prototype.getCommands = function() {
   return [CONSTANTS.COMMANDS.DELETE_REPORT_VOTE];
 };
 
+VoteDeletedCommandHandler.prototype.getAggregate = function(id) {
+  return reportAggregate.getCurrentState(id);
+};
+
 VoteDeletedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;

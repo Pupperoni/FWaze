@@ -70,7 +70,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.CREATE_APPLICATION
+      CONSTANTS.COMMANDS.CREATE_USER_APPLICATION
     )
       .then(result => {
         return res.json({
@@ -93,7 +93,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.APPROVE_APPLICATION
+      CONSTANTS.COMMANDS.APPROVE_USER_APPLICATION
     )
       .then(result => {
         return res.json({
@@ -119,7 +119,7 @@ const Handler = {
 
     CommonCommandHandler.sendCommand(
       payload,
-      CONSTANTS.COMMANDS.REJECT_APPLICATION
+      CONSTANTS.COMMANDS.REJECT_USER_APPLICATION
     )
       .then(result => {
         return res.json({

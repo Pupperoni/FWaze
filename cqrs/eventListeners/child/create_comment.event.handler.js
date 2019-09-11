@@ -15,7 +15,7 @@ Object.defineProperty(CommentCreatedEventHandler.prototype, "constructor", {
 });
 
 CommentCreatedEventHandler.prototype.getEvents = function() {
-  return [CONSTANTS.EVENTS.COMMENT_CREATED];
+  return [CONSTANTS.EVENTS.REPORT_COMMENT_CREATED];
 };
 
 CommentCreatedEventHandler.prototype.performEvent = function(event) {

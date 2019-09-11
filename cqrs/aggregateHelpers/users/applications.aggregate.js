@@ -38,17 +38,17 @@ module.exports = {
             let payload = event.payload;
 
             switch (event.eventName) {
-              case CONSTANTS.EVENTS.APPLICATION_CREATED:
+              case CONSTANTS.EVENTS.USER_APPLICATION_CREATED:
                 application.id = payload.id;
                 application.userId = payload.userId;
                 application.userName = payload.userName;
                 application.timestamp = payload.timestamp;
                 application.status = 0;
                 break;
-              case CONSTANTS.EVENTS.APPLICATION_APPROVED:
+              case CONSTANTS.EVENTS.USER_APPLICATION_APPROVED:
                 application.status = 1;
                 break;
-              case CONSTANTS.EVENTS.APPLICATION_REJECTED:
+              case CONSTANTS.EVENTS.USER_APPLICATION_REJECTED:
                 application.status = -1;
                 break;
             }

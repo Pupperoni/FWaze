@@ -18,6 +18,10 @@ AdCreatedCommandHandler.prototype.getCommands = function() {
   return [CONSTANTS.COMMANDS.CREATE_AD];
 };
 
+AdCreatedCommandHandler.prototype.getAggregate = function(id) {
+  return aggregate.getCurrentState(id);
+};
+
 // gets user aggregate
 AdCreatedCommandHandler.prototype.getAggregate = function(id) {
   return aggregate.getCurrentState(id);

@@ -17,18 +17,23 @@ Object.defineProperty(CommentCreatedCommandHandler.prototype, "constructor", {
 });
 
 CommentCreatedCommandHandler.prototype.getCommands = function() {
-  return [CONSTANTS.COMMANDS.CREATE_COMMENT];
+  return [CONSTANTS.COMMANDS.CREATE_REPORT_COMMENT];
+};
+
+CommentCreatedCommandHandler.prototype.getAggregate = function(id) {
+  return reportAggregate.getCurrentState(id);
 };
 
 CommentCreatedCommandHandler.prototype.validate = function(payload) {
   // validate data sent here
   let valid = true;
   let reasons = [];
-  // check type of report
+
   let reportCheck = reportAggregate
     .getCurrentState(payload.reportId) // check if report exists
     .then(report => {
       // report doesn't exist
+      console.log(report);
       if (!report) {
         valid = false;
         reasons.push(CONSTANTS.ERRORS.REPORT_NOT_EXISTS);
@@ -38,6 +43,7 @@ CommentCreatedCommandHandler.prototype.validate = function(payload) {
   let userCheck = userAggregate
     .getCurrentState(payload.userId) // check if user exists
     .then(user => {
+      console.log(user);
       if (!user) {
         valid = false;
         reasons.push(CONSTANTS.ERRORS.USER_NOT_EXISTS);
@@ -56,9 +62,9 @@ CommentCreatedCommandHandler.prototype.performCommand = function(payload) {
   let events = [];
   events.push({
     eventId: shortid.generate(),
-    eventName: CONSTANTS.EVENTS.COMMENT_CREATED,
-    aggregateName: CONSTANTS.AGGREGATES.COMMENT_AGGREGATE_NAME,
-    aggregateID: payload.id,
+    eventName: CONSTANTS.EVENTS.REPORT_COMMENT_CREATED,
+    aggregateName: CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME,
+    aggregateID: payload.reportId,
     payload: payload
   });
 

@@ -19,6 +19,10 @@ RouteCreatedCommandHandler.prototype.getCommands = function() {
   return [CONSTANTS.COMMANDS.CREATE_USER_ROUTE];
 };
 
+RouteCreatedCommandHandler.prototype.getAggregate = function(id) {
+  return aggregate.getCurrentState(id);
+};
+
 RouteCreatedCommandHandler.prototype.validate = function(payload) {
   let valid = true;
   let reasons = [];

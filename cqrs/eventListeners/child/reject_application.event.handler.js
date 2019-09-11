@@ -19,7 +19,7 @@ Object.defineProperty(
 );
 
 ApplicationRejectedEventHandler.prototype.getEvents = function() {
-  return [CONSTANTS.EVENTS.APPLICATION_REJECTED];
+  return [CONSTANTS.EVENTS.USER_APPLICATION_REJECTED];
 };
 
 ApplicationRejectedEventHandler.prototype.performEvent = function(event) {

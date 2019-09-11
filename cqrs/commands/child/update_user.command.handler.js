@@ -1,6 +1,7 @@
 const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
 const CONSTANTS = require("../../../constants");
+const aggregate = require("../../aggregateHelpers/users/users.aggregate");
 
 function validateEmail(email) {
   let re = /\S+@\S+/;
@@ -25,6 +26,10 @@ UserUpdatedCommandHandler.prototype.getCommands = function() {
     CONSTANTS.COMMANDS.UPDATE_USER_HOME,
     CONSTANTS.COMMANDS.UPDATE_USER_WORK
   ];
+};
+
+UserUpdatedCommandHandler.prototype.getAggregate = function(id) {
+  return aggregate.getCurrentState(id);
 };
 
 UserUpdatedCommandHandler.prototype.validate = function(payload) {

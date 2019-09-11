@@ -74,15 +74,25 @@ module.exports = {
                 user.work.longitude = payload.longitude;
                 user.work.address = payload.address;
                 break;
-              case CONSTANTS.EVENTS.USER_ROUTE_CREATED:
-                if (!user.faveRoutes) {
-                  user.faveRoutes = [];
-                }
-                user.faveRoutes.push(payload.routeId);
+              // case CONSTANTS.EVENTS.USER_ROUTE_CREATED:
+              //   if (!user.faveRoutes) {
+              //     user.faveRoutes = [];
+              //   }
+              //   user.faveRoutes.push(payload.routeId);
+              //   break;
+              // case CONSTANTS.EVENTS.USER_ROUTE_DELETED:
+              //   let index = user.faveRoutes.indexOf(payload.routeId);
+              //   user.faveRoutes.splice(index, 1);
+              //   break;
+              case CONSTANTS.EVENTS.USER_APPLICATION_CREATED:
+                user.status = 0;
                 break;
-              case CONSTANTS.EVENTS.USER_ROUTE_DELETED:
-                let index = user.faveRoutes.indexOf(payload.routeId);
-                user.faveRoutes.splice(index, 1);
+              case CONSTANTS.EVENTS.USER_APPLICATION_APPROVED:
+                user.status = 1;
+                user.role = 1;
+                break;
+              case CONSTANTS.EVENTS.USER_APPLICATION_REJECTED:
+                user.status = -1;
                 break;
             }
           });

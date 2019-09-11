@@ -19,6 +19,10 @@ RouteDeletedCommandHandler.prototype.getCommands = function() {
   return [CONSTANTS.COMMANDS.DELETE_USER_ROUTE];
 };
 
+RouteDeletedCommandHandler.prototype.getAggregate = function(id) {
+  return reportAggregate.getCurrentState(id);
+};
+
 RouteDeletedCommandHandler.prototype.validate = function(payload) {
   let valid = true;
   let reasons = [];

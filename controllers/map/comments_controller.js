@@ -113,7 +113,10 @@ const Handler = {
     };
     // commandHandler
     //   .commentCreated(req.body)
-    CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.CREATE_COMMENT)
+    CommonCommandHandler.sendCommand(
+      payload,
+      CONSTANTS.COMMANDS.CREATE_REPORT_COMMENT
+    )
       .then(result => {
         return res.json({
           msg: CONSTANTS.SUCCESS.DEFAULT_SUCCESS,
