@@ -74,7 +74,7 @@ const CommonCommandHandler = {
   // add event to write repo
   addEvent(event) {
     // call write repo to save to event store
-    writeRepo.saveEvent(event);
+    writeRepo.enqueueEvent(event);
   }
 };
 

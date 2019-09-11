@@ -3,14 +3,20 @@ const redis = new Redis(process.env.REDIS_URL);
 const CONSTANTS = require("../../constants");
 const userAggregate = require("../aggregateHelpers/users/users.aggregate");
 const reportAggregate = require("../aggregateHelpers/map/reports.aggregate");
-const applicationAggregate = require("../aggregateHelpers/users/applications.aggregate");
-module.exports = {
+const async = require("async");
+
+const WriteRepo = {
+  queue: async.queue(function(task, callback) {
+    console.log("Executing", task.event);
+    callback(task.event);
+  }, 1),
+
   saveEvent(event) {
     let aggregateName = event.aggregateName;
     let aggregateID = event.aggregateID;
     let offset;
     // Get last offset from event store
-    redis
+    return redis
       .zrevrange(`events:${aggregateName}:${aggregateID}`, 0, 0, "WITHSCORES")
       .then(result => {
         // if empty list, start at 0
@@ -19,18 +25,21 @@ module.exports = {
       })
       .then(() => {
         // save to eventstore
-        redis.zadd(
+        let promise = redis.zadd(
           `events:${aggregateName}:${aggregateID}`,
           offset,
           JSON.stringify(event)
         );
 
         // sanity checker
-        // redis
-        //   .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
-        //   .then(console.log);
+        redis
+          .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
+          .then(console.log);
+
+        return promise;
       })
-      .then(() => {
+      .then(result => {
+        console.log(result);
         // save snapshot after 50 offsets
         if ((offset + 1) % 50 === 0) {
           // could separate these into multiple files for cleaner code i guess
@@ -39,8 +48,6 @@ module.exports = {
               return userAggregate.getCurrentState(aggregateID);
             case CONSTANTS.AGGREGATES.REPORT_AGGREGATE_NAME:
               return reportAggregate.getCurrentState(aggregateID);
-            case CONSTANTS.AGGREGATES.APPLICATION_AGGREGATE_NAME:
-              return applicationAggregate.getCurrentState(aggregateID);
           }
         }
       })
@@ -56,6 +63,24 @@ module.exports = {
             JSON.stringify(aggregate)
           );
         }
+        return Promise.resolve("Done");
       });
+  }
+};
+
+module.exports = {
+  enqueueEvent(event) {
+    console.log("Added to queue", event);
+    return Promise.resolve(
+      WriteRepo.queue.push(
+        { event: event },
+        // perform command
+        function(event) {
+          WriteRepo.saveEvent(event).then(result => {
+            console.log(result);
+          });
+        }
+      )
+    );
   }
 };

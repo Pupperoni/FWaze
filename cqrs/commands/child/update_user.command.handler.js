@@ -57,8 +57,7 @@ UserUpdatedCommandHandler.prototype.performCommand = function(payload) {
     payload: {
       id: payload.id,
       name: payload.name,
-      email: payload.email,
-      role: payload.role
+      email: payload.email
     }
   });
 

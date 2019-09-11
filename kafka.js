@@ -35,13 +35,13 @@ const producerClient = new kafka.KafkaClient({
   kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
 });
 
-const commandClient = new kafka.KafkaClient({
-  kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
-});
+// const commandClient = new kafka.KafkaClient({
+//   kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
+// });
 
-const eventClient = new kafka.KafkaClient({
-  kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
-});
+// const eventClient = new kafka.KafkaClient({
+//   kafkaHost: `${process.env.KAFKA_HOST_NAME}:${process.env.KAFKA_PORT}`
+// });
 
 const kafkaEndPoints = {
   commandConsumerGroup: new kafka.ConsumerGroup(
@@ -93,7 +93,7 @@ const broker = {
     });
   },
 
-  publish: (topic, payload) => {
+  publish: (topic, payload, aggregateId) => {
     let messagesToBeSent = [
       {
         topic: topic,
