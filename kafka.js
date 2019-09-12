@@ -54,7 +54,9 @@ const kafkaEndPoints = {
     CONSTANTS.TOPICS.EVENT
   ),
 
-  producer: new kafka.Producer(producerClient)
+  producer: new kafka.Producer(producerClient, {
+    partitionerType: 3
+  })
 };
 
 kafkaEndPoints.producer.on("ready", () => {
