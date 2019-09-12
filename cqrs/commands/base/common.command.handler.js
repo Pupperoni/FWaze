@@ -56,7 +56,12 @@ const CommonCommandHandler = {
             payload: payload,
             commandName: commandName
           };
-          broker.publish(CONSTANTS.TOPICS.COMMAND, formattedPayload);
+          let aggregateID = payload.aggregateID;
+          broker.publish(
+            CONSTANTS.TOPICS.COMMAND,
+            formattedPayload,
+            aggregateID
+          );
           return payload;
         })
         .catch(e => {
@@ -79,7 +84,8 @@ const CommonCommandHandler = {
 
   // send event to read repo
   sendEvent(event) {
-    broker.publish(CONSTANTS.TOPICS.EVENT, event);
+    let aggregateID = event.aggregateID;
+    broker.publish(CONSTANTS.TOPICS.EVENT, event, aggregateID);
   },
 
   // add event to write repo

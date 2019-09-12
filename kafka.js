@@ -97,14 +97,17 @@ const broker = {
     });
   },
 
-  publish: (topic, payload, aggregateId) => {
+  publish: (topic, payload, aggregateID) => {
     let messagesToBeSent = [
       {
         topic: topic,
-        messages: JSON.stringify(payload)
+        messages: JSON.stringify(payload),
+        key: aggregateID
       }
     ];
-    kafkaEndPoints.producer.send(messagesToBeSent, (err, results) => {});
+    kafkaEndPoints.producer.send(messagesToBeSent, (err, results) => {
+      console.log("[BROKER] Sent data", results);
+    });
   }
 };
 
