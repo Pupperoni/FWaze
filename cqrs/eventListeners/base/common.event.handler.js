@@ -9,8 +9,19 @@ const CommonEventHandler = {
   eventHandlerList: {},
 
   eventQueue: async.queue(function(task, callback) {
-    console.log(`Sending ${task.event.eventName}`);
-    callback(task.event);
+    console.log(
+      `[COMMON EVENT HANDLER] Performing event ${task.event.eventName}`
+    );
+    CommonEventHandler.sendEvent(task.event).then(commands => {
+      // if there are additional commands, send them to common command handler
+      commands.forEach(command => {
+        console.log("[COMMON EVENT HANDLER] Doing", command.commandName);
+        let commandName = command.commandName;
+        let payload = command.payload;
+        CommonCommandHandler.sendCommand(payload, commandName);
+      });
+    });
+    callback();
   }),
 
   // save event handler instances
@@ -53,7 +64,7 @@ const CommonEventHandler = {
   }
 };
 
-console.log("Initializing Common Event Handler");
+console.log("[COMMON EVENT HANDLER] Initializing Common Event Handler");
 CommonEventHandler.initialzeEventHandlers();
 
 function enqueueEvent(event) {
@@ -61,20 +72,8 @@ function enqueueEvent(event) {
     CommonEventHandler.eventQueue.push(
       { event: event },
       // perform event
-      function(event) {
-        CommonEventHandler.sendEvent(event).then(commands => {
-          // if there are additional commands, send them to common command handler
-          commands.forEach(command => {
-            console.log("Doing", command.commandName);
-            let commandName = command.commandName;
-            let payload = command.payload;
-            CommonCommandHandler.sendCommand(payload, commandName).then(
-              result => {
-                console.log(commandName, "done");
-              }
-            );
-          });
-        });
+      function() {
+        console.log("[COMMON EVENT HANDLER] Event done");
       }
     )
   );

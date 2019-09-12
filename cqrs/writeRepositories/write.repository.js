@@ -7,9 +7,8 @@ const async = require("async");
 
 const WriteRepo = {
   queue: async.queue(function(task, callback) {
-    console.log("Executing", task.event);
-    callback(task.event);
-  }, 1),
+    WriteRepo.saveEvent(task.event).then(callback);
+  }),
 
   saveEvent(event) {
     let aggregateName = event.aggregateName;
@@ -25,7 +24,7 @@ const WriteRepo = {
       })
       .then(() => {
         // save to eventstore
-        let promise = redis.zadd(
+        redis.zadd(
           `events:${aggregateName}:${aggregateID}`,
           offset,
           JSON.stringify(event)
@@ -34,12 +33,13 @@ const WriteRepo = {
         // sanity checker
         redis
           .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
-          .then(console.log);
-
-        return promise;
+          .then(results => {
+            results.forEach(element => {
+              console.log("[WRITE REPOSITORY]", element);
+            });
+          });
       })
-      .then(result => {
-        console.log(result);
+      .then(() => {
         // save snapshot after 50 offsets
         if ((offset + 1) % 50 === 0) {
           // could separate these into multiple files for cleaner code i guess
@@ -53,7 +53,7 @@ const WriteRepo = {
       })
       .then(aggregate => {
         if (aggregate) {
-          console.log(`Snapshot updated: ${offset}`);
+          console.log(`[WRITE REPOSITORY] Snapshot updated: ${offset}`);
           // save currentstate with offset
           redis.hset(
             `snapshot:${aggregateName}:${aggregateID}`,
@@ -63,24 +63,16 @@ const WriteRepo = {
             JSON.stringify(aggregate)
           );
         }
-        return Promise.resolve("Done");
       });
   }
 };
 
 module.exports = {
   enqueueEvent(event) {
-    console.log("Added to queue", event);
     return Promise.resolve(
-      WriteRepo.queue.push(
-        { event: event },
-        // perform command
-        function(event) {
-          WriteRepo.saveEvent(event).then(result => {
-            console.log(result);
-          });
-        }
-      )
+      WriteRepo.queue.push({ event: event }, function() {
+        console.log("[WRITE REPOSITORY] Saved to event store");
+      })
     );
   }
 };

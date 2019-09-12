@@ -9,8 +9,17 @@ const CommonCommandHandler = {
   commandHandlerList: {},
 
   commandQueue: async.queue(function(task, callback) {
-    console.log(`Running ${task.commandName}`);
-    callback(task.commandName, task.payload);
+    console.log(`[COMMON COMMAND HANDLER] Running ${task.commandName}`);
+    let commandHandler =
+      CommonCommandHandler.commandHandlerList[task.commandName];
+    commandHandler.performCommand(task.payload).then(events => {
+      // after the events, send to read and write models
+      events.forEach(event => {
+        CommonCommandHandler.sendEvent(event);
+        CommonCommandHandler.addEvent(event);
+      });
+    });
+    callback();
   }),
 
   // save command handler instances
@@ -40,7 +49,9 @@ const CommonCommandHandler = {
         .validate(payload)
         .then(valid => {
           // Publish command and payload to kafka
-          console.log("Sending...");
+          console.log(
+            `[COMMON COMMAND HANDLER] Sending command ${commandName} to broker`
+          );
           let formattedPayload = {
             payload: payload,
             commandName: commandName
@@ -78,7 +89,7 @@ const CommonCommandHandler = {
   }
 };
 
-console.log("Initializing Common Command Handler");
+console.log("[COMMON COMMAND HANDLER] Initializing Common Command Handler");
 CommonCommandHandler.initialzeCommandHandlers();
 
 // push command and payload to command queue
@@ -90,16 +101,8 @@ function enqueueCommand(commandName, payload) {
         payload: payload
       },
       // perform command
-      function(commandName, payload) {
-        let commandHandler =
-          CommonCommandHandler.commandHandlerList[commandName];
-        commandHandler.performCommand(payload).then(events => {
-          // after the events, send to read and write models
-          events.forEach(event => {
-            CommonCommandHandler.sendEvent(event);
-            CommonCommandHandler.addEvent(event);
-          });
-        });
+      function() {
+        console.log("[COMMON COMMAND HANDLER] Command executed");
       }
     )
   );
