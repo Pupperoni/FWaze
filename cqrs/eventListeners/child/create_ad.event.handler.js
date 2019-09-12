@@ -17,7 +17,7 @@ AdCreatedEventHandler.prototype.getEvents = function() {
 };
 
 AdCreatedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: ad created");
+  console.log("[ACTUAL EVENT HANDLER] event received: ad created");
   queryHandler.createAd(event.payload);
 
   // create new commands

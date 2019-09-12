@@ -32,17 +32,17 @@ broker.eventSocketsSubscribe(message => {
     room = "admins";
   }
 
-  console.log("Sending to room", room);
+  console.log("[SOCKET HANDLER] Sending to client at room", room);
   // emit to client
   eventsNameSpace.to(room).emit(event.eventName, event.payload);
 });
 
 eventsNameSpace.on("connection", socket => {
-  console.log("Connected");
+  console.log("[SOCKET HANDLER] Client connected");
 
   // upon reconnect
   socket.on("initialize", data => {
-    console.log("Reconnecting");
+    console.log("[SOCKET HANDLER] Client reconnecting");
     // join private room
     socket.join(`${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${data.id}`);
 
@@ -52,7 +52,7 @@ eventsNameSpace.on("connection", socket => {
 
   // login
   socket.on("login", data => {
-    console.log("Logging in");
+    console.log("[SOCKET HANDLER] User logging in");
     // when a user logs in, he joins a private room with himself
     socket.join(
       `${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${data.id}`,
@@ -65,12 +65,12 @@ eventsNameSpace.on("connection", socket => {
   });
 
   socket.on("subscribe", data => {
-    console.log("Joined", data);
+    console.log("[SOCKET HANDLER] Client joined", data);
     socket.join(data);
   });
 
   socket.on("unsubscribe", data => {
-    console.log("Left", data);
+    console.log("[SOCKET HANDLER] Client left", data);
     socket.leave(data);
   });
 });

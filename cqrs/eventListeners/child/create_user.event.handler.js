@@ -17,7 +17,7 @@ UserCreatedEventHandler.prototype.getEvents = function() {
 };
 
 UserCreatedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: user created");
+  console.log("[ACTUAL EVENT HANDLER] event received: user created");
   queryHandler.createUser(event.payload);
 
   // create new commands

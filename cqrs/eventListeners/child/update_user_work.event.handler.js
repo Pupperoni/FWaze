@@ -19,7 +19,7 @@ UpdateUserWorkEventHandler.prototype.getEvents = function() {
 };
 
 UpdateUserWorkEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: user work updated");
+  console.log("[ACTUAL EVENT HANDLER] event received: user work updated");
   queryHandler.setWorkAd(event.payload);
 
   // create new commands

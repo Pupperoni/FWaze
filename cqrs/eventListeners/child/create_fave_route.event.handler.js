@@ -17,7 +17,7 @@ RouteCreatedEventHandler.prototype.getEvents = function() {
 };
 
 RouteCreatedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: fave route created");
+  console.log("[ACTUAL EVENT HANDLER] event received: fave route created");
   queryHandler.createFaveRoute(event.payload);
 
   // create new commands

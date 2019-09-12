@@ -23,7 +23,7 @@ ApplicationApprovedEventHandler.prototype.getEvents = function() {
 };
 
 ApplicationApprovedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: application approved");
+  console.log("[ACTUAL EVENT HANDLER] event received: application approved");
   queryHandler.approveApplication(event.payload);
 
   // create new commands

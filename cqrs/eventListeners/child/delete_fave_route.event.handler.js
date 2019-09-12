@@ -17,7 +17,7 @@ RouteDeletedEventHandler.prototype.getEvents = function() {
 };
 
 RouteDeletedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: fave route deleted");
+  console.log("[ACTUAL EVENT HANDLER] event received: fave route deleted");
   queryHandler.deleteFaveRoute(event.payload);
 
   // create new commands

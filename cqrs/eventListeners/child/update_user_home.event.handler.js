@@ -19,7 +19,7 @@ UpdateUserHomeEventHandler.prototype.getEvents = function() {
 };
 
 UpdateUserHomeEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: user home updated");
+  console.log("[ACTUAL EVENT HANDLER] event received: user home updated");
   queryHandler.setHomeAd(event.payload);
 
   // create new commands

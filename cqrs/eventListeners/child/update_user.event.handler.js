@@ -17,29 +17,11 @@ UserUpdatedEventHandler.prototype.getEvents = function() {
 };
 
 UserUpdatedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: user updated");
+  console.log("[ACTUAL EVENT HANDLER] event received: user updated");
   queryHandler.updateUser(event.payload);
 
   // create new commands
   let commands = [];
-
-  // // update report user name
-  // commands.push({
-  //   commandName: CONSTANTS.COMMANDS.UPDATE_REPORT_USER_NAME,
-  //   payload: {
-  //     userId: event.payload.userId,
-  //     userName: event.payload.userName
-  //   }
-  // });
-
-  // // update ad user name
-  // commands.push({
-  //   commandName: CONSTANTS.COMMANDS.UPDATE_AD_USER_NAME,
-  //   payload: {
-  //     userId: event.payload.userId,
-  //     userName: event.payload.userName
-  //   }
-  // });
 
   return Promise.resolve(commands);
 };

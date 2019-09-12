@@ -23,7 +23,7 @@ ApplicationRejectedEventHandler.prototype.getEvents = function() {
 };
 
 ApplicationRejectedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: application rejected");
+  console.log("[ACTUAL EVENT HANDLER] event received: application rejected");
   queryHandler.rejectApplication(event.payload);
 
   // create new commands

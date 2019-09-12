@@ -19,7 +19,7 @@ AdUserNameUpdatedEventHandler.prototype.getEvents = function() {
 };
 
 AdUserNameUpdatedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: user updated");
+  console.log("[ACTUAL EVENT HANDLER] event received: user updated");
   queryHandler.updateUser(event.payload);
 
   // create new commands

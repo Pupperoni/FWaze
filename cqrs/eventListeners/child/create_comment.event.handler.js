@@ -19,7 +19,7 @@ CommentCreatedEventHandler.prototype.getEvents = function() {
 };
 
 CommentCreatedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: comment created");
+  console.log("[ACTUAL EVENT HANDLER] event received: comment created");
   queryHandler.createComment(event.payload);
 
   // create new commands

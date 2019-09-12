@@ -17,7 +17,7 @@ VoteCreatedEventHandler.prototype.getEvents = function() {
 };
 
 VoteCreatedEventHandler.prototype.performEvent = function(event) {
-  console.log("event received: vote created");
+  console.log("[ACTUAL EVENT HANDLER] event received: vote created");
   queryHandler.addVote(event.payload);
 
   // create new commands

@@ -58,7 +58,7 @@ const kafkaEndPoints = {
 };
 
 kafkaEndPoints.producer.on("ready", () => {
-  console.log("Producer is ready to send messages");
+  console.log("[BROKER] Producer is ready to send messages");
 });
 
 const broker = {
@@ -69,7 +69,7 @@ const broker = {
         // commit (assuming everything goes smoothly)
         kafkaEndPoints.commandConsumerGroup.commit((err, data) => {
           // console.log("Committing...");
-          console.log(data);
+          console.log("[BROKER] Committing to fwaze_command");
         });
       });
     });
@@ -81,7 +81,7 @@ const broker = {
       callback(message).then(() => {
         kafkaEndPoints.eventConsumerGroup.commit((err, data) => {
           // console.log("Committing...");
-          console.log(data);
+          console.log("[BROKER] Committing to fwaze_event");
         });
       });
     });
