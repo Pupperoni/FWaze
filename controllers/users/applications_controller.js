@@ -68,6 +68,7 @@ const Handler = {
       timestamp: req.body.timestamp
     };
 
+    payload.aggregateID = payload.userId;
     CommonCommandHandler.sendCommand(
       payload,
       CONSTANTS.COMMANDS.CREATE_USER_APPLICATION
@@ -91,6 +92,7 @@ const Handler = {
       userId: req.body.userId
     };
 
+    payload.aggregateID = payload.userId;
     CommonCommandHandler.sendCommand(
       payload,
       CONSTANTS.COMMANDS.APPROVE_USER_APPLICATION
@@ -117,6 +119,7 @@ const Handler = {
       userId: req.body.userId
     };
 
+    payload.aggregateID = payload.userId;
     CommonCommandHandler.sendCommand(
       payload,
       CONSTANTS.COMMANDS.REJECT_USER_APPLICATION

@@ -215,6 +215,7 @@ const Handler = {
       type: req.body.type,
       file: req.file
     };
+    payload.aggregateID = payload.id;
 
     CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.CREATE_REPORT)
       .then(result => {
@@ -235,6 +236,7 @@ const Handler = {
       userId: req.body.userId
     };
 
+    payload.aggregateID = payload.id;
     CommonCommandHandler.sendCommand(
       payload,
       CONSTANTS.COMMANDS.CREATE_REPORT_VOTE
@@ -256,6 +258,7 @@ const Handler = {
       id: req.body.reportId,
       userId: req.body.userId
     };
+    payload.aggregateID = payload.id;
 
     CommonCommandHandler.sendCommand(
       payload,

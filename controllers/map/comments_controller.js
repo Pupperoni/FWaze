@@ -111,6 +111,7 @@ const Handler = {
       body: req.body.body,
       timestamp: req.body.timestamp
     };
+    payload.aggregateID = payload.reportId;
     // commandHandler
     //   .commentCreated(req.body)
     CommonCommandHandler.sendCommand(

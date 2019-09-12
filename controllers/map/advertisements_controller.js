@@ -114,6 +114,9 @@ const Handler = {
       location: req.body.location,
       file: req.file
     };
+
+    payload.aggregateId = payload.id;
+
     // commandHandler
     //   .adCreated(req.body, req.file)
     CommonCommandHandler.sendCommand(payload, CONSTANTS.COMMANDS.CREATE_AD)

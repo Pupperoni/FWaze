@@ -156,6 +156,7 @@ const Handler = {
       password: req.body.password,
       confirmPassword: req.body.confirmPassword
     };
+    payload.aggregateID = payload.id;
     // validate user details
     queryHandler
       .getUserByName(payload.name) // checks name
@@ -205,6 +206,7 @@ const Handler = {
       },
       file: req.file
     };
+    payload.aggregateID = payload.id;
     // validate user details
     queryHandler
       .getUserByName(payload.name) // checks name
@@ -293,6 +295,7 @@ const Handler = {
       destinationString: req.body.destinationString,
       id: req.body.userId
     };
+    payload.aggregateID = payload.id;
     CommonCommandHandler.sendCommand(
       payload,
       CONSTANTS.COMMANDS.CREATE_USER_ROUTE
@@ -314,6 +317,7 @@ const Handler = {
       routeId: req.body.routeId,
       userId: req.body.userId
     };
+    payload.aggregateID = payload.userId;
     CommonCommandHandler.sendCommand(
       payload,
       CONSTANTS.COMMANDS.DELETE_USER_ROUTE
