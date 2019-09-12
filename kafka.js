@@ -7,6 +7,7 @@ let commandOptions = {
   groupId: "commandGroup",
   sessionTimeout: 15000,
   protocol: ["roundrobin"],
+  autoCommit: false,
   encoding: "utf8", // default is utf8, use 'buffer' for binary data
   fromOffset: "latest", // default
   commitOffsetsOnFirstJoin: true,
@@ -22,6 +23,7 @@ let eventOptions = {
   groupId: "eventGroup",
   sessionTimeout: 15000,
   protocol: ["roundrobin"],
+  autoCommit: false,
   encoding: "utf8", // default is utf8, use 'buffer' for binary data
   fromOffset: "latest", // default
   commitOffsetsOnFirstJoin: true,
