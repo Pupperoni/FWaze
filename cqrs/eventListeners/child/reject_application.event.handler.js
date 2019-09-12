@@ -22,9 +22,12 @@ ApplicationRejectedEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.USER_APPLICATION_REJECTED];
 };
 
-ApplicationRejectedEventHandler.prototype.performEvent = function(event) {
+ApplicationRejectedEventHandler.prototype.performEvent = function(
+  event,
+  offset
+) {
   console.log("[ACTUAL EVENT HANDLER] event received: application rejected");
-  queryHandler.rejectApplication(event.payload);
+  queryHandler.rejectApplication(event.payload, offset);
 
   // create new commands
   let commands = [];

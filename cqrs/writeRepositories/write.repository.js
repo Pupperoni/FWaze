@@ -7,7 +7,9 @@ const async = require("async");
 
 const WriteRepo = {
   queue: async.queue(function(task, callback) {
-    WriteRepo.saveEvent(task.event).then(callback);
+    WriteRepo.saveEvent(task.event).then(offset => {
+      callback(offset);
+    });
   }),
 
   saveEvent(event) {
@@ -24,20 +26,19 @@ const WriteRepo = {
       })
       .then(() => {
         // save to eventstore
-        redis.zadd(
+        let promise = redis.zadd(
           `events:${aggregateName}:${aggregateID}`,
           offset,
           JSON.stringify(event)
         );
 
         // sanity checker
-        redis
-          .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
-          .then(results => {
-            results.forEach(element => {
-              console.log("[WRITE REPOSITORY]", element);
-            });
-          });
+        // redis
+        //   .zrange(`events:${aggregateName}:${aggregateID}`, 0, -1, "WITHSCORES")
+        //   .then(results => {
+        //     console.log("[WRITE REPOSITORY]", results);
+        //   });
+        return promise;
       })
       .then(() => {
         // save snapshot after 50 offsets
@@ -63,15 +64,17 @@ const WriteRepo = {
             JSON.stringify(aggregate)
           );
         }
+        return offset;
       });
   }
 };
 
 module.exports = {
-  enqueueEvent(event) {
+  enqueueEvent(event, callback) {
     return Promise.resolve(
-      WriteRepo.queue.push({ event: event }, function() {
+      WriteRepo.queue.push({ event: event }, function(offset) {
         console.log("[WRITE REPOSITORY] Saved to event store");
+        callback(offset);
       })
     );
   }

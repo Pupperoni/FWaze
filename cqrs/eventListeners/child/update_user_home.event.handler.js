@@ -18,9 +18,9 @@ UpdateUserHomeEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.USER_HOME_UPDATED];
 };
 
-UpdateUserHomeEventHandler.prototype.performEvent = function(event) {
+UpdateUserHomeEventHandler.prototype.performEvent = function(event, offset) {
   console.log("[ACTUAL EVENT HANDLER] event received: user home updated");
-  queryHandler.setHomeAd(event.payload);
+  queryHandler.setHomeAd(event.payload, offset);
 
   // create new commands
   let commands = [];

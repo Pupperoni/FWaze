@@ -16,9 +16,9 @@ VoteDeletedEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.REPORT_VOTE_DELETED];
 };
 
-VoteDeletedEventHandler.prototype.performEvent = function(event) {
+VoteDeletedEventHandler.prototype.performEvent = function(event, offset) {
   console.log("[ACTUAL EVENT HANDLER] event received: vote deleted");
-  queryHandler.removeVote(event.payload);
+  queryHandler.removeVote(event.payload, offset);
 
   // create new commands
   let commands = [];

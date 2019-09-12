@@ -17,8 +17,7 @@ var server = http.createServer(app);
 const io = socket(server);
 const eventsNameSpace = io.of("/events");
 
-broker.eventSocketsSubscribe(message => {
-  let event = JSON.parse(message.value);
+broker.eventSocketsSubscribe((event, offset) => {
   let room = `${event.aggregateName} ${event.aggregateID}`;
 
   if (
@@ -31,6 +30,8 @@ broker.eventSocketsSubscribe(message => {
     // users that are admins must receive new applications
     room = "admins";
   }
+
+  event.payload.offset = offset;
 
   console.log("[SOCKET HANDLER] Sending to client at room", room);
   // emit to client

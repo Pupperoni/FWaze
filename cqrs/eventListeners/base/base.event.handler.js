@@ -6,9 +6,9 @@ BaseEventHandler.prototype.getEvents = function() {
   return [];
 };
 
-BaseEventHandler.prototype.performEvent = function(event) {
+BaseEventHandler.prototype.performEvent = function(event, offset) {
   // do it
-  return Promise.resolve(event);
+  return Promise.resolve([]);
 };
 
 module.exports = BaseEventHandler;

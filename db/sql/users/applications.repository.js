@@ -4,7 +4,7 @@ const redis = new Redis(process.env.REDIS_URL);
 
 const Handler = {
   // Create an application
-  createApplication(data) {
+  createApplication(data, offset) {
     redis.hmset(
       `application:${data.id}`,
       `userId`,
@@ -16,6 +16,8 @@ const Handler = {
       `timestamp`,
       data.timestamp
     );
+
+    redis.hset(`user:${data.userId}`, "offset", offset);
 
     redis.set(`user:${data.userId}:application`, data.id);
 
@@ -60,6 +62,7 @@ const Handler = {
   // Get all pending applications
   approveApplication(data) {
     redis.hmset(`application:${data.userId}`, `status`, 1);
+    redis.hset(`user:${data.userId}`, "offset", offset);
 
     redis.del(`user:${data.userId}:application`);
     return knex
@@ -75,6 +78,7 @@ const Handler = {
   // Get all pending applications
   rejectApplication(data) {
     redis.hmset(`application:${data.userId}`, `status`, -1);
+    redis.hset(`user:${data.userId}`, "offset", offset);
     redis.del(`user:${data.userId}:application`);
     return knex
       .raw("CALL RejectApplication(?)", [data.id])

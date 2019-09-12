@@ -54,8 +54,8 @@ VoteCreatedCommandHandler.prototype.validate = function(payload) {
       if (!value) valid = value;
     });
 
-    if (valid) Promise.resolve(valid);
-    else Promise.reject(reasons);
+    if (valid) return Promise.resolve(valid);
+    else return Promise.reject(reasons);
   });
 };
 

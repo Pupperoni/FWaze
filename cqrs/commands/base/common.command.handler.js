@@ -15,7 +15,6 @@ const CommonCommandHandler = {
     commandHandler.performCommand(task.payload).then(events => {
       // after the events, send to read and write models
       events.forEach(event => {
-        CommonCommandHandler.sendEvent(event);
         CommonCommandHandler.addEvent(event);
       });
     });
@@ -83,15 +82,17 @@ const CommonCommandHandler = {
   },
 
   // send event to read repo
-  sendEvent(event) {
+  sendEvent(event, offset) {
     let aggregateID = event.aggregateID;
-    broker.publish(CONSTANTS.TOPICS.EVENT, event, aggregateID);
+    broker.publish(CONSTANTS.TOPICS.EVENT, event, aggregateID, offset);
   },
 
   // add event to write repo
   addEvent(event) {
     // call write repo to save to event store
-    writeRepo.enqueueEvent(event);
+    writeRepo.enqueueEvent(event, function(offset) {
+      CommonCommandHandler.sendEvent(event, offset);
+    });
   }
 };
 

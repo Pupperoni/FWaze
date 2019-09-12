@@ -22,9 +22,12 @@ ApplicationApprovedEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.USER_APPLICATION_APPROVED];
 };
 
-ApplicationApprovedEventHandler.prototype.performEvent = function(event) {
+ApplicationApprovedEventHandler.prototype.performEvent = function(
+  event,
+  offset
+) {
   console.log("[ACTUAL EVENT HANDLER] event received: application approved");
-  queryHandler.approveApplication(event.payload);
+  queryHandler.approveApplication(event.payload, offset);
 
   // create new commands
   let commands = [];

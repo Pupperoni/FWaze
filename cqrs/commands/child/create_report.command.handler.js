@@ -25,6 +25,7 @@ ReportCreatedCommandHandler.prototype.getAggregate = function(id) {
 };
 
 ReportCreatedCommandHandler.prototype.validate = function(payload) {
+  console.log(payload);
   // validate data sent here
   let valid = true;
   let reasons = [];

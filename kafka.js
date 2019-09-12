@@ -82,7 +82,14 @@ const broker = {
   eventSubscribe(callback) {
     // when consumer receives a message, pass it to event handler
     kafkaEndPoints.eventConsumerGroup.on("message", message => {
-      callback(message).then(() => {
+      let payload = JSON.parse(message.value);
+      let offset = payload.offset;
+      delete payload.offset;
+      console.log(
+        "[BROKER] Message received from COMMAND HANDLER. Sending to Event Handler",
+        message
+      );
+      callback(payload, offset).then(() => {
         kafkaEndPoints.eventConsumerGroup.commit((err, data) => {
           // console.log("Committing...");
           console.log("[BROKER] Committing to fwaze_event");
@@ -93,11 +100,21 @@ const broker = {
 
   eventSocketsSubscribe(callback) {
     kafkaEndPoints.eventConsumerGroup.on("message", message => {
-      callback(message);
+      let payload = JSON.parse(message.value);
+      let offset = payload.offset;
+      delete payload.offset;
+      console.log(
+        "[BROKER] Message received from COMMAND HANDLER. Sending to Socket Handler",
+        message
+      );
+      callback(payload, offset);
     });
   },
 
-  publish: (topic, payload, aggregateID) => {
+  publish: (topic, payload, aggregateID, offset) => {
+    // Add offset to payload to extract later
+    payload.offset = offset;
+
     let messagesToBeSent = [
       {
         topic: topic,
@@ -105,6 +122,7 @@ const broker = {
         key: aggregateID
       }
     ];
+
     kafkaEndPoints.producer.send(messagesToBeSent, (err, results) => {
       console.log("[BROKER] Sent data", results);
     });

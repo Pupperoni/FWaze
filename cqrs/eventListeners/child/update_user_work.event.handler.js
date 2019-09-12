@@ -18,9 +18,9 @@ UpdateUserWorkEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.USER_WORK_UPDATED];
 };
 
-UpdateUserWorkEventHandler.prototype.performEvent = function(event) {
+UpdateUserWorkEventHandler.prototype.performEvent = function(event, offset) {
   console.log("[ACTUAL EVENT HANDLER] event received: user work updated");
-  queryHandler.setWorkAd(event.payload);
+  queryHandler.setWorkAd(event.payload, offset);
 
   // create new commands
   let commands = [];

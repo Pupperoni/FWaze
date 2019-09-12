@@ -16,9 +16,9 @@ AdCreatedEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.AD_CREATED];
 };
 
-AdCreatedEventHandler.prototype.performEvent = function(event) {
+AdCreatedEventHandler.prototype.performEvent = function(event, offset) {
   console.log("[ACTUAL EVENT HANDLER] event received: ad created");
-  queryHandler.createAd(event.payload);
+  queryHandler.createAd(event.payload, offset);
 
   // create new commands
   let commands = [];

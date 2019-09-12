@@ -18,9 +18,9 @@ CommentCreatedEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.REPORT_COMMENT_CREATED];
 };
 
-CommentCreatedEventHandler.prototype.performEvent = function(event) {
+CommentCreatedEventHandler.prototype.performEvent = function(event, offset) {
   console.log("[ACTUAL EVENT HANDLER] event received: comment created");
-  queryHandler.createComment(event.payload);
+  queryHandler.createComment(event.payload, offset);
 
   // create new commands
   let commands = [];

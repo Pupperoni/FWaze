@@ -14,7 +14,7 @@ const Handler = {
       });
   },
 
-  createAd(data) {
+  createAd(data, offset) {
     // Add to redis
     if (data.photoPath) {
       redis.hmset(
@@ -34,7 +34,9 @@ const Handler = {
         "location",
         data.location,
         "photoPath",
-        data.photoPath
+        data.photoPath,
+        "offset",
+        offset
       );
     } else {
       redis.hmset(
@@ -52,11 +54,11 @@ const Handler = {
         "latitude",
         data.latitude,
         "location",
-        data.location
+        data.location,
+        "offset",
+        offset
       );
     }
-
-    redis.sadd(`ads:${data.userId}`, data.id);
 
     return knex
       .raw("CALL CreateAd(?,?,?)", [data.id, data.longitude, data.latitude])

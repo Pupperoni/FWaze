@@ -12,7 +12,7 @@ const CommonEventHandler = {
     console.log(
       `[COMMON EVENT HANDLER] Performing event ${task.event.eventName}`
     );
-    CommonEventHandler.sendEvent(task.event).then(commands => {
+    CommonEventHandler.sendEvent(task.event, task.offset).then(commands => {
       // if there are additional commands, send them to common command handler
       commands.forEach(command => {
         console.log("[COMMON EVENT HANDLER] Doing", command.commandName);
@@ -20,8 +20,8 @@ const CommonEventHandler = {
         let payload = command.payload;
         CommonCommandHandler.sendCommand(payload, commandName);
       });
+      callback();
     });
-    callback();
   }),
 
   // save event handler instances
@@ -43,11 +43,11 @@ const CommonEventHandler = {
   },
 
   // send to actual event handlers
-  sendEvent(event) {
+  sendEvent(event, offset) {
     // get appropriate event handler
     return this.getEventHandler(event.eventName).then(eventHandler => {
       // run perform
-      return eventHandler.performEvent(event);
+      return eventHandler.performEvent(event, offset);
     });
   },
 
@@ -67,10 +67,10 @@ const CommonEventHandler = {
 console.log("[COMMON EVENT HANDLER] Initializing Common Event Handler");
 CommonEventHandler.initialzeEventHandlers();
 
-function enqueueEvent(event) {
+function enqueueEvent(event, offset) {
   return Promise.resolve(
     CommonEventHandler.eventQueue.push(
-      { event: event },
+      { event: event, offset: offset },
       // perform event
       function() {
         console.log("[COMMON EVENT HANDLER] Event done");
@@ -79,9 +79,8 @@ function enqueueEvent(event) {
   );
 }
 
-broker.eventSubscribe(message => {
-  let event = JSON.parse(message.value);
-  return enqueueEvent(event);
+broker.eventSubscribe((event, offset) => {
+  return enqueueEvent(event, offset);
 });
 
 module.exports = CommonEventHandler;

@@ -54,7 +54,8 @@ const Handler = {
   },
 
   // Set a home address for a user
-  setHomeAd(data) {
+  setHomeAd(data, offset) {
+    redis.hset(`user:${data.id}`, "offset", offset);
     redis.hmset(
       `user:${data.id}:home`,
       `latitude`,
@@ -75,7 +76,8 @@ const Handler = {
   },
 
   // Set a work address for a user
-  setWorkAd(data) {
+  setWorkAd(data, offset) {
+    redis.hset(`user:${data.id}`, "offset", offset);
     redis.hmset(
       `user:${data.id}:work`,
       `latitude`,
@@ -96,7 +98,8 @@ const Handler = {
   },
 
   // Add a route to favorites
-  createFaveRoute(data) {
+  createFaveRoute(data, offset) {
+    redis.hset(`user:${data.id}`, "offset", offset);
     return knex
       .raw("CALL CreateFaveRoute(?,?,?,?,?,?,?,?,?)", [
         data.routeId,
@@ -118,7 +121,8 @@ const Handler = {
   },
 
   // Add a route to favorites
-  deleteFaveRoute(data) {
+  deleteFaveRoute(data, offset) {
+    redis.hset(`user:${data.id}`, "offset", offset);
     return knex
       .raw("CALL DeleteFaveRoute(?)", [data.routeId])
       .then(row => {
@@ -142,7 +146,7 @@ const Handler = {
   },
 
   // Insert new user to 'users'
-  createUser(data) {
+  createUser(data, offset) {
     redis
       .hmset(
         `user:${data.id}`,
@@ -155,7 +159,9 @@ const Handler = {
         `password`,
         data.password,
         `role`,
-        data.role
+        data.role,
+        "offset",
+        offset
       )
       .then(() => {
         // To access a user by his name, we store his id somewhere
@@ -198,7 +204,7 @@ const Handler = {
   },
 
   // Update user details
-  updateUser(data) {
+  updateUser(data, offset) {
     // Update redis data
     if (data.name) {
       // delete old name checker
@@ -228,6 +234,9 @@ const Handler = {
 
     if (data.avatarPath)
       redis.hset(`user:${data.id}`, `avatarPath`, data.avatarPath);
+
+    redis.hset(`user:${data.id}`, "offset", offset);
+
     // Update MySQL data
     if (data.name && data.email) {
       return knex

@@ -4,6 +4,26 @@ const CONSTANTS = require("../../constants");
 const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
+
+let scanCursor = 0;
+
+function findKey(id) {
+  console.log("Current cursor:", scanCursor);
+
+  return Promise.resolve(
+    redis.scan(scanCursor, "match", `ad:*:${id}`).then(results => {
+      // update the cursor
+      scanCursor = results[0];
+      // the key has been found!
+      if (results[1].length > 0) {
+        return results[1];
+      } else {
+        return findKey(id);
+      }
+    })
+  );
+}
+
 const Handler = {
   //
   //  Query responsibility
@@ -23,10 +43,12 @@ const Handler = {
 
   // Get ad by ad id
   getAdById(req, res, next) {
-    redis
-      .scan(0, "match", `report:*:${req.params.id}`)
-      .then(results => {
-        let key = results[1];
+    console.log(scanCursor);
+
+    // scan to get keys
+    findKey(req.params.id)
+      .then(key => {
+        console.log(key);
         return redis.hgetall(key);
       })
       .then(result => {
@@ -115,7 +137,7 @@ const Handler = {
       file: req.file
     };
 
-    payload.aggregateId = payload.id;
+    payload.aggregateID = payload.id;
 
     // commandHandler
     //   .adCreated(req.body, req.file)

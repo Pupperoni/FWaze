@@ -16,9 +16,9 @@ UserUpdatedEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.USER_UPDATED];
 };
 
-UserUpdatedEventHandler.prototype.performEvent = function(event) {
+UserUpdatedEventHandler.prototype.performEvent = function(event, offset) {
   console.log("[ACTUAL EVENT HANDLER] event received: user updated");
-  queryHandler.updateUser(event.payload);
+  queryHandler.updateUser(event.payload, offset);
 
   // create new commands
   let commands = [];

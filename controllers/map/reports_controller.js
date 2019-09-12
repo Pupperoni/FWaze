@@ -5,6 +5,8 @@ const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
+let scanCursor = 0;
+
 const reportTypes = {
   traffic_jam: 0,
   heavy_traffic_jam: 1,
@@ -16,6 +18,24 @@ const reportTypes = {
   major_accident: 7,
   others: 8
 };
+
+function findKey(id) {
+  console.log("Current cursor:", scanCursor);
+
+  return Promise.resolve(
+    redis.scan(scanCursor, "match", `report:*:${id}`).then(results => {
+      // update the cursor
+      scanCursor = results[0];
+      // the key has been found!
+      if (results[1].length > 0) {
+        return results[1];
+      } else {
+        // look for the key again
+        return findKey(id);
+      }
+    })
+  );
+}
 
 const Handler = {
   //
@@ -37,10 +57,9 @@ const Handler = {
   // Get report by report id
   getReportById(req, res, next) {
     // scan to get keys
-    redis
-      .scan(0, "match", `report:*:${req.params.id}`)
-      .then(results => {
-        let key = results[1];
+    findKey(req.params.id)
+      .then(key => {
+        console.log(key);
         return redis.hgetall(key);
       })
       .then(result => {

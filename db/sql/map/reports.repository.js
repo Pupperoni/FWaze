@@ -2,29 +2,52 @@ const knex = require("../../knex");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
+let scanCursor = 0;
+
+function findKey(id) {
+  console.log("Current cursor:", scanCursor);
+
+  return Promise.resolve(
+    redis.scan(scanCursor, "match", `report:*:${id}`).then(results => {
+      // update the cursor
+      scanCursor = results[0];
+      // the key has been found!
+      if (results[1].length > 0) {
+        return results[1];
+      } else {
+        // look for the key again
+        return findKey(id);
+      }
+    })
+  );
+}
 const Handler = {
-  createReport(data) {
+  createReport(data, offset) {
     // Add to redis
     if (data.photoPath) {
-      redis.hmset(
-        `report:${data.userId}:${data.id}`,
-        `id`,
-        data.id,
-        `userId`,
-        data.userId,
-        `userName`,
-        data.userName,
-        `longitude`,
-        data.longitude,
-        `latitude`,
-        data.latitude,
-        `location`,
-        data.location,
-        `type`,
-        data.type,
-        "photoPath",
-        data.photoPath
-      );
+      redis
+        .hmset(
+          `report:${data.userId}:${data.id}`,
+          `id`,
+          data.id,
+          `userId`,
+          data.userId,
+          `userName`,
+          data.userName,
+          `longitude`,
+          data.longitude,
+          `latitude`,
+          data.latitude,
+          `location`,
+          data.location,
+          `type`,
+          data.type,
+          "photoPath",
+          data.photoPath,
+          "offset",
+          offset
+        )
+        .then(console.log);
     } else {
       redis.hmset(
         `report:${data.userId}:${data.id}`,
@@ -41,7 +64,9 @@ const Handler = {
         `location`,
         data.location,
         `type`,
-        data.type
+        data.type,
+        "offset",
+        offset
       );
     }
 
@@ -60,7 +85,10 @@ const Handler = {
       });
   },
 
-  addVote(data) {
+  addVote(data, offset) {
+    findKey(data.id).then(key => {
+      redis.hset(key, "offset", offset);
+    });
     redis.sadd(`user:${data.userId}:upvoting`, data.id);
     redis.sadd(`report:${data.id}:upvoters`, data.userId);
     return knex
@@ -73,7 +101,10 @@ const Handler = {
       });
   },
 
-  removeVote(data) {
+  removeVote(data, offset) {
+    findKey(data.id).then(key => {
+      redis.hset(key, "offset", offset);
+    });
     redis.srem(`user:${data.userId}:upvoting`, data.id);
     redis.srem(`report:${data.id}:upvoters`, data.userId);
     return knex

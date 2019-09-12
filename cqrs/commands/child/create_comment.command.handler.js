@@ -52,8 +52,8 @@ CommentCreatedCommandHandler.prototype.validate = function(payload) {
     });
 
   return Promise.all([reportCheck, userCheck]).then(results => {
-    if (valid) Promise.resolve(valid);
-    else Promise.reject(reasons);
+    if (valid) return Promise.resolve(valid);
+    else return Promise.reject(reasons);
   });
 };
 

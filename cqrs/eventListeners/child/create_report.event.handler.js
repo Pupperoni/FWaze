@@ -16,9 +16,9 @@ ReportCreatedEventHandler.prototype.getEvents = function() {
   return [CONSTANTS.EVENTS.REPORT_CREATED];
 };
 
-ReportCreatedEventHandler.prototype.performEvent = function(event) {
+ReportCreatedEventHandler.prototype.performEvent = function(event, offset) {
   console.log("[ACTUAL EVENT HANDLER] event received: report created");
-  queryHandler.createReport(event.payload);
+  queryHandler.createReport(event.payload, offset);
 
   // create new commands
   let commands = [];
