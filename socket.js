@@ -5,6 +5,9 @@ const socket = require("socket.io");
 const broker = require("./kafka");
 const CONSTANTS = require("./constants");
 
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
+
 /**
  * Create HTTP server.
  */
@@ -19,10 +22,13 @@ const eventsNameSpace = io.of("/events");
 
 broker.eventSocketsSubscribe((event, offset) => {
   let room = `${event.aggregateName} ${event.aggregateID}`;
+  // Save event to socket store
+  console.log("[SOCKET HANDLER] Saving event", room, "to socket store");
+  redis.zadd(room, offset, JSON.stringify(event));
 
   if (
     event.eventName === CONSTANTS.EVENTS.REPORT_CREATED ||
-    event.eventName === CONSTANTS.EVENTS.AD_CREATED
+    event.eventName == CONSTANTS.EVENTS.AD_CREATED
   ) {
     // users viewing map must receive new reports and ads
     room = "map viewers";
@@ -30,12 +36,11 @@ broker.eventSocketsSubscribe((event, offset) => {
     // users that are admins must receive new applications
     room = "admins";
   }
-
   event.payload.offset = offset;
 
   console.log("[SOCKET HANDLER] Sending to client at room", room);
   // emit to client
-  eventsNameSpace.to(room).emit(event.eventName, event.payload);
+  eventsNameSpace.to(room).emit("event_received", event);
 });
 
 eventsNameSpace.on("connection", socket => {
@@ -51,28 +56,45 @@ eventsNameSpace.on("connection", socket => {
     if (data.role == 2) socket.join("admins");
   });
 
-  // login
-  socket.on("login", data => {
-    console.log("[SOCKET HANDLER] User logging in");
-    // when a user logs in, he joins a private room with himself
-    socket.join(
-      `${CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME} ${data.id}`,
-      () => {
-        if (data.role == 2) {
-          socket.join("admins");
-        }
-      }
-    );
-  });
-
   socket.on("subscribe", data => {
-    console.log("[SOCKET HANDLER] Client joined", data);
-    socket.join(data);
+    let room = `${data.aggregateName} ${data.id}`;
+    console.log("[SOCKET HANDLER] Client joined", room);
+    socket.join(room);
+
+    // if client is admin, join admins room
+    if (data.aggregateName === CONSTANTS.AGGREGATES.USER_AGGREGATE_NAME) {
+      // admin
+      if (data.role === 2) {
+        console.log("[SOCKET HANDLER] Joined admins");
+        socket.join("admins");
+      }
+    }
+
+    // Retrieve events after offset from socket store
+    console.log("[SOCKET HANDLER] Current offset received:", data.offset);
+
+    if (data.offset !== null) {
+      let offset = parseInt(data.offset) + 1;
+      // Set offset to 0 for testing
+      // let offset = 0;
+
+      redis.zrangebyscore(room, offset, "+inf").then(events => {
+        // Send back each event to client using emit
+        events.forEach(event => {
+          let nextEvent = JSON.parse(event);
+          console.log("[SOCKET HANDLER] Sending event at offset", offset);
+          console.log("[SOCKET HANDLER]", nextEvent);
+          socket.emit("event_received", nextEvent);
+          offset++;
+        });
+      });
+    }
   });
 
   socket.on("unsubscribe", data => {
-    console.log("[SOCKET HANDLER] Client left", data);
-    socket.leave(data);
+    let room = `${data.aggregateName} ${data.id}`;
+    console.log("[SOCKET HANDLER] Client left", room);
+    socket.leave(room);
   });
 });
 
