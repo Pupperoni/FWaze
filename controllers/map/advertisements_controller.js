@@ -43,12 +43,9 @@ const Handler = {
 
   // Get ad by ad id
   getAdById(req, res, next) {
-    console.log(scanCursor);
-
     // scan to get keys
     findKey(req.params.id)
       .then(key => {
-        console.log(key);
         return redis.hgetall(key);
       })
       .then(result => {
@@ -100,10 +97,9 @@ const Handler = {
     let options = {
       root: "/usr/src/app/"
     };
-    redis
-      .scan(0, "match", `report:*:${req.params.id}`)
-      .then(results => {
-        let key = results[1];
+    // scan to get keys
+    findKey(req.params.id)
+      .then(key => {
         return redis.hgetall(key);
       })
       .then(ad => {

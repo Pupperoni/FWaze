@@ -2,9 +2,28 @@ const knex = require("../../knex");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
+let scanCursor = 0;
+
+function findKey(id) {
+  console.log("Current cursor:", scanCursor);
+
+  return Promise.resolve(
+    redis.scan(scanCursor, "match", `ad:*:${id}`).then(results => {
+      // update the cursor
+      scanCursor = results[0];
+      // the key has been found!
+      if (results[1].length > 0) {
+        return results[1];
+      } else {
+        return findKey(id);
+      }
+    })
+  );
+}
+
 const Handler = {
   // Fetch all user names and emails
-  getAllUsers(id) {
+  getAllUsers() {
     return knex
       .raw("CALL GetAllUsers()")
       .then(row => {
@@ -212,15 +231,19 @@ const Handler = {
       // set new name
       redis.hset(`user:${data.id}`, `name`, data.name);
       // Update reports
-      redis.scan(0, "match", `report:${data.id}:*`).then(results => {
-        let keys = results[1];
+      findKey(data.id).then(keys => {
         keys.forEach(key => {
           redis.hset(key, "userName", data.name);
         });
       });
+      // redis.scan(0, "match", `report:${data.id}:*`).then(results => {
+      //   let keys = results[1];
+      //   keys.forEach(key => {
+      //     redis.hset(key, "userName", data.name);
+      //   });
+      // });
       // Update ads
-      redis.scan(0, "match", `ad:${data.id}:*`).then(results => {
-        let keys = results[1];
+      findKey(data.id).then(keys => {
         keys.forEach(key => {
           redis.hset(key, "userName", data.name);
         });

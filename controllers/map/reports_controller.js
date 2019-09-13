@@ -195,10 +195,8 @@ const Handler = {
     let options = {
       root: "/usr/src/app/"
     };
-    redis
-      .scan(0, "match", `report:*:${req.params.id}`)
-      .then(results => {
-        let key = results[1];
+    findKey(req.params.id)
+      .then(key => {
         return redis.hgetall(key);
       })
       .then(report => {
