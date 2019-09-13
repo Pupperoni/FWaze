@@ -15,7 +15,11 @@ const CommonEventHandler = {
     CommonEventHandler.sendEvent(task.event, task.offset).then(commands => {
       // if there are additional commands, send them to common command handler
       commands.forEach(command => {
-        console.log("[COMMON EVENT HANDLER] Doing", command.commandName);
+        console.log(
+          "[COMMON EVENT HANDLER] Sending",
+          command.commandName,
+          " to Command Handler"
+        );
         let commandName = command.commandName;
         let payload = command.payload;
         CommonCommandHandler.sendCommand(payload, commandName);
