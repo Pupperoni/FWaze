@@ -73,7 +73,7 @@ const broker = {
         // commit (assuming everything goes smoothly)
         kafkaEndPoints.commandConsumerGroup.commit((err, data) => {
           // console.log("Committing...");
-          console.log("[BROKER] Committing to fwaze_command");
+          console.log("[BROKER] Committing to", CONSTANTS.TOPICS.COMMAND);
         });
       });
     });
@@ -92,7 +92,7 @@ const broker = {
       callback(payload, offset).then(() => {
         kafkaEndPoints.eventConsumerGroup.commit((err, data) => {
           // console.log("Committing...");
-          console.log("[BROKER] Committing to fwaze_event");
+          console.log("[BROKER] Committing to", CONSTANTS.TOPICS.EVENT);
         });
       });
     });
