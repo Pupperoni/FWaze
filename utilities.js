@@ -2,96 +2,115 @@ const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
 module.exports = {
-  cursor: 0,
-
-  findAdQueryKey(id) {
-    console.log("[UTILITIES] Current cursor:", this.cursor);
+  findAdQueryKey(id, cursor) {
+    if (typeof cursor === "undefined") {
+      cursor = 0;
+    }
+    console.log("[UTILITIES] Current cursor:", cursor);
     return Promise.resolve(
-      redis.scan(this.cursor, "match", `ad:*:${id}`).then(results => {
+      redis.scan(cursor, "match", `ad:*:${id}`).then(results => {
         // update the cursor
-        this.cursor = results[0];
+        cursor = results[0];
         // the key has been found!
         if (results[1].length > 0) {
           console.log("[UTILITIES] Key found", results[1]);
           return results[1];
         }
         // entire scan completed but key not found
-        // else if (this.adQueryCursor === 0) {
-        //   console.log("[UTILITIES] Key not found");
-        //   return null;
-        // }
-        else {
-          return this.findAdQueryKey(id);
+        else if (cursor === 0 || cursor === "0") {
+          console.log("[UTILITIES] Key not found");
+          return null;
+        } else {
+          return this.findAdQueryKey(id, cursor);
         }
       })
     );
   },
 
-  findReportQueryKey(id) {
-    console.log("[UTILITIES] Current cursor:", this.cursor);
+  findReportQueryKey(id, cursor) {
+    if (typeof cursor === "undefined") {
+      cursor = 0;
+    }
+    console.log("[UTILITIES] Current cursor:", cursor);
     return Promise.resolve(
-      redis.scan(this.cursor, "match", `report:*:${id}`).then(results => {
+      redis.scan(cursor, "match", `report:*:${id}`).then(results => {
         // update the cursor
-        this.cursor = results[0];
+        cursor = results[0];
         // the key has been found!
         if (results[1].length > 0) {
           console.log("[UTILITIES] Key found", results[1]);
           return results[1];
         }
         // entire scan completed but key not found
-        // else if (this.cursor === 0) {
-        //   console.log("[UTILITIES] Key not found");
-        //   return null;
-        // }
-        else {
+        else if (cursor === 0 || cursor === "0") {
+          console.log("[UTILITIES] Key not found");
+          return null;
+        } else {
           // look for the key again
-          return this.findReportQueryKey(id);
+          return this.findReportQueryKey(id, cursor);
         }
       })
     );
   },
 
-  findReportUserKey(id) {
-    console.log("[UTILITIES] Current cursor:", this.cursor);
+  findReportUserKey(id, cursor, keys) {
+    let keyList = [];
+    if (typeof cursor === "undefined") {
+      cursor = 0;
+    } else {
+      keyList = keys;
+    }
+    console.log("[UTILITIES] Current cursor:", cursor);
     return Promise.resolve(
-      redis.scan(this.cursor, "match", `report:${id}:*`).then(results => {
+      redis.scan(cursor, "match", `report:${id}:*`).then(results => {
         // update the cursor
-        this.cursor = results[0];
-        // the key has been found!
+        cursor = results[0];
+        // a key has been found!
         if (results[1].length > 0) {
-          console.log("[UTILITIES] Key found", results[1]);
-          return results[1];
-        } // entire scan completed but key not found
-        // else if (this.cursor === 0) {
-        //   console.log("[UTILITIES] Key not found");
-        //   return null;
-        // }
-        else {
+          // console.log("[UTILITIES] Key(s) found", results[1]);
+          results[1].forEach(key => {
+            keyList.push(key);
+          });
+        } // entire scan completed
+        if (cursor === 0 || cursor === "0") {
+          console.log(
+            `[UTILITIES] Key(s) found matching report:${id}:*`,
+            keyList
+          );
+          return keyList;
+        } else {
           // look for the key again
-          return this.findReportUserKey(id);
+          return this.findReportUserKey(id, cursor, keyList);
         }
       })
     );
   },
 
-  findAdUserKey(id) {
-    console.log("[UTILITIES] Current cursor:", this.cursor);
+  findAdUserKey(id, cursor, keys) {
+    let keyList = [];
+    if (typeof cursor === "undefined") {
+      cursor = 0;
+    } else {
+      keyList = keys;
+    }
+    console.log("[UTILITIES] Current cursor:", cursor);
     return Promise.resolve(
-      redis.scan(this.cursor, "match", `report:${id}:*`).then(results => {
+      redis.scan(cursor, "match", `ad:${id}:*`).then(results => {
         // update the cursor
-        this.cursor = results[0];
-        // the key has been found!
+        cursor = results[0];
+        // a key has been found!
         if (results[1].length > 0) {
-          console.log("[UTILITIES] Key found", results[1]);
-          return results[1];
-        } // entire scan completed but key not found
-        // else if (this.cursor === 0) {
-        //   console.log("[UTILITIES] Key not found");
-        //   return null;
-        // }
-        else {
+          // console.log("[UTILITIES] Key(s) found", results[1]);
+          results[1].forEach(key => {
+            keyList.push(key);
+          });
+        } // entire scan completed
+        if (cursor === 0 || cursor === "0") {
+          console.log(`[UTILITIES] Key(s) found matching ad:${id}:*`, keyList);
+          return keyList;
+        } else {
           // look for the key again
-          return this.findAdUserKey(id);
+          return this.findAdUserKey(id, cursor, keyList);
         }
       })
     );
