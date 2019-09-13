@@ -9,8 +9,8 @@ const Handler = {
       `application:${data.id}`,
       `userId`,
       data.userId,
-      `userName`,
-      data.userName,
+      // `userName`,
+      // data.userName,
       `status`,
       0,
       `timestamp`,
@@ -60,7 +60,7 @@ const Handler = {
   },
 
   // Get all pending applications
-  approveApplication(data) {
+  approveApplication(data, offset) {
     redis.hmset(`application:${data.userId}`, `status`, 1);
     redis.hset(`user:${data.userId}`, "offset", offset);
 
@@ -76,7 +76,7 @@ const Handler = {
   },
 
   // Get all pending applications
-  rejectApplication(data) {
+  rejectApplication(data, offset) {
     redis.hmset(`application:${data.userId}`, `status`, -1);
     redis.hset(`user:${data.userId}`, "offset", offset);
     redis.del(`user:${data.userId}:application`);
