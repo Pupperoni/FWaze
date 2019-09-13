@@ -1,26 +1,8 @@
 const knex = require("../../knex");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
+const finder = require("../../../utilities");
 
-let scanCursor = 0;
-
-function findKey(id) {
-  console.log("Current cursor:", scanCursor);
-
-  return Promise.resolve(
-    redis.scan(scanCursor, "match", `report:*:${id}`).then(results => {
-      // update the cursor
-      scanCursor = results[0];
-      // the key has been found!
-      if (results[1].length > 0) {
-        return results[1];
-      } else {
-        // look for the key again
-        return findKey(id);
-      }
-    })
-  );
-}
 const Handler = {
   createReport(data, offset) {
     // Add to redis
@@ -84,7 +66,7 @@ const Handler = {
   },
 
   addVote(data, offset) {
-    findKey(data.id).then(key => {
+    finder.findReportQueryKey(data.id).then(key => {
       redis.hset(key, "offset", offset);
     });
     redis.sadd(`user:${data.userId}:upvoting`, data.id);
@@ -100,7 +82,7 @@ const Handler = {
   },
 
   removeVote(data, offset) {
-    findKey(data.id).then(key => {
+    finder.findReportQueryKey(data.id).then(key => {
       redis.hset(key, "offset", offset);
     });
     redis.srem(`user:${data.userId}:upvoting`, data.id);

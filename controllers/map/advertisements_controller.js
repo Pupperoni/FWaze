@@ -4,25 +4,7 @@ const CONSTANTS = require("../../constants");
 const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-
-let scanCursor = 0;
-
-function findKey(id) {
-  console.log("Current cursor:", scanCursor);
-
-  return Promise.resolve(
-    redis.scan(scanCursor, "match", `ad:*:${id}`).then(results => {
-      // update the cursor
-      scanCursor = results[0];
-      // the key has been found!
-      if (results[1].length > 0) {
-        return results[1];
-      } else {
-        return findKey(id);
-      }
-    })
-  );
-}
+const finder = require("../../utilities");
 
 const Handler = {
   //
@@ -44,7 +26,8 @@ const Handler = {
   // Get ad by ad id
   getAdById(req, res, next) {
     // scan to get keys
-    findKey(req.params.id)
+    finder
+      .findAdQueryKey(req.params.id)
       .then(key => {
         return redis.hgetall(key);
       })
@@ -98,7 +81,8 @@ const Handler = {
       root: "/usr/src/app/"
     };
     // scan to get keys
-    findKey(req.params.id)
+    finder
+      .findAdQueryKey(req.params.id)
       .then(key => {
         return redis.hgetall(key);
       })

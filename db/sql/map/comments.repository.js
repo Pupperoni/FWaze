@@ -1,29 +1,11 @@
 const knex = require("../../knex");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-let scanCursor = 0;
-
-function findKey(id) {
-  console.log("Current cursor:", scanCursor);
-
-  return Promise.resolve(
-    redis.scan(scanCursor, "match", `report:*:${id}`).then(results => {
-      // update the cursor
-      scanCursor = results[0];
-      // the key has been found!
-      if (results[1].length > 0) {
-        return results[1];
-      } else {
-        // look for the key again
-        return findKey(id);
-      }
-    })
-  );
-}
+let finder = require("../../../utilities");
 
 const Handler = {
   createComment(commentData, offset) {
-    findKey(commentData.reportId).then(key => {
+    finder.findReportQueryKey(commentData.reportId).then(key => {
       redis.hset(key, "offset", offset);
     });
 
