@@ -1,7 +1,7 @@
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
 
-module.exports = {
+module.exports.keys = {
   findAdQueryKey(id, cursor) {
     if (typeof cursor === "undefined") {
       cursor = 0;
@@ -114,5 +114,12 @@ module.exports = {
         }
       })
     );
+  }
+};
+
+module.exports.validators = {
+  validateEmail(email) {
+    let re = /\S+@\S+/;
+    return re.test(email);
   }
 };

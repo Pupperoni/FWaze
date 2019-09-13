@@ -2,11 +2,7 @@ const BaseCommandHandler = require("../base/base.command.handler");
 const shortid = require("shortid");
 const CONSTANTS = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
-
-function validateEmail(email) {
-  let re = /\S+@\S+/;
-  return re.test(email);
-}
+const validator = require("../../../utilities").validators;
 
 function UserUpdatedCommandHandler() {}
 
@@ -38,7 +34,7 @@ UserUpdatedCommandHandler.prototype.validate = function(payload) {
   let reasons = [];
   // email valid?
 
-  if (payload.email && !validateEmail(payload.email)) {
+  if (payload.email && !validator.validateEmail(payload.email)) {
     valid = false;
     reasons.push(CONSTANTS.ERRORS.EMAIL_INVALID_FORMAT);
   }

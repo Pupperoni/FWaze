@@ -1,7 +1,7 @@
 const knex = require("../../knex");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-let finder = require("../../../utilities");
+let finder = require("../../../utilities").keys;
 
 const Handler = {
   createComment(commentData, offset) {

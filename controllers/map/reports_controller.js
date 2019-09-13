@@ -4,7 +4,7 @@ const CommonCommandHandler = require("../../cqrs/commands/base/common.command.ha
 const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-const finder = require("../../utilities");
+const finder = require("../../utilities").keys;
 
 const reportTypes = {
   traffic_jam: 0,

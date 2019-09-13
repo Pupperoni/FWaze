@@ -3,11 +3,7 @@ const shortid = require("shortid");
 const bcrypt = require("bcryptjs");
 const CONSTANTS = require("../../../constants");
 const aggregate = require("../../aggregateHelpers/users/users.aggregate");
-
-function validateEmail(email) {
-  let re = /\S+@\S+/;
-  return re.test(email);
-}
+const validator = require("../../../utilities").validators;
 
 function UserCreatedCommandHandler() {}
 
@@ -40,7 +36,7 @@ UserCreatedCommandHandler.prototype.validate = function(payload) {
   }
 
   // email valid?
-  if (!validateEmail(payload.email)) {
+  if (!validator.validateEmail(payload.email)) {
     valid = false;
     reasons.push(CONSTANTS.ERRORS.EMAIL_INVALID_FORMAT);
   }

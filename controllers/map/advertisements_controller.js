@@ -4,7 +4,7 @@ const CONSTANTS = require("../../constants");
 const shortid = require("shortid");
 const Redis = require("ioredis");
 const redis = new Redis(process.env.REDIS_URL);
-const finder = require("../../utilities");
+const finder = require("../../utilities").keys;
 
 const Handler = {
   //
