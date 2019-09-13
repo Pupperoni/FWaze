@@ -25,29 +25,27 @@ const Handler = {
   createReport(data, offset) {
     // Add to redis
     if (data.photoPath) {
-      redis
-        .hmset(
-          `report:${data.userId}:${data.id}`,
-          `id`,
-          data.id,
-          `userId`,
-          data.userId,
-          `userName`,
-          data.userName,
-          `longitude`,
-          data.longitude,
-          `latitude`,
-          data.latitude,
-          `location`,
-          data.location,
-          `type`,
-          data.type,
-          "photoPath",
-          data.photoPath,
-          "offset",
-          offset
-        )
-        .then(console.log);
+      redis.hmset(
+        `report:${data.userId}:${data.id}`,
+        `id`,
+        data.id,
+        `userId`,
+        data.userId,
+        `userName`,
+        data.userName,
+        `longitude`,
+        data.longitude,
+        `latitude`,
+        data.latitude,
+        `location`,
+        data.location,
+        `type`,
+        data.type,
+        "photoPath",
+        data.photoPath,
+        "offset",
+        offset
+      );
     } else {
       redis.hmset(
         `report:${data.userId}:${data.id}`,

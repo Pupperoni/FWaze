@@ -7,7 +7,8 @@ CREATE TABLE advertiser_applications(
     `user_name` VARCHAR(255) NOT NULL,
     `status` INT NOT NULL DEFAULT 0,
     `created_at` timestamp ,
-    PRIMARY KEY(`id`)
+    PRIMARY KEY(`id`),
+    FOREIGN KEY(`user_name`) references `users`(`name`) ON UPDATE CASCADE
 );
 
 -- Add stored procedures
